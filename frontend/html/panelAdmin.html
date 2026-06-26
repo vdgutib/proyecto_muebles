@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel Administrativo de Muebles LB - Herramienta de Despiece">
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
+    <link rel="stylesheet" href="../css/panelAdmin.css" type="text/css">
+    <title>Panel Administrativo | Muebles LB</title>
+</head>
+
+<body>
+
+    <div class="admin-container">
+        
+        <h1 class="title">Panel Administrativo</h1>
+        
+        <main class="admin-dashboard-box">
+            
+            <header class="admin-header">
+                <h2 class="subtitle">Panel de Administración</h2>
+            </header>
+
+            <div class="admin-content">
+                
+                <section class="admin-left-panel">
+                    <button class="btn-admin" id="btn-subir-excel">
+                        <i></i>
+                        Subir Excel
+                    </button>
+                </section>
+
+                <section class="admin-right-panel">
+                    <h3 class="tool-heading">Herramienta de Despiece</h3>
+                    
+                    <div class="tool-form-card">
+                        <form class="despiece-form" id="form-despiece">
+                            
+                            <div class="form-row">
+                                <label for="input-alto">Alto:</label>
+                                <input type="number" id="input-alto" name="alto" class="input-form"  required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="input-ancho">Ancho:</label>
+                                <input type="number" id="input-ancho" name="ancho" class="input-form" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="input-profundidad">Profundidad:</label>
+                                <input type="number" id="input-profundidad" name="profundidad" class="input-form" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="input-grosor">Grosor:</label>
+                                <input type="number" id="input-grosor" name="grosor" class="input-form" required>
+                            </div>
+
+                            <div class="form-actions">
+                                <a type="submit" class="btn-admin">Calcular</a>
+                            </div>
+
+                        </form>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+</body>
+</html>

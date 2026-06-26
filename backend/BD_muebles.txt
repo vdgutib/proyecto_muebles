@@ -1,0 +1,95 @@
+CREATE DATABASE IF NOT EXISTS tienda_muebles;
+USE tienda_muebles;
+
+CREATE TABLE administrador (
+    id_admin INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE inventario (
+    id_inventario INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id_admin INT
+);
+
+CREATE TABLE categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_categoria VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE muebles (
+    id_mueble INT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(50) UNIQUE NOT NULL,
+    nombre VARCHAR(150) NOT NULL,
+    imagen VARCHAR(255),
+    medidas VARCHAR(255),       
+    precio_costo INT NOT NULL, 
+    precio_venta INT,          
+    peso_kg DECIMAL(5,2),       
+    bultos INT DEFAULT 1,
+    observaciones VARCHAR(255),
+    id_categoria INT
+);
+
+CREATE TABLE consultas (
+    id_consulta INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_cliente VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20) NOT NULL,
+    correo VARCHAR(100),
+    mensaje TEXT,
+    id_mueble INT,
+    fecha_consulta TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE calculos_medidas (
+    id_calculo INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion_mueble VARCHAR(150) NOT NULL,
+    alto_base DECIMAL(6,2) NOT NULL,
+    ancho_base DECIMAL(6,2) NOT NULL,
+    profundidad_base DECIMAL(6,2) NOT NULL,
+    grosor_melamina_mm DECIMAL(4,2) NOT NULL,
+    fecha_calculo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_admin INT
+);
+
+CREATE TABLE detalle_calculo (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    id_calculo INT,
+    nombre_pieza VARCHAR(100) NOT NULL,
+    cantidad INT NOT NULL,
+    largo_mm DECIMAL(6,1) NOT NULL,
+    ancho_mm DECIMAL(6,1) NOT NULL
+);
+
+
+ALTER TABLE inventario
+ADD CONSTRAINT fk_inventario_admin 
+FOREIGN KEY (id_admin) REFERENCES administrador(id_admin) ON DELETE SET NULL;
+
+ALTER TABLE muebles
+ADD CONSTRAINT fk_muebles_categoria 
+FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE SET NULL;
+
+ALTER TABLE consultas
+ADD CONSTRAINT fk_consultas_mueble 
+FOREIGN KEY (id_mueble) REFERENCES muebles(id_mueble) ON DELETE SET NULL;
+
+ALTER TABLE calculos_medidas
+ADD CONSTRAINT fk_calculos_admin 
+FOREIGN KEY (id_admin) REFERENCES administrador(id_admin) ON DELETE SET NULL;
+
+ALTER TABLE detalle_calculo
+ADD CONSTRAINT fk_detalle_calculo 
+FOREIGN KEY (id_calculo) REFERENCES calculos_medidas(id_calculo) ON DELETE CASCADE;
+
+INSERT INTO administrador VALUES('', 'admin', '123456');
+
+DELIMITER //
+CREATE TRIGGER calcular_precio_venta 
+BEFORE INSERT ON muebles
+FOR EACH ROW
+BEGIN
+    SET NEW.precio_venta = ROUND(NEW.precio_costo * 1.60);
+END; //
+DELIMITER ;

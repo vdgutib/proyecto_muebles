@@ -1,0 +1,202 @@
+.catalog-page-title {
+    color: var(--dark-amethyst-2);
+    font-size: 2rem;
+    font-weight: 800;
+    display: inline-block;
+    padding-bottom: 6px;
+    border-bottom: 3px solid var(--royal-violet);
+}
+
+.top-cat-btn {
+    background-color: #ffffff;
+    color: var(--indigo-ink);
+    border: 2px solid var(--wisteria-2);
+    padding: 9px 22px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.top-cat-btn:hover,
+.top-cat-btn.active {
+    background-color: var(--royal-violet);
+    border-color: var(--royal-violet);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(123, 44, 191, 0.25);
+}
+
+.catalog-section {
+    margin-bottom: 48px;
+}
+
+.section-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.catalog-section-label {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dark-amethyst-2);
+    margin: 0;
+    padding-left: 14px;
+    border-left: 4px solid var(--royal-violet);
+}
+
+.section-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-arrow {
+    background: #ffffff;
+    border: 2px solid var(--wisteria-2);
+    color: var(--royal-violet);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.nav-arrow:hover:not(:disabled) {
+    background: var(--royal-violet);
+    border-color: var(--royal-violet);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.nav-arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.nav-counter {
+    font-size: 0.78rem;
+    color: var(--indigo-ink);
+    font-weight: 600;
+    min-width: 68px;
+    text-align: center;
+    opacity: 0.75;
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.cat-card {
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #ede8f5;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(123, 44, 191, 0.12);
+}
+
+.cat-card-img {
+    overflow: hidden;
+}
+
+.cat-card-img img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.cat-card:hover .cat-card-img img {
+    transform: scale(1.05);
+}
+
+.servicio-img {
+    height: 140px;
+    background: linear-gradient(135deg, var(--dark-amethyst-2), var(--indigo-velvet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.cat-card-info {
+    padding: 14px 16px 16px;
+}
+
+.cat-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark-amethyst-2);
+    margin-bottom: 4px;
+}
+
+.cat-card-desc {
+    font-size: 0.82rem;
+    color: var(--indigo-ink);
+    opacity: 0.75;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.cat-card-price {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--royal-violet);
+}
+
+.btn-solicitar {
+    background-color: var(--dark-amethyst-2);
+    color: #ffffff;
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+}
+
+.btn-solicitar:hover {
+    background-color: var(--royal-violet);
+    color: #ffffff;
+    box-shadow: 0 6px 15px rgba(123, 44, 191, 0.3);
+}
+
+@media (max-width: 768px) {
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+}

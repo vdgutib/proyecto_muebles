@@ -1,0 +1,142 @@
+:root {
+    --thistle: #dec9e9ff;
+    --thistle-2: #dac3e8ff;
+    --wisteria: #d2b7e5ff;
+    --wisteria-2: #c19ee0ff;
+    --bright-lavender: #b185dbff;
+    --lavender-purple: #a06cd5ff;
+    --dark-amethyst: #10002bff;
+    --dark-amethyst-2: #240046ff;
+    --indigo-ink: #3c096cff;
+    --indigo-velvet: #5a189aff;
+    --royal-violet: #7b2cbfff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: #FAF8FD;
+    color: var(--dark-amethyst);
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+}
+
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.login-container {
+    border: 2px solid var(--wisteria-2);
+    border-radius: 32px;
+    width: 100%;
+    max-width: 1100px;
+    height: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.login-form {
+    flex: 1;
+    padding: 60px 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--dark-amethyst);
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 1.6rem;
+    font-weight: 500;
+    border-bottom: 1px solid var(--wisteria-2);
+    display: inline-block;
+    color: var(--dark-amethyst);
+    margin-bottom: 40px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--wisteria-2);
+    border-radius: 20px;
+    padding: 8px 18px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.input-group i {
+    color: #404040;
+    font-size: 1.2rem;
+    margin-right: 12px;
+}
+
+.input-group input {
+    border: none;
+    padding: 6px 0;
+    flex: 1;
+    color: var(--dark-amethyst);
+    font-size: 1rem;
+    background: transparent;
+}
+
+.input-group input:focus {
+    outline: none;
+}
+
+.span-pass {
+    font-size: 0.7rem;
+    color: #707070;
+    margin-top: -8px;
+    margin-bottom: 15px;
+    margin-left: 2px;
+    opacity: 0.8;
+}
+
+.btn-login {
+    background-color: var(--dark-amethyst);
+    color: #ffffff;
+    border: none;
+    padding: 12px 0;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-login:hover {
+    background-color: var(--dark-amethyst-2);
+}
+
+.login-image {
+    flex: 1;
+    background-image: url('../imagenes/imagenLogin.png');
+    background-size: cover;
+    background-position: right center;
+    position: relative;
+    z-index: 1;   
+}

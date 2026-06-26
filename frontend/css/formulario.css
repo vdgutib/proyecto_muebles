@@ -1,0 +1,75 @@
+
+.form-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    animation: fadeInUp 0.7s ease 0.1s both;
+}
+
+
+.form-card {
+    background: #ffffff;
+    border: 1.5px solid var(--wisteria);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 650px;
+    box-shadow: 0 15px 40px rgba(16, 0, 43, 0.08);
+    position: relative;
+}
+
+
+.form-custom-label {
+    font-family: 'Outfit', sans-serif;
+    color: var(--dark-amethyst-2);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+}
+
+
+.form-custom-input {
+    background-color: var(--thistle) !important;
+    color: var(--dark-amethyst-2) !important;
+    border: 1.5px solid transparent !important;
+    border-radius: 50px !important;
+    padding: 12px 20px !important;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+
+.form-custom-input.custom-textarea {
+    border-radius: 18px !important;
+    resize: vertical;
+}
+
+
+.form-custom-input:focus {
+    background-color: #ffffff !important;
+    border-color: var(--royal-violet) !important;
+    box-shadow: 0 0 0 4px rgba(123, 44, 191, 0.15) !important;
+    outline: none;
+}
+
+
+.form-custom-input::placeholder {
+    color: var(--lavender-purple);
+    opacity: 0.8;
+}
+
+
+@media (max-width: 768px) {
+    .form-section {
+        padding: 40px 20px;
+    }
+    
+    .form-card {
+        padding: 30px 20px;
+    }
+}
