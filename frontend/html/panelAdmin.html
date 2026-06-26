@@ -14,33 +14,42 @@
 <body>
 
     <div class="admin-container">
-        
+
         <h1 class="title">Panel Administrativo</h1>
-        
+
         <main class="admin-dashboard-box">
-            
+
             <header class="admin-header">
                 <h2 class="subtitle">Panel de Administración</h2>
             </header>
 
             <div class="admin-content">
-                
+
                 <section class="admin-left-panel">
                     <button class="btn-admin" id="btn-subir-excel">
-                        <i></i>
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
                         Subir Excel
                     </button>
+                    <button class="btn-admin" id="btn-subir-imagenes" style="margin-top: 15px; background-color: #6c757d; color: white;">
+                        <i class="bi bi-images me-2"></i>
+                        Subir Imágenes
+                    </button>
+                    <input type="file" id="file-excel" accept=".xlsx, .xls" style="display: none;">
+                    <input type="file" id="file-imagenes" accept="image/*" multiple style="display: none;">
+
+                    <div id="upload-status" class="mt-3"
+                        style="display:none; font-size: 0.9rem; padding: 10px; border-radius: 5px;"></div>
                 </section>
 
                 <section class="admin-right-panel">
                     <h3 class="tool-heading">Herramienta de Despiece</h3>
-                    
+
                     <div class="tool-form-card">
                         <form class="despiece-form" id="form-despiece">
-                            
+
                             <div class="form-row">
                                 <label for="input-alto">Alto:</label>
-                                <input type="number" id="input-alto" name="alto" class="input-form"  required>
+                                <input type="number" id="input-alto" name="alto" class="input-form" required>
                             </div>
 
                             <div class="form-row">
@@ -50,7 +59,8 @@
 
                             <div class="form-row">
                                 <label for="input-profundidad">Profundidad:</label>
-                                <input type="number" id="input-profundidad" name="profundidad" class="input-form" required>
+                                <input type="number" id="input-profundidad" name="profundidad" class="input-form"
+                                    required>
                             </div>
 
                             <div class="form-row">
@@ -70,6 +80,8 @@
         </main>
 
     </div>
-
+    <script src="../js/api.js"></script>
+    <script src="../js/panelAdmin.js"></script>
 </body>
+
 </html>
