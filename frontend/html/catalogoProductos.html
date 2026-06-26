@@ -43,250 +43,13 @@
                 </h1>
             </div>
 
-            <div class="d-flex justify-content-center gap-3 mb-5 flex-wrap">
-                <button class="top-cat-btn active" id="btn-todos" onclick="filtrarCategoria(this, 'todos')">
+            <div class="d-flex justify-content-center gap-3 mb-5 flex-wrap" id="category-filters">
+                <button class="top-cat-btn active" id="btn-todos" onclick="filtrarCategoria('todos')">
                     <i class="bi bi-grid-fill"></i> Todos
                 </button>
-                <button class="top-cat-btn" id="btn-compra" onclick="filtrarCategoria(this, 'compra')">
-                    <i class="bi bi-bag-heart-fill"></i> Muebles para compra
-                </button>
-                <button class="top-cat-btn" id="btn-servicios" onclick="filtrarCategoria(this, 'servicios')">
-                    <i class="bi bi-tools"></i> Servicios de armado
-                </button>
             </div>
 
-            <div class="catalog-section" id="seccion-externos">
-                <div class="section-top">
-                    <h2 class="catalog-section-label">
-                        <i class="bi bi-box-seam me-2"></i>Muebles externos
-                    </h2>
-                    <div class="section-nav" id="nav-externos">
-                        <button class="nav-arrow" id="prev-externos" onclick="navSection('externos', -1)"
-                            disabled aria-label="Anterior">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <span class="nav-counter" id="counter-externos"></span>
-                        <button class="nav-arrow" id="next-externos" onclick="navSection('externos', 1)"
-                            aria-label="Siguiente">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="catalog-grid" id="grid-externos">
-
-                    <div class="cat-card compra" id="card-sillon-terraza"
-                        onclick="abrirModal('Sillón Terraza', '$120.000', '120x80x70 cm', 'Muebles externos', '../imagenes/producto1.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto1.jpeg" alt="Sillón Terraza">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Sillón Terraza</h5>
-                            <p class="cat-card-desc">Ideal para patios y espacios exteriores.</p>
-                            <span class="cat-card-price">$120.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-mesa-exterior"
-                        onclick="abrirModal('Mesa Exterior', '$85.000', '90x90x75 cm', 'Muebles externos', '../imagenes/producto1.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto1.jpeg" alt="Mesa Exterior">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Mesa Exterior</h5>
-                            <p class="cat-card-desc">Madera tratada resistente a la intemperie.</p>
-                            <span class="cat-card-price">$85.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-silla-plegable"
-                        onclick="abrirModal('Silla Plegable', '$25.000', '45x45x80 cm', 'Muebles externos', '../imagenes/producto1.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto1.jpeg" alt="Silla Plegable">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Silla Plegable</h5>
-                            <p class="cat-card-desc">Liviana, fácil de guardar, muy resistente.</p>
-                            <span class="cat-card-price">$25.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-tumbona"
-                        onclick="abrirModal('Tumbona', '$150.000', '190x65x30 cm', 'Muebles externos', '../imagenes/producto1.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto1.jpeg" alt="Tumbona">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Tumbona</h5>
-                            <p class="cat-card-desc">Descanso al sol, estructura aluminio.</p>
-                            <span class="cat-card-price">$150.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-mesa-centro-ext"
-                        onclick="abrirModal('Mesa Centro Exterior', '$45.000', '60x60x40 cm', 'Muebles externos', '../imagenes/producto1.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto1.jpeg" alt="Mesa Centro Exterior">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Mesa Centro Exterior</h5>
-                            <p class="cat-card-desc">Estilo rústico, madera y fierro.</p>
-                            <span class="cat-card-price">$45.000</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="catalog-section" id="seccion-propios">
-                <div class="section-top">
-                    <h2 class="catalog-section-label">
-                        <i class="bi bi-house-heart me-2"></i>Muebles propios
-                    </h2>
-                    <div class="section-nav" id="nav-propios">
-                        <button class="nav-arrow" id="prev-propios" onclick="navSection('propios', -1)"
-                            disabled aria-label="Anterior">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <span class="nav-counter" id="counter-propios"></span>
-                        <button class="nav-arrow" id="next-propios" onclick="navSection('propios', 1)"
-                            aria-label="Siguiente">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="catalog-grid" id="grid-propios">
-
-                    <div class="cat-card compra" id="card-estante"
-                        onclick="abrirModal('Estante Minimalista', '$60.000', '80x30x180 cm', 'Muebles propios', '../imagenes/producto2.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto2.jpeg" alt="Estante Minimalista">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Estante Minimalista</h5>
-                            <p class="cat-card-desc">Para tu living, 5 niveles de madera.</p>
-                            <span class="cat-card-price">$60.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-escritorio-hogar"
-                        onclick="abrirModal('Escritorio Hogar', '$95.000', '120x60x75 cm', 'Muebles propios', '../imagenes/producto2.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto2.jpeg" alt="Escritorio Hogar">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Escritorio Hogar</h5>
-                            <p class="cat-card-desc">Trabaja cómodo desde casa, amplio y firme.</p>
-                            <span class="cat-card-price">$95.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-comoda"
-                        onclick="abrirModal('Cómoda 4 Cajones', '$110.000', '80x40x90 cm', 'Muebles propios', '../imagenes/producto2.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto2.jpeg" alt="Cómoda 4 Cajones">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Cómoda 4 Cajones</h5>
-                            <p class="cat-card-desc">Gran capacidad, diseño limpio y moderno.</p>
-                            <span class="cat-card-price">$110.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-velador"
-                        onclick="abrirModal('Velador Moderno', '$35.000', '40x40x50 cm', 'Muebles propios', '../imagenes/producto2.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto2.jpeg" alt="Velador Moderno">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Velador Moderno</h5>
-                            <p class="cat-card-desc">Diseño limpio, cajón interior incluido.</p>
-                            <span class="cat-card-price">$35.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card compra" id="card-repisa"
-                        onclick="abrirModal('Repisa Flotante', '$20.000', '60x20x5 cm', 'Muebles propios', '../imagenes/producto2.jpeg')">
-                        <div class="cat-card-img">
-                            <img src="../imagenes/producto2.jpeg" alt="Repisa Flotante">
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Repisa Flotante</h5>
-                            <p class="cat-card-desc">Ahorra espacio, fácil instalación en pared.</p>
-                            <span class="cat-card-price">$20.000</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="catalog-section" id="seccion-servicios">
-                <div class="section-top">
-                    <h2 class="catalog-section-label">
-                        <i class="bi bi-wrench-adjustable me-2"></i>Servicios de armado
-                    </h2>
-                    <div class="section-nav" id="nav-servicios">
-                        <button class="nav-arrow" id="prev-servicios" onclick="navSection('servicios', -1)"
-                            disabled aria-label="Anterior">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <span class="nav-counter" id="counter-servicios"></span>
-                        <button class="nav-arrow" id="next-servicios" onclick="navSection('servicios', 1)"
-                            aria-label="Siguiente">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="catalog-grid" id="grid-servicios">
-
-                    <div class="cat-card servicio" id="card-armado-ropero"
-                        onclick="abrirModal('Armado Ropero', '$40.000', 'N/A', 'Servicios de armado', '../imagenes/producto3.jpg')">
-                        <div class="cat-card-img servicio-img">
-                            <i class="bi bi-box-arrow-in-up-right"></i>
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Armado Ropero</h5>
-                            <p class="cat-card-desc">Rápidos, seguros y herramientas de calidad.</p>
-                            <span class="cat-card-price">$40.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card servicio" id="card-armado-cama"
-                        onclick="abrirModal('Armado Cama', '$30.000', 'N/A', 'Servicios de armado', '../imagenes/producto3.jpg')">
-                        <div class="cat-card-img servicio-img">
-                            <i class="bi bi-moon-stars"></i>
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Armado Cama</h5>
-                            <p class="cat-card-desc">Camas de 1 a 2 plazas, camarotes y más.</p>
-                            <span class="cat-card-price">$30.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card servicio" id="card-reparacion"
-                        onclick="abrirModal('Reparación Mueble', '$20.000', 'N/A', 'Servicios de armado', '../imagenes/producto3.jpg')">
-                        <div class="cat-card-img servicio-img">
-                            <i class="bi bi-wrench-adjustable-circle"></i>
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Reparación Mueble</h5>
-                            <p class="cat-card-desc">Bisagras, rieles, cajones y ajustes.</p>
-                            <span class="cat-card-price">$20.000</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card servicio" id="card-armado-escritorio"
-                        onclick="abrirModal('Armado Escritorio', '$25.000', 'N/A', 'Servicios de armado', '../imagenes/producto3.jpg')">
-                        <div class="cat-card-img servicio-img">
-                            <i class="bi bi-laptop"></i>
-                        </div>
-                        <div class="cat-card-info">
-                            <h5 class="cat-card-name">Armado Escritorio</h5>
-                            <p class="cat-card-desc">Escritorios de oficina, gamers y estudio.</p>
-                            <span class="cat-card-price">$25.000</span>
-                        </div>
-                    </div>
-
-                </div>
+            <div id="dynamic-catalog-container">
             </div>
 
         </div>
@@ -294,17 +57,14 @@
 
     <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content"
-                style="border-radius:18px;overflow:hidden;border:none;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
-                <div class="modal-header"
-                    style="background-color:var(--dark-amethyst-2);color:#fff;border-bottom:none;">
+            <div class="modal-content modal-custom-content">
+                <div class="modal-header modal-custom-header">
                     <h5 class="modal-title fw-bold" id="m-nombre">Nombre del Producto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                         aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body text-center p-4">
-                    <img id="m-imagen" src="" alt="Producto" class="img-fluid rounded mb-4"
-                        style="max-height:220px;width:100%;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                    <img id="m-imagen" src="" alt="Producto" class="img-fluid rounded mb-4 modal-custom-img">
                     <div class="d-flex justify-content-around mb-3 text-start bg-light p-3 rounded">
                         <div>
                             <small class="text-muted d-block">Categoría</small>
@@ -315,12 +75,10 @@
                             <span id="m-medidas" class="fw-bold"></span>
                         </div>
                     </div>
-                    <h3 class="fw-bold mt-2" style="color:var(--royal-violet);" id="m-precio">$0</h3>
+                    <h3 class="fw-bold mt-2 modal-custom-price" id="m-precio">$0</h3>
                 </div>
-                <div class="modal-footer justify-content-center p-3"
-                    style="border-top:none;background-color:#f8f9fa;">
-                    <a href="formulario.html" class="btn-solicitar w-100 justify-content-center py-2"
-                        style="font-size:1rem;">
+                <div class="modal-footer justify-content-center p-3 modal-custom-footer">
+                    <a href="formulario.html" class="btn-solicitar w-100 justify-content-center py-2 modal-custom-btn">
                         <i class="bi bi-send-check"></i> Solicitar este producto
                     </a>
                 </div>
@@ -341,6 +99,7 @@
     </footer>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/eventosCatalogo.js"></script>
 
 </body>
