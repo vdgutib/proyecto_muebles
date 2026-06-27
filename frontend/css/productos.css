@@ -120,12 +120,18 @@
 
 .cat-card-img {
     overflow: hidden;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 190px;
 }
 
 .cat-card-img img {
     width: 100%;
-    height: 170px;
-    object-fit: cover;
+    height: 100%;
+    object-fit: contain;
+    padding: 10px;
     display: block;
     transition: transform 0.4s ease;
 }
@@ -199,4 +205,39 @@
     .catalog-grid {
         grid-template-columns: 1fr;
     }
+}
+
+.modal-custom-content {
+    border-radius: 18px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-custom-header {
+    background-color: var(--dark-amethyst-2);
+    color: #fff;
+    border-bottom: none;
+}
+
+.modal-custom-img {
+    max-height: 220px;
+    width: 100%;
+    object-fit: contain;
+    background-color: #ffffff;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.modal-custom-price {
+    color: var(--royal-violet);
+}
+
+.modal-custom-footer {
+    border-top: none;
+    background-color: #f8f9fa;
+}
+
+.modal-custom-btn {
+    font-size: 1rem;
 }
