@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 def get_db_connection():
     try:
-        connection = mysql.connector.connect(**Config.DB_CONFIG)
+        connection = mysql.connector.connect(**Config.DB_CONFIG, use_pure=True)
         return connection
     except mysql.connector.Error as err:
         logger.error("Error de conexión a la BD: %s", err)
