@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Check authentication
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     // Referencias Excel
     const btnSubirExcel = document.getElementById('btn-subir-excel');
     const dropZoneExcel = document.getElementById('drop-zone-excel');

@@ -1,6 +1,31 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
 const api = {
+    getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
+    },
+
+    async login(usuario, password) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ usuario, password })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Error en el login');
+            }
+            return data;
+        } catch (error) {
+            console.error('Error en el login:', error);
+            return { status: 'error', error: error.message };
+        }
+    },
+
     async getMuebles() {
         try {
             const response = await fetch(`${API_BASE_URL}/muebles`);
@@ -21,6 +46,7 @@ const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/subir-excel`, {
                 method: 'POST',
+                headers: this.getAuthHeaders(),
                 body: formData
             });
             return await response.json();
@@ -39,6 +65,7 @@ const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/subir-imagenes`, {
                 method: 'POST',
+                headers: this.getAuthHeaders(),
                 body: formData
             });
             return await response.json();

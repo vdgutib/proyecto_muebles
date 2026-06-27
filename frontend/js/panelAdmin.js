@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     const btnSubirExcel = document.getElementById('btn-subir-excel');
     const fileInputExcel = document.getElementById('file-excel');
     const btnSubirImagenes = document.getElementById('btn-subir-imagenes');
