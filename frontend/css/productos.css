@@ -243,17 +243,19 @@
 }
 
 .modal-precio-nota {
-    font-size: 0.82rem;
-    color: var(--indigo-velvet);
-    font-weight: 500;
-    margin-top: -6px;
-    margin-bottom: 0;
-    display: flex;
+    font-size: 0.85rem;
+    color: var(--royal-violet);
+    font-weight: 600;
+    background-color: rgba(123, 44, 191, 0.08);
+    padding: 6px 14px;
+    border-radius: 30px;
+    margin: 8px auto 0;
+    display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 6px;
 }
 
 .modal-precio-nota i {
-    color: var(--royal-violet);
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
