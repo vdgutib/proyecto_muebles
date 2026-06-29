@@ -25,20 +25,13 @@
 
             <div class="admin-content">
 
-                <section class="admin-left-panel">
-                    <button class="btn-admin" id="btn-subir-excel">
-                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
-                        Subir Excel
-                    </button>
-                    <button class="btn-admin" id="btn-subir-imagenes" style="margin-top: 15px; background-color: #6c757d; color: white;">
-                        <i class="bi bi-images me-2"></i>
-                        Subir Imágenes
-                    </button>
-                    <input type="file" id="file-excel" accept=".xlsx, .xls" style="display: none;">
-                    <input type="file" id="file-imagenes" accept="image/*" multiple style="display: none;">
-
-                    <div id="upload-status" class="mt-3"
-                        style="display:none; font-size: 0.9rem; padding: 10px; border-radius: 5px;"></div>
+                <section class="admin-left-panel tool-form-card d-flex flex-column justify-content-center">
+                    <h3 class="tool-heading mb-4 text-center">Gestión de Archivos</h3>
+                    <a href="subidaArchivos.html" class="btn-admin text-decoration-none text-center d-block w-100 py-3 mt-2 mb-3">
+                        <i class="bi bi-cloud-arrow-up me-2"></i>
+                        Ir a Subida de Archivos
+                    </a>
+                    <p class="text-muted text-center" style="font-size: 0.95rem;">Sube el Excel de inventario y las imágenes de los productos desde el nuevo panel unificado.</p>
                 </section>
 
                 <section class="admin-right-panel">
