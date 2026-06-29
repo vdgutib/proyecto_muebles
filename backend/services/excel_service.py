@@ -27,6 +27,18 @@ class ExcelService:
             df.columns = df.columns.astype(str).str.replace('\\n', ' ').str.replace('\\r', ' ').str.strip().str.upper()
             df.columns = df.columns.str.replace(r'\\s+', ' ', regex=True)
 
+            columnas = list(df.columns)
+            has_nombre = 'NOMBRE' in columnas
+            has_medidas = 'MEDIDAS' in columnas
+            has_precio = any('PRECIO' in col for col in columnas)
+
+            if not (has_nombre and has_medidas and has_precio):
+                return {
+                    "status": "error",
+                    "error": "Esquema de archivo inválido. Faltan columnas obligatorias (Nombre, Precio, Medidas).",
+                    "columnas_encontradas": columnas
+                }
+
             filas_muebles = []
             categoria_actual_nombre = None
 
