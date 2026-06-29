@@ -104,8 +104,13 @@ async function cargarMuebles() {
     const muebles = await api.getMuebles();
     container.innerHTML = '';
 
+    if (muebles.error) {
+        container.innerHTML = '<div class="alert alert-danger text-center">Servicio no disponible en este momento. Por favor, intenta de nuevo más tarde.</div>';
+        return;
+    }
+
     if (muebles.length === 0) {
-        container.innerHTML = '<div class="alert alert-info text-center">No hay productos disponibles en este momento.</div>';
+        container.innerHTML = '<div class="alert alert-info text-center">No hay productos disponibles en este momento. El catálogo está en actualización.</div>';
         return;
     }
 

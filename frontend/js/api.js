@@ -35,7 +35,7 @@ const api = {
             return await response.json();
         } catch (error) {
             console.error('Error fetching muebles:', error);
-            return [];
+            return { error: true, message: error.message };
         }
     },
 
