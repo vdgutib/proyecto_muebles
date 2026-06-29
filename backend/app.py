@@ -25,8 +25,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-# NOTA seguridad: CORS(app) sin restricción acepta cualquier origen.
-# Para producción se recomienda CORS(app, origins=["https://tu-dominio.com"]).
 CORS(app)
 
 
@@ -148,8 +146,6 @@ def eliminar_mueble(sku):
             try:
                 ImagenService.eliminar_imagen(imagen)
             except Exception:
-                # No revertimos el borrado en BD por esto; queda registrado
-                # para limpieza manual del archivo huérfano.
                 logger.exception(
                     "Mueble %s eliminado en BD, pero no se pudo borrar el archivo de imagen '%s'",
                     sku, imagen
@@ -189,8 +185,10 @@ def calcular_despiece():
         "piezas": piezas
     }), 201
 
-@app.route('/api/solicitudes', methods=['POST'])
+@app.route('/api/solicitudes', methods=['POST', 'OPTIONS'])
 def crear_solicitud():
+    if request.method == 'OPTIONS':
+        return '', 200
     datos = request.get_json(silent=True) or {}
     producto = datos.get('producto', '')
     nombre = datos.get('nombre', '')
