@@ -6,6 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('nombre-producto').textContent = producto;
     }
 
+    function mostrarAlerta(mensaje, tipo = 'danger') {
+        const container = document.getElementById('alert-container');
+        if (!container) return;
+        container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+    }
+
     const btnEnviar = document.getElementById('btn-enviar-ws');
     if (btnEnviar) {
         btnEnviar.addEventListener('click', async () => {
@@ -16,9 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const pago = document.getElementById('pago').value;
             const mensaje = document.getElementById('mensaje').value.trim();
 
-            // CU-002: Ningún campo obligatorio, pero al menos uno debe estar lleno
-            if (!nombre && !direccion && !contacto && !pago && !mensaje) {
-                alert('El formulario se encuentra vacío. Debes completar al menos un campo para enviar la solicitud.');
+            if (!nombre || !direccion || !contacto) {
+                mostrarAlerta('Faltan campos obligatorios: Nombre, Dirección y Contacto.');
                 return;
             }
 
@@ -40,17 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error('Fallo al guardar en el servidor');
                 }
 
-                alert('¡Solicitud recibida con éxito en el sistema! A continuación te redirigiremos a WhatsApp.');
+                mostrarAlerta('¡Solicitud recibida con éxito en el sistema! A continuación te redirigiremos a WhatsApp.', 'success');
 
                 const textoMsj = `Hola, me interesa solicitar el producto "${prod}".\n\nMis datos:\n- Nombre: ${nombre || 'No especificado'}\n- Dirección: ${direccion || 'No especificada'}\n- Contacto: ${contacto || 'No especificado'}\n- Forma de pago: ${pago || 'No especificada'}\n\nMensaje adicional:\n${mensaje || 'Sin mensaje adicional'}`;
 
                 const numeroDestino = '56984248526';
                 const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(textoMsj)}`;
 
-                window.open(url, '_blank');
+                setTimeout(() => {
+                    window.open(url, '_blank');
+                }, 1500);
             } catch (error) {
-                // CU-002 Alt B: Fallo de conexión
-                alert('Hubo un problema de conexión y la solicitud no pudo ser guardada. Tus datos no se han perdido. Por favor intenta de nuevo o contáctanos directamente.');
+                mostrarAlerta('Hubo un problema de conexión y la solicitud no pudo ser guardada. Por favor intenta de nuevo o contáctanos directamente.');
             }
         });
     }
