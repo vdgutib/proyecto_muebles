@@ -6,3 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // La lógica de subida de archivos ahora se maneja en subidaArchivos.js
 });
+
+window.cerrarSesion = function() {
+    localStorage.removeItem('token');
+    window.location.href = 'home.html';
+};
