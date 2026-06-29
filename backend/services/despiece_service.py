@@ -56,31 +56,34 @@ class DespieceService:
         return alto, ancho, profundidad, grosor
 
     @staticmethod
-    def _calcular_piezas(alto_cm, ancho_cm, profundidad_cm, grosor_mm):
-        # Conversión a mm para el detalle de corte (alto/ancho/profundidad
-        # llegan en cm desde el formulario, grosor ya viene en mm).
+    def _calcular_piezas(alto_cm, ancho_cm, profundidad_cm, grosor_cm):
+        # Conversión a mm para el detalle de corte
         alto_mm = alto_cm * 10
         ancho_mm = ancho_cm * 10
         profundidad_mm = profundidad_cm * 10
+        grosor_mm = grosor_cm * 10
+        
+        # Margen de tolerancia física (hoja de sierra / tapacantos)
+        tolerancia_mm = 2
 
         return [
             {
                 "nombre_pieza": "Lateral",
                 "cantidad": 2,
-                "largo_mm": round(alto_mm, 1),
-                "ancho_mm": round(profundidad_mm, 1),
+                "largo_mm": round(alto_mm - tolerancia_mm, 1),
+                "ancho_mm": round(profundidad_mm - tolerancia_mm, 1),
             },
             {
                 "nombre_pieza": "Techo/Base",
                 "cantidad": 2,
-                "largo_mm": round(ancho_mm - 2 * grosor_mm, 1),
-                "ancho_mm": round(profundidad_mm, 1),
+                "largo_mm": round(ancho_mm - (2 * grosor_mm) - tolerancia_mm, 1),
+                "ancho_mm": round(profundidad_mm - tolerancia_mm, 1),
             },
             {
                 "nombre_pieza": "Fondo",
                 "cantidad": 1,
-                "largo_mm": round(alto_mm - grosor_mm, 1),
-                "ancho_mm": round(ancho_mm - 2 * grosor_mm, 1),
+                "largo_mm": round(alto_mm - grosor_mm - tolerancia_mm, 1),
+                "ancho_mm": round(ancho_mm - (2 * grosor_mm) - tolerancia_mm, 1),
             },
         ]
 
