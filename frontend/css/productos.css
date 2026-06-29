@@ -241,3 +241,19 @@
 .modal-custom-btn {
     font-size: 1rem;
 }
+
+.modal-precio-nota {
+    font-size: 0.82rem;
+    color: var(--indigo-velvet);
+    font-weight: 500;
+    margin-top: -6px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-precio-nota i {
+    color: var(--royal-violet);
+    font-size: 0.9rem;
+}
