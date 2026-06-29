@@ -2,6 +2,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const formDespiece = document.getElementById('form-despiece');
     if (!formDespiece) return;
 
+    function mostrarAlerta(mensaje, tipo = 'danger') {
+        const container = document.getElementById('alert-container-despiece');
+        if (!container) return;
+        container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`;
+    }
+
     formDespiece.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -17,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
         const resultsContainer = document.getElementById('despiece-resultados');
         if (resultsContainer) resultsContainer.style.display = 'none';
+        
+        const alertContainer = document.getElementById('alert-container-despiece');
+        if (alertContainer) alertContainer.innerHTML = '';
 
         const data = {
             ancho: document.getElementById('input-ancho').value,
@@ -64,12 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (!response.ok) {
-                alert('Error al calcular: ' + (result.error || 'Problema en el servidor'));
+                mostrarAlerta('Error al calcular: ' + (result.error || 'Problema en el servidor'));
             } else {
                 mostrarResultados(result.piezas);
             }
         } catch (error) {
-            alert('No se pudo conectar con el servidor para calcular las medidas.');
+            mostrarAlerta('No se pudo conectar con el servidor para calcular las medidas.');
         } finally {
             if (btnSubmit) {
                 btnSubmit.innerHTML = defaultText;
