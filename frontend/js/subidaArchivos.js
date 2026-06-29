@@ -1,18 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Check authentication
     const token = localStorage.getItem('token');
     if (!token) {
         window.location.href = 'login.html';
         return;
     }
 
-    // Referencias Excel
     const btnSubirExcel = document.getElementById('btn-subir-excel');
     const dropZoneExcel = document.getElementById('drop-zone-excel');
     const fileInputExcel = document.getElementById('file-excel');
     const excelFileList = document.getElementById('excel-file-list');
 
-    // Referencias Imágenes
     const btnSubirImagenes = document.getElementById('btn-subir-imagenes');
     const dropZoneImagenes = document.getElementById('drop-zone-imagenes');
     const fileInputImagenes = document.getElementById('file-imagenes');
@@ -20,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnFinalizar = document.getElementById('btn-finalizar');
 
-    // Funciones Helper de UI
     const formatBytes = (bytes, decimals = 1) => {
         if (!+bytes) return '0 Bytes';
         const k = 1024, dm = decimals < 0 ? 0 : decimals, sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -28,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
     };
 
-    // --- MANEJO EXCEL ---
     btnSubirExcel.addEventListener('click', () => fileInputExcel.click());
     dropZoneExcel.addEventListener('click', () => fileInputExcel.click());
     
@@ -79,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const bar = document.getElementById(`${id}-bar`);
 
         try {
-            // Simulamos un poco de progreso para UX
             setTimeout(() => { if(bar.style.width === '10%') { bar.style.width = '40%'; text.innerText = 'Progreso: 40%'; } }, 500);
             
             const result = await api.uploadExcel(file);
@@ -109,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- MANEJO IMÁGENES ---
     btnSubirImagenes.addEventListener('click', () => fileInputImagenes.click());
     dropZoneImagenes.addEventListener('click', () => fileInputImagenes.click());
 
@@ -139,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
         if(files.length === 0) return;
 
-        // Mostrar previsualizaciones locales de inmediato
         files.forEach(file => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -157,10 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Subir al backend
         try {
-            // El API actual espera que enviemos los archivos. 
-            // Esto llamara a la BD en batch para todas.
             const result = await api.subirImagenes(files);
             if (result.status === 'success') {
                 console.log(`${result.mensaje}`);
@@ -172,9 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- ACCIÓN FINAL ---
     btnFinalizar.addEventListener('click', () => {
-        window.location.href = 'catalogoProductos.html'; // O redirigir a inicio
+        window.location.href = 'catalogoProductos.html';
     });
 
     function preventDefaults(e) {
