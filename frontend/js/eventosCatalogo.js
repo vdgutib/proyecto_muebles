@@ -80,10 +80,17 @@ function abrirModal(nombre, precio, medidas, categoria, imagenSrc) {
 
     const catEl = document.getElementById('m-categoria');
     const catRow = document.getElementById('m-categoria-row');
+    const medidasDiv = document.getElementById('m-medidas-col');
     if (!categoria || categoria === 'Sin Categoría') {
         if (catRow) catRow.style.display = 'none';
+        if (medidasDiv) {
+            medidasDiv.classList.remove('border-start', 'ps-3');
+        }
     } else {
         if (catRow) catRow.style.display = '';
+        if (medidasDiv) {
+            medidasDiv.classList.add('border-start', 'ps-3');
+        }
         catEl.innerText = categoria;
     }
 
