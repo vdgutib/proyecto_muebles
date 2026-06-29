@@ -77,6 +77,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenSrc) {
     document.getElementById('m-medidas').innerText = medidas;
     document.getElementById('m-categoria').innerText = categoria;
     document.getElementById('m-imagen').src = imagenSrc;
+    document.getElementById('btn-solicitar-producto').href = 'formulario.html?producto=' + encodeURIComponent(nombre);
 
     if (typeof bootstrap !== 'undefined') {
         var modalElement = document.getElementById('modalProducto');
