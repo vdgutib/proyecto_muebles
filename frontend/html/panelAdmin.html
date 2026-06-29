@@ -32,59 +32,60 @@
         <h1 class="title">Panel Administrativo</h1>
 
         <main class="admin-dashboard-box">
+            
+            <div class="row w-100 m-0">
+                
+                <div class="col-lg-5 left-panel">
+                    <h2 class="panel-subtitle">Panel de Administración</h2>
+                    
+                    <div class="upload-btn-container">
+                        <a href="subidaArchivos.html" class="btn-ghost" id="btn-upload">
+                            <i class="bi bi-cloud-arrow-up me-2"></i> Ir a Subida de Archivos
+                        </a>
+                    </div>
+                </div>
 
-            <header class="admin-header">
-                <h2 class="subtitle">Panel de Administración</h2>
-            </header>
-
-            <div class="admin-content">
-
-                <section class="admin-left-panel tool-form-card d-flex flex-column justify-content-center">
-                    <h3 class="tool-heading mb-4 text-center">Gestión de Archivos</h3>
-                    <a href="subidaArchivos.html" class="btn-admin text-decoration-none text-center d-block w-100 py-3 mt-2 mb-3">
-                        <i class="bi bi-cloud-arrow-up me-2"></i>
-                        Ir a Subida de Archivos
-                    </a>
-                    <p class="text-muted text-center" style="font-size: 0.95rem;">Sube el Excel de inventario y las imágenes de los productos desde el nuevo panel unificado.</p>
-                </section>
-
-                <section class="admin-right-panel">
-                    <h3 class="tool-heading">Herramienta de Despiece</h3>
-
-                    <div class="tool-form-card">
+                <div class="col-lg-7 right-panel">
+                    
+                    <h3 class="tool-heading text-center mb-3">Herramienta de Despiece</h3>
+                    
+                    <div class="despiece-container">
+                        <div id="alert-container-despiece"></div>
+                        
                         <form class="despiece-form" id="form-despiece">
-
-                            <div class="form-row">
-                                <label for="input-alto">Alto:</label>
-                                <input type="number" id="input-alto" name="alto" class="input-form" required>
+                            
+                            <div class="despiece-row">
+                                <label for="input-alto" class="despiece-label">Alto:</label>
+                                <input type="number" id="input-alto" name="alto" class="despiece-input" required>
                             </div>
 
-                            <div class="form-row">
-                                <label for="input-ancho">Ancho:</label>
-                                <input type="number" id="input-ancho" name="ancho" class="input-form" required>
+                            <div class="despiece-row">
+                                <label for="input-ancho" class="despiece-label">Ancho:</label>
+                                <input type="number" id="input-ancho" name="ancho" class="despiece-input" required>
                             </div>
 
-                            <div class="form-row">
-                                <label for="input-profundidad">Profundidad:</label>
-                                <input type="number" id="input-profundidad" name="profundidad" class="input-form"
-                                    required>
+                            <div class="despiece-row">
+                                <label for="input-profundidad" class="despiece-label">Profundidad:</label>
+                                <input type="number" id="input-profundidad" name="profundidad" class="despiece-input" required>
                             </div>
 
-                            <div class="form-row">
-                                <label for="input-grosor">Grosor:</label>
-                                <input type="number" id="input-grosor" name="grosor" class="input-form" required>
+                            <div class="despiece-row">
+                                <label for="input-grosor" class="despiece-label">Grosor:</label>
+                                <input type="number" id="input-grosor" name="grosor" class="despiece-input" required>
                             </div>
 
-                            <div class="form-actions">
-                                <button type="submit" class="btn-admin w-100 mt-2" id="btn-calcular">Calcular Medidas</button>
+                            <div class="d-flex justify-content-center mt-4">
+                                <button type="submit" class="btn-ghost" id="btn-calcular">Calcular</button>
                             </div>
 
                         </form>
-                        <div id="despiece-resultados" style="display: none;"></div>
+                        
+                        <div id="despiece-resultados" style="display: none;" class="mt-4"></div>
                     </div>
-                </section>
 
+                </div>
             </div>
+
         </main>
 
     </div>
