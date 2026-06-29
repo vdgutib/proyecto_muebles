@@ -32,14 +32,16 @@ CREATE TABLE muebles (
     id_categoria INT
 );
 
-CREATE TABLE consultas (
-    id_consulta INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_cliente VARCHAR(100) NOT NULL,
-    telefono VARCHAR(20) NOT NULL,
-    correo VARCHAR(100),
+CREATE TABLE solicitudes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_cliente VARCHAR(255) NOT NULL,
+    telefono VARCHAR(100) NOT NULL,
+    direccion VARCHAR(255),
+    metodo_pago VARCHAR(50),
     mensaje TEXT,
-    id_mueble INT,
-    fecha_consulta TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    estado VARCHAR(50) DEFAULT 'PENDIENTE',
+    producto_id INT
 );
 
 CREATE TABLE calculos_medidas (
@@ -71,9 +73,9 @@ ALTER TABLE muebles
 ADD CONSTRAINT fk_muebles_categoria 
 FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE SET NULL;
 
-ALTER TABLE consultas
-ADD CONSTRAINT fk_consultas_mueble 
-FOREIGN KEY (id_mueble) REFERENCES muebles(id_mueble) ON DELETE SET NULL;
+ALTER TABLE solicitudes
+ADD CONSTRAINT fk_solicitudes_mueble 
+FOREIGN KEY (producto_id) REFERENCES muebles(id_mueble) ON DELETE SET NULL;
 
 ALTER TABLE calculos_medidas
 ADD CONSTRAINT fk_calculos_admin 

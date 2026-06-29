@@ -15,6 +15,7 @@ from services.auth_service import AuthService
 from services.despiece_service import DespieceService, DespieceError
 from repositories.muebles_repository import MueblesRepository
 from repositories.calculo_repository import CalculoRepository
+from repositories.solicitudes_repository import SolicitudesRepository
 
 
 logging.basicConfig(
@@ -187,6 +188,26 @@ def calcular_despiece():
         "id_calculo": id_calculo,
         "piezas": piezas
     }), 201
+
+@app.route('/api/solicitudes', methods=['POST'])
+def crear_solicitud():
+    datos = request.get_json(silent=True) or {}
+    producto = datos.get('producto', '')
+    nombre = datos.get('nombre', '')
+    direccion = datos.get('direccion', '')
+    contacto = datos.get('contacto', '')
+    pago = datos.get('pago', '')
+    mensaje = datos.get('mensaje', '')
+    
+    if not nombre or not direccion or not contacto:
+        return jsonify({"status": "error", "error": "Faltan campos obligatorios: nombre, dirección y contacto."}), 400
+        
+    try:
+        id_solicitud = SolicitudesRepository.guardar_solicitud(producto, nombre, direccion, contacto, pago, mensaje)
+        return jsonify({"status": "success", "mensaje": "Solicitud recibida con éxito", "id": id_solicitud}), 201
+    except Exception:
+        logger.exception("Error guardando solicitud")
+        return jsonify({"status": "error", "error": "Error interno del servidor persistiendo la solicitud"}), 500
 
 @jwt.unauthorized_loader
 def manejar_token_faltante(motivo):
