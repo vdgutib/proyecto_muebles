@@ -74,8 +74,19 @@ function filtrarCategoria(tipo) {
 function abrirModal(nombre, precio, medidas, categoria, imagenSrc) {
     document.getElementById('m-nombre').innerText = nombre;
     document.getElementById('m-precio').innerText = precio;
-    document.getElementById('m-medidas').innerText = medidas;
-    document.getElementById('m-categoria').innerText = categoria;
+
+    const medidasLimpias = medidas.replace(/^medidas:\s*/i, '').trim();
+    document.getElementById('m-medidas').innerText = medidasLimpias || 'N/A';
+
+    const catEl = document.getElementById('m-categoria');
+    const catRow = document.getElementById('m-categoria-row');
+    if (!categoria || categoria === 'Sin Categoría') {
+        if (catRow) catRow.style.display = 'none';
+    } else {
+        if (catRow) catRow.style.display = '';
+        catEl.innerText = categoria;
+    }
+
     document.getElementById('m-imagen').src = imagenSrc;
     document.getElementById('btn-solicitar-producto').href = 'formulario.html?producto=' + encodeURIComponent(nombre);
 
