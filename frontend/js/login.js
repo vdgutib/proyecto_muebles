@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = passwordInput.value.trim();
 
         if (!usuario || !password) {
-            alert('Por favor ingrese usuario y contraseña');
+            mostrarModalAdvertencia('Por favor ingrese usuario y contraseña');
             return;
         }
 
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'panelAdmin.html';
         } else {
             // Mostramos un error
-            alert(result.error || 'Error al iniciar sesión');
+            mostrarModalError(result.error || 'Error al iniciar sesión');
         }
     });
 

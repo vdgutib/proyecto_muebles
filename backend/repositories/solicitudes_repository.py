@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class SolicitudesRepository:
 
     @staticmethod
-    def guardar_solicitud(producto_nombre, nombre, direccion, contacto, pago, mensaje=None):
+    def guardar_solicitud(producto_id, producto_nombre, nombre, direccion, contacto, pago, mensaje=None):
         conexion = get_db_connection()
         if not conexion:
             raise Exception("No hay conexión a la base de datos")
@@ -16,9 +16,8 @@ class SolicitudesRepository:
         cursor_prod = None
         cursor = None
         try:
-            # Buscar producto_id por nombre (best-effort, nullable FK)
-            producto_id = None
-            if producto_nombre:
+            # Si no se proporciona producto_id, buscar por nombre (best-effort, nullable FK)
+            if not producto_id and producto_nombre:
                 cursor_prod = conexion.cursor(dictionary=True)
                 cursor_prod.execute(
                     "SELECT id_mueble FROM muebles WHERE nombre = %s LIMIT 1",

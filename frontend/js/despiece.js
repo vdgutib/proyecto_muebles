@@ -3,12 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!formDespiece) return;
 
     function mostrarAlerta(mensaje, tipo = 'danger') {
-        const container = document.getElementById('alert-container-despiece');
-        if (!container) return;
-        container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-            ${mensaje}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
+        if (tipo === 'danger' || tipo === 'error') {
+            mostrarModalError(mensaje);
+        } else if (tipo === 'success') {
+            mostrarModalExito(mensaje);
+        } else {
+            mostrarModalInfo(mensaje);
+        }
     }
 
     function mostrarErrorCampo(id, mensaje) {
@@ -80,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let hasError = false;
         ['alto', 'ancho', 'profundidad', 'grosor'].forEach(key => {
-            if (isNaN(rawData[key]) || rawData[key] <= 0) {
-                mostrarErrorCampo('input-' + key, 'Debe ser un número mayor a 0');
+            if (isNaN(rawData[key]) || rawData[key] < 0) {
+                mostrarErrorCampo('input-' + key, 'No se permiten valores negativos');
                 hasError = true;
             }
         });

@@ -57,7 +57,7 @@
                             <div class="despiece-row mb-3">
                                 <label for="input-alto" class="despiece-label">Alto:</label>
                                 <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-alto" name="alto" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <input type="number" id="input-alto" name="alto" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
                                     <select class="form-select" id="unidad-alto" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
                                         <option value="m">m</option>
                                         <option value="cm" selected>cm</option>
@@ -69,7 +69,7 @@
                             <div class="despiece-row mb-3">
                                 <label for="input-ancho" class="despiece-label">Ancho:</label>
                                 <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-ancho" name="ancho" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <input type="number" id="input-ancho" name="ancho" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
                                     <select class="form-select" id="unidad-ancho" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
                                         <option value="m">m</option>
                                         <option value="cm" selected>cm</option>
@@ -81,7 +81,7 @@
                             <div class="despiece-row mb-3">
                                 <label for="input-profundidad" class="despiece-label">Profundidad:</label>
                                 <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-profundidad" name="profundidad" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <input type="number" id="input-profundidad" name="profundidad" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
                                     <select class="form-select" id="unidad-profundidad" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
                                         <option value="m">m</option>
                                         <option value="cm" selected>cm</option>
@@ -93,7 +93,7 @@
                             <div class="despiece-row mb-3">
                                 <label for="input-grosor" class="despiece-label">Grosor:</label>
                                 <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-grosor" name="grosor" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <input type="number" id="input-grosor" name="grosor" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
                                     <select class="form-select" id="unidad-grosor" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
                                         <option value="m">m</option>
                                         <option value="cm">cm</option>
@@ -117,7 +117,9 @@
         </main>
 
     </div>
+    <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/api.js"></script>
+    <script src="../js/modal.js"></script>
     <script src="../js/panelAdmin.js"></script>
     <script src="../js/despiece.js"></script>
 </body>

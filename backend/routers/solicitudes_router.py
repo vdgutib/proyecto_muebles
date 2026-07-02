@@ -10,6 +10,7 @@ def crear_solicitud():
     if request.method == 'OPTIONS':
         return '', 200
     datos = request.get_json(silent=True) or {}
+    producto_id = datos.get('producto_id', '')
     producto = datos.get('producto', '')
     nombre = datos.get('nombre', '')
     direccion = datos.get('direccion', '')
@@ -21,7 +22,7 @@ def crear_solicitud():
         return jsonify({"status": "error", "error": "Faltan campos obligatorios: nombre, dirección y contacto."}), 400
         
     try:
-        id_solicitud = SolicitudesRepository.guardar_solicitud(producto, nombre, direccion, contacto, pago, mensaje)
+        id_solicitud = SolicitudesRepository.guardar_solicitud(producto_id, producto, nombre, direccion, contacto, pago, mensaje)
         return jsonify({"status": "success", "mensaje": "Solicitud recibida con éxito", "id": id_solicitud}), 201
     except Exception:
         logger.exception("Error guardando solicitud")

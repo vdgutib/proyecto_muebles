@@ -14,11 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const precioVenta = parseFloat(m.precio_venta || m.precio_costo || 0);
             const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
             const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
-            const nombreEscaped = (m.nombre || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            const nombreEscaped = (m.nombre || '').replace(/'/g, "\\'").replace(/"]/g, '&quot;');
+            const productoId = m.id_mueble || '';
+            const onClickStr = `window.location.href='formulario.html?producto=${encodeURIComponent(nombreEscaped)}&producto_id=${productoId}'`;
 
             return `
                 <div class="col-md-4">
-                    <div class="product-item-clean">
+                    <div class="product-item-clean" style="cursor: pointer;" onclick="${onClickStr}">
                         <div class="product-img-wrapper">
                             <img src="${imgPath}" class="img-fluid" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
                         </div>

@@ -1,30 +1,70 @@
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const producto = params.get('producto');
+    const productoId = params.get('producto_id');
     const spanProducto = document.getElementById('nombre-producto');
-    const inputProducto = document.getElementById('producto-input');
+    const inputProductoId = document.getElementById('producto_id_hidden');
 
     if (producto) {
         spanProducto.textContent = producto;
-        if (inputProducto) {
-            inputProducto.value = producto;
-        }
+    }
+    if (productoId && inputProductoId) {
+        inputProductoId.value = productoId;
+    }
+
+    // Formateo automático de teléfono chileno
+    const contactoInput = document.getElementById('contacto');
+    if (contactoInput) {
+        contactoInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Si el usuario no escribió el prefijo, asumimos +56 9
+            if (value.length > 0 && !value.startsWith('569')) {
+                // Si empieza con 9, agregar 56
+                if (value.startsWith('9')) {
+                    value = '56' + value;
+                }
+                // Si no empieza con 56 ni 9, agregar 569
+                else if (!value.startsWith('56')) {
+                    value = '569' + value;
+                }
+            }
+            
+            // Formatear: +56 9 XXXX XXXX
+            if (value.length >= 2) {
+                let formatted = '+56 ';
+                if (value.length > 2) {
+                    formatted += value.substring(2, 3) + ' ';
+                    if (value.length > 3) {
+                        formatted += value.substring(3, 7);
+                        if (value.length > 7) {
+                            formatted += ' ' + value.substring(7, 11);
+                        }
+                    }
+                }
+                e.target.value = formatted;
+            } else {
+                e.target.value = value;
+            }
+        });
     }
 
     function mostrarAlerta(mensaje, tipo = 'danger') {
-        const container = document.getElementById('alert-container');
-        if (!container) return;
-        container.innerHTML = `<div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-            ${mensaje}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`;
+        if (tipo === 'danger' || tipo === 'error') {
+            mostrarModalError(mensaje);
+        } else if (tipo === 'success') {
+            mostrarModalExito(mensaje);
+        } else {
+            mostrarModalInfo(mensaje);
+        }
     }
 
     const btnEnviar = document.getElementById('btn-enviar-ws');
     if (btnEnviar) {
         btnEnviar.addEventListener('click', async () => {
 
-            const prod      = (inputProducto ? inputProducto.value : spanProducto.textContent || '').trim();
+            const productoId = inputProductoId ? inputProductoId.value : '';
+            const productoNombre = spanProducto.textContent || '';
             const nombre    = document.getElementById('nombre').value.trim();
             const direccion = document.getElementById('direccion').value.trim();
             const contacto  = document.getElementById('contacto').value.trim();
@@ -36,11 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // prod empieza con '[' cuando no vino ningún producto en la URL
-            const productoEnviar = prod.startsWith('[') ? '' : prod;
+            // productoNombre empieza con '[' cuando no vino ningún producto en la URL
+            const productoEnviar = productoNombre.startsWith('[') ? '' : productoNombre;
 
             try {
                 const result = await api.crearSolicitud({
+                    producto_id: productoId,
                     producto: productoEnviar,
                     nombre,
                     direccion,

@@ -45,10 +45,25 @@
                 </h1>
             </div>
 
-            <div class="d-flex justify-content-center gap-3 mb-5 flex-wrap" id="category-filters">
+            <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap" id="category-filters">
                 <button class="top-cat-btn active" id="btn-todos" onclick="filtrarCategoria('todos')">
                     <i class="bi bi-grid-fill"></i> Todos
                 </button>
+            </div>
+
+            <div class="filter-toolbar mb-4 p-3 bg-light rounded">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" id="search-input" class="form-control" placeholder="Buscar por nombre...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label mb-1">Precio máximo: <span id="price-value" class="fw-bold text-primary">$0</span></label>
+                        <input type="range" id="price-range" class="form-range" min="0" max="1000000" step="10000" value="1000000">
+                    </div>
+                </div>
             </div>
 
             <div id="dynamic-catalog-container">

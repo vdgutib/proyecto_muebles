@@ -1,4 +1,8 @@
 const paginacion = {};
+let allMuebles = [];
+let currentCategory = 'todos';
+let currentSearch = '';
+let currentMaxPrice = 1000000;
 
 function getPerPage() {
     const w = window.innerWidth;
@@ -54,24 +58,125 @@ function navSection(sec, dir) {
 }
 
 function filtrarCategoria(tipo) {
+    currentCategory = tipo;
     document.querySelectorAll('.top-cat-btn').forEach(function (b) { b.classList.remove('active'); });
     const targetBtn = document.getElementById('btn-' + tipo);
     if (targetBtn) targetBtn.classList.add('active');
+    aplicarFiltros();
+}
 
-    document.querySelectorAll('.catalog-section').forEach(sec => {
-        if (tipo === 'todos') {
-            sec.style.display = 'block';
-        } else {
-            if (sec.dataset.categoria === tipo) {
-                sec.style.display = 'block';
-            } else {
-                sec.style.display = 'none';
+function aplicarFiltros() {
+    const mueblesFiltrados = allMuebles.filter(m => {
+        // Filtro por categoría
+        if (currentCategory !== 'todos') {
+            const catSlug = toSlug(m.nombre_categoria || 'Sin Categoría');
+            if (catSlug !== currentCategory) return false;
+        }
+
+        // Filtro por búsqueda de texto
+        if (currentSearch) {
+            const nombre = (m.nombre || '').toLowerCase();
+            if (!nombre.includes(currentSearch.toLowerCase())) return false;
+        }
+
+        // Filtro por precio
+        const precio = parseFloat(m.precio_venta || m.precio_costo || 0);
+        if (precio > currentMaxPrice) return false;
+
+        return true;
+    });
+
+    renderizarCatalogoFiltrado(mueblesFiltrados);
+}
+
+function renderizarCatalogoFiltrado(muebles) {
+    const container = document.getElementById('dynamic-catalog-container');
+    if (!container) return;
+
+    if (muebles.length === 0) {
+        container.innerHTML = '<div class="alert alert-info text-center">No se encontraron productos con los filtros actuales.</div>';
+        return;
+    }
+
+    const categorias = {};
+    muebles.forEach(m => {
+        const cat = m.nombre_categoria || 'Sin Categoría';
+        if (!categorias[cat]) categorias[cat] = [];
+        categorias[cat].push(m);
+    });
+
+    const categoryFilters = document.getElementById('category-filters');
+    if (categoryFilters) {
+        categoryFilters.innerHTML = `<button class="top-cat-btn ${currentCategory === 'todos' ? 'active' : ''}" id="btn-todos" onclick="filtrarCategoria('todos')"><i class="bi bi-grid-fill"></i> Todos</button>`;
+    }
+
+    Object.keys(categorias).forEach(catName => {
+        const catSlug = toSlug(catName);
+        const items = categorias[catName];
+
+        if (categoryFilters && !document.getElementById('btn-' + catSlug)) {
+            categoryFilters.innerHTML += `<button class="top-cat-btn ${currentCategory === catSlug ? 'active' : ''}" id="btn-${catSlug}" onclick="filtrarCategoria('${catSlug}')">${catName}</button>`;
+        } else if (categoryFilters) {
+            const btn = document.getElementById('btn-' + catSlug);
+            if (btn) {
+                btn.classList.toggle('active', currentCategory === catSlug);
             }
         }
+
+        const sectionHtml = `
+            <div class="catalog-section" id="seccion-${catSlug}" data-categoria="${catSlug}" style="display: ${currentCategory === 'todos' || currentCategory === catSlug ? 'block' : 'none'};">
+                <div class="section-top">
+                    <h2 class="catalog-section-label">
+                        <i class="bi bi-collection me-2"></i>${catName}
+                    </h2>
+                    <div class="section-nav" id="nav-${catSlug}">
+                        <button class="nav-arrow" id="prev-${catSlug}" onclick="navSection('${catSlug}', -1)" disabled aria-label="Anterior">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <span class="nav-counter" id="counter-${catSlug}"></span>
+                        <button class="nav-arrow" id="next-${catSlug}" onclick="navSection('${catSlug}', 1)" aria-label="Siguiente">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="catalog-grid" id="grid-${catSlug}">
+                    ${items.map(m => {
+            const precioVenta = parseFloat(m.precio_venta || m.precio_costo || 0);
+            const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
+            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+
+            const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
+
+            const nombreEscaped = sanitize(m.nombre);
+            const catNameEscaped = sanitize(catName);
+            const medidasEscaped = sanitize(m.medidas || 'N/A');
+
+            const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imgPath}', '${m.id_mueble || ''}')`;
+
+            return `
+                        <div class="cat-card compra" onclick="${onClickStr}">
+                            <div class="cat-card-img">
+                                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+                            </div>
+                            <div class="cat-card-info">
+                                <h5 class="cat-card-name">${nombreEscaped}</h5>
+                                <p class="cat-card-desc">${m.observaciones || 'Sin descripción'}</p>
+                                <span class="cat-card-price">${precioFormateado}</span>
+                            </div>
+                        </div>
+                        `;
+        }).join('')}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML += sectionHtml;
+        paginacion[catSlug] = 0;
+        renderSeccion(catSlug);
     });
 }
 
-function abrirModal(nombre, precio, medidas, categoria, imagenSrc) {
+function abrirModal(nombre, precio, medidas, categoria, imagenSrc, productoId = '') {
     document.getElementById('m-nombre').innerText = nombre;
     document.getElementById('m-precio').innerText = precio;
 
@@ -98,7 +203,12 @@ function abrirModal(nombre, precio, medidas, categoria, imagenSrc) {
     document.getElementById('m-imagen').onerror = function() {
         this.src = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
     };
-    document.getElementById('btn-solicitar-producto').href = 'formulario.html?producto=' + encodeURIComponent(nombre);
+    
+    let url = 'formulario.html?producto=' + encodeURIComponent(nombre);
+    if (productoId) {
+        url += '&producto_id=' + encodeURIComponent(productoId);
+    }
+    document.getElementById('btn-solicitar-producto').href = url;
 
     if (typeof bootstrap !== 'undefined') {
         var modalElement = document.getElementById('modalProducto');
@@ -135,75 +245,43 @@ async function cargarMuebles() {
         return;
     }
 
-    const categorias = {};
-    muebles.forEach(m => {
-        const cat = m.nombre_categoria || 'Sin Categoría';
-        if (!categorias[cat]) categorias[cat] = [];
-        categorias[cat].push(m);
-    });
+    allMuebles = muebles;
 
-    const categoryFilters = document.getElementById('category-filters');
-    if (categoryFilters) categoryFilters.innerHTML = `<button class="top-cat-btn active" id="btn-todos" onclick="filtrarCategoria('todos')"><i class="bi bi-grid-fill"></i> Todos</button>`;
+    // Calcular precio máximo para el slider
+    const maxPrecio = Math.max(...muebles.map(m => parseFloat(m.precio_venta || m.precio_costo || 0)));
+    const priceRange = document.getElementById('price-range');
+    const priceValue = document.getElementById('price-value');
+    
+    if (priceRange) {
+        priceRange.max = maxPrecio;
+        priceRange.value = maxPrecio;
+        currentMaxPrice = maxPrecio;
+    }
+    if (priceValue) {
+        priceValue.textContent = '$' + maxPrecio.toLocaleString('es-CL');
+    }
 
-    Object.keys(categorias).forEach(catName => {
-        const catSlug = toSlug(catName);
-        const items = categorias[catName];
+    // Configurar event listeners para filtros
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            aplicarFiltros();
+        });
+    }
 
-        if (categoryFilters) {
-            categoryFilters.innerHTML += `<button class="top-cat-btn" id="btn-${catSlug}" onclick="filtrarCategoria('${catSlug}')">${catName}</button>`;
-        }
+    if (priceRange) {
+        priceRange.addEventListener('input', (e) => {
+            currentMaxPrice = parseFloat(e.target.value);
+            if (priceValue) {
+                priceValue.textContent = '$' + currentMaxPrice.toLocaleString('es-CL');
+            }
+            aplicarFiltros();
+        });
+    }
 
-        const sectionHtml = `
-            <div class="catalog-section" id="seccion-${catSlug}" data-categoria="${catSlug}">
-                <div class="section-top">
-                    <h2 class="catalog-section-label">
-                        <i class="bi bi-collection me-2"></i>${catName}
-                    </h2>
-                    <div class="section-nav" id="nav-${catSlug}">
-                        <button class="nav-arrow" id="prev-${catSlug}" onclick="navSection('${catSlug}', -1)" disabled aria-label="Anterior">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <span class="nav-counter" id="counter-${catSlug}"></span>
-                        <button class="nav-arrow" id="next-${catSlug}" onclick="navSection('${catSlug}', 1)" aria-label="Siguiente">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="catalog-grid" id="grid-${catSlug}">
-                    ${items.map(m => {
-            const precioVenta = parseFloat(m.precio_venta || m.precio_costo || 0);
-            const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
-            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
-
-            const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
-
-            const nombreEscaped = sanitize(m.nombre);
-            const catNameEscaped = sanitize(catName);
-            const medidasEscaped = sanitize(m.medidas || 'N/A');
-
-            const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imgPath}')`;
-
-            return `
-                        <div class="cat-card compra" onclick="${onClickStr}">
-                            <div class="cat-card-img">
-                                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
-                            </div>
-                            <div class="cat-card-info">
-                                <h5 class="cat-card-name">${nombreEscaped}</h5>
-                                <p class="cat-card-desc">${m.observaciones || 'Sin descripción'}</p>
-                                <span class="cat-card-price">${precioFormateado}</span>
-                            </div>
-                        </div>
-                        `;
-        }).join('')}
-                </div>
-            </div>
-        `;
-
-        container.innerHTML += sectionHtml;
-        paginacion[catSlug] = 0;
-        renderSeccion(catSlug);
-    });
+    // Renderizar catálogo inicial con todos los productos
+    aplicarFiltros();
 }
 
 var resizeTimer;

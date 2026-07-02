@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function processExcelFile(file) {
         if(!file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
-            alert('Por favor selecciona un archivo Excel válido (.xls, .xlsx)');
+            mostrarModalAdvertencia('Por favor selecciona un archivo Excel válido (.xls, .xlsx)');
             return;
         }
 
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 badge.innerText = 'Error';
                 bar.style.backgroundColor = '#e53e3e';
                 text.innerText = 'Fallo';
-                alert('Error: ' + result.error);
+                mostrarModalError('Error: ' + result.error);
             }
         } catch (err) {
             badge.className = 'file-badge';
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             badge.innerText = 'Error';
             bar.style.backgroundColor = '#e53e3e';
             text.innerText = 'Fallo';
-            alert('Error de conexión.');
+            mostrarModalError('Error de conexión.');
         }
     }
 
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.status === 'success') {
                 console.log(`${result.mensaje}`);
             } else {
-                alert(`Error al subir imágenes: ${result.error}`);
+                mostrarModalError(`Error al subir imágenes: ${result.error}`);
             }
         } catch (err) {
             console.error("Error subiendo imágenes", err);
@@ -168,23 +168,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnLimpiarBD.addEventListener('click', async () => {
-        if (!confirm('¿Estás seguro de que deseas borrar TODOS los registros de la base de datos? Esta acción no se puede deshacer.')) {
-            return;
-        }
-
-        try {
-            const result = await api.limpiarBaseDatos();
-            if (result.status === 'success') {
-                alert(result.mensaje);
-                excelFileList.innerHTML = '';
-                imagePreviewGrid.innerHTML = '';
-            } else {
-                alert('Error: ' + result.error);
+        mostrarModalConfirmacion(
+            'Confirmar eliminación',
+            '¿Estás seguro de que deseas borrar TODOS los registros de la base de datos? Esta acción no se puede deshacer.',
+            async () => {
+                try {
+                    const result = await api.limpiarBaseDatos();
+                    if (result.status === 'success') {
+                        mostrarModalExito(result.mensaje);
+                        excelFileList.innerHTML = '';
+                        imagePreviewGrid.innerHTML = '';
+                    } else {
+                        mostrarModalError('Error: ' + result.error);
+                    }
+                } catch (err) {
+                    mostrarModalError('Error de conexión al intentar limpiar la base de datos.');
+                    console.error('Error limpiando BD:', err);
+                }
             }
-        } catch (err) {
-            alert('Error de conexión al intentar limpiar la base de datos.');
-            console.error('Error limpiando BD:', err);
-        }
+        );
     });
 
     function preventDefaults(e) {
