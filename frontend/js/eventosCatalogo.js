@@ -62,28 +62,31 @@ function filtrarCategoria(tipo) {
     document.querySelectorAll('.top-cat-btn').forEach(function (b) { b.classList.remove('active'); });
     const targetBtn = document.getElementById('btn-' + tipo);
     if (targetBtn) targetBtn.classList.add('active');
-    aplicarFiltros();
+    filtrarCatalogo();
 }
 
-function aplicarFiltros() {
+function filtrarCatalogo() {
+    // Leer estado actual de los 3 filtros
+    const categoriaSeleccionada = currentCategory;
+    const textoBusqueda = currentSearch.toLowerCase().trim();
+    const precioMaximo = Number(currentMaxPrice);
+
+    // Filtrar con lógica AND estricta: un producto SOLO pasa si cumple TODAS las condiciones
     const mueblesFiltrados = allMuebles.filter(m => {
-        // Filtro por categoría
-        if (currentCategory !== 'todos') {
-            const catSlug = toSlug(m.nombre_categoria || 'Sin Categoría');
-            if (catSlug !== currentCategory) return false;
-        }
-
-        // Filtro por búsqueda de texto
-        if (currentSearch) {
-            const nombre = (m.nombre || '').toLowerCase();
-            if (!nombre.includes(currentSearch.toLowerCase())) return false;
-        }
-
-        // Filtro por precio
-        const precio = parseFloat(m.precio_venta || m.precio_costo || 0);
-        if (precio > currentMaxPrice) return false;
-
-        return true;
+        // Condición 1: Categoría (debe coincidir O ser "todos")
+        const cumpleCategoria = categoriaSeleccionada === 'todos' || 
+                                toSlug(m.nombre_categoria || 'Sin Categoría') === categoriaSeleccionada;
+        
+        // Condición 2: Precio (debe ser <= al máximo del slider)
+        const precioProducto = Number(m.precio_venta || m.precio_costo || 0);
+        const cumplePrecio = precioProducto <= precioMaximo;
+        
+        // Condición 3: Búsqueda de texto (nombre debe incluir el texto buscado)
+        const nombreProducto = (m.nombre || '').toLowerCase();
+        const cumpleBusqueda = textoBusqueda === '' || nombreProducto.includes(textoBusqueda);
+        
+        // Lógica AND estricta: solo pasa si cumple las 3 condiciones
+        return cumpleCategoria && cumplePrecio && cumpleBusqueda;
     });
 
     renderizarCatalogoFiltrado(mueblesFiltrados);
@@ -266,22 +269,22 @@ async function cargarMuebles() {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             currentSearch = e.target.value;
-            aplicarFiltros();
+            filtrarCatalogo();
         });
     }
 
     if (priceRange) {
         priceRange.addEventListener('input', (e) => {
-            currentMaxPrice = parseFloat(e.target.value);
+            currentMaxPrice = Number(e.target.value);
             if (priceValue) {
                 priceValue.textContent = '$' + currentMaxPrice.toLocaleString('es-CL');
             }
-            aplicarFiltros();
+            filtrarCatalogo();
         });
     }
 
     // Renderizar catálogo inicial con todos los productos
-    aplicarFiltros();
+    filtrarCatalogo();
 }
 
 var resizeTimer;
