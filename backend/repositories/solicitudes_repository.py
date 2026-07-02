@@ -1,50 +1,54 @@
 import logging
+import mysql.connector
 from database import get_db_connection
-from repositories.muebles_repository import MueblesRepository
 
 logger = logging.getLogger(__name__)
 
+
 class SolicitudesRepository:
+
     @staticmethod
     def guardar_solicitud(producto_nombre, nombre, direccion, contacto, pago, mensaje=None):
         conexion = get_db_connection()
         if not conexion:
             raise Exception("No hay conexión a la base de datos")
-            
+
+        cursor_prod = None
+        cursor = None
         try:
+            # Buscar producto_id por nombre (best-effort, nullable FK)
             producto_id = None
             if producto_nombre:
-                with conexion.cursor(dictionary=True) as cursor_prod:
-                    cursor_prod.execute("SELECT id_mueble FROM muebles WHERE nombre = %s LIMIT 1", (producto_nombre,))
-                    row = cursor_prod.fetchone()
-                    if row:
-                        producto_id = row['id_mueble']
+                cursor_prod = conexion.cursor(dictionary=True)
+                cursor_prod.execute(
+                    "SELECT id_mueble FROM muebles WHERE nombre = %s LIMIT 1",
+                    (producto_nombre,)
+                )
+                row = cursor_prod.fetchone()
+                if row:
+                    producto_id = row['id_mueble']
+                cursor_prod.close()
+                cursor_prod = None
 
-            with conexion.cursor() as cursor:
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS solicitudes (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        nombre_cliente VARCHAR(255),
-                        telefono VARCHAR(100),
-                        direccion VARCHAR(255),
-                        metodo_pago VARCHAR(50),
-                        mensaje TEXT,
-                        fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        estado VARCHAR(50) DEFAULT 'PENDIENTE',
-                        producto_id INT
-                    )
-                """)
-                
-                query = """
-                    INSERT INTO solicitudes (nombre_cliente, telefono, direccion, metodo_pago, mensaje, producto_id)
-                    VALUES (%s, %s, %s, %s, %s, %s)
+            cursor = conexion.cursor()
+            cursor.execute(
                 """
-                cursor.execute(query, (nombre, contacto, direccion, pago, mensaje, producto_id))
+                INSERT INTO solicitudes
+                    (nombre_cliente, telefono, direccion, metodo_pago, mensaje, producto_id)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (nombre, contacto, direccion or None, pago or None, mensaje or None, producto_id)
+            )
             conexion.commit()
-            return cursor.lastrowid
-        except Exception as e:
+            return cursor.lastrowid   # ← leído ANTES de cerrar el cursor
+
+        except (mysql.connector.Error, Exception):
             logger.exception("Error guardando solicitud en DB")
             conexion.rollback()
-            raise e
+            raise
         finally:
+            if cursor_prod:
+                cursor_prod.close()
+            if cursor:
+                cursor.close()
             conexion.close()

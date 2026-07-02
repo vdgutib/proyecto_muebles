@@ -1,6 +1,7 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
 const api = {
+
     getAuthHeaders() {
         const token = localStorage.getItem('token');
         return token ? { 'Authorization': `Bearer ${token}` } : {};
@@ -10,15 +11,11 @@ const api = {
         try {
             const response = await fetch(`${API_BASE_URL}/login`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ usuario, password })
             });
             const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || 'Error en el login');
-            }
+            if (!response.ok) throw new Error(data.error || 'Error en el login');
             return data;
         } catch (error) {
             console.error('Error en el login:', error);
@@ -29,9 +26,7 @@ const api = {
     async getMuebles() {
         try {
             const response = await fetch(`${API_BASE_URL}/muebles`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
             return await response.json();
         } catch (error) {
             console.error('Error fetching muebles:', error);
@@ -42,7 +37,6 @@ const api = {
     async uploadExcel(file) {
         const formData = new FormData();
         formData.append('archivo', file);
-
         try {
             const response = await fetch(`${API_BASE_URL}/subir-excel`, {
                 method: 'POST',
@@ -58,10 +52,7 @@ const api = {
 
     async subirImagenes(files) {
         const formData = new FormData();
-        Array.from(files).forEach(file => {
-            formData.append('imagenes', file);
-        });
-
+        Array.from(files).forEach(file => formData.append('imagenes', file));
         try {
             const response = await fetch(`${API_BASE_URL}/subir-imagenes`, {
                 method: 'POST',
@@ -73,5 +64,37 @@ const api = {
             console.error('Error uploading images:', error);
             return { status: 'error', error: error.message };
         }
+    },
+
+    async calcularDespiece(data) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/despiece`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...this.getAuthHeaders()
+                },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error calculando despiece:', error);
+            return { status: 'error', error: error.message };
+        }
+    },
+
+    async crearSolicitud(datos) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/solicitudes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error creando solicitud:', error);
+            return { status: 'error', error: error.message };
+        }
     }
+
 };
