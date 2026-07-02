@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
     <link rel="stylesheet" href="../css/home.css" type="text/css">
+    <link rel="stylesheet" href="../css/productos.css" type="text/css">
     <title>Inicio | Muebles LB</title>
 </head>
 
@@ -110,6 +111,41 @@
             </div>
         </section>
     </main>
+    
+    <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-custom-content">
+                <div class="modal-header modal-custom-header">
+                    <h5 class="modal-title fw-bold" id="m-nombre">Nombre del Producto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <img id="m-imagen" src="" alt="Producto" class="img-fluid rounded mb-4 modal-custom-img">
+                    <div class="d-flex justify-content-around mb-3 text-start bg-light p-3 rounded">
+                        <div id="m-categoria-row" class="pe-3">
+                            <small class="text-muted d-block">Categoría</small>
+                            <span id="m-categoria" class="fw-bold text-break"></span>
+                        </div>
+                        <div id="m-medidas-col" class="border-start ps-3">
+                            <small class="text-muted d-block">Medidas</small>
+                            <span id="m-medidas" class="fw-bold"></span>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mt-2 modal-custom-price" id="m-precio">$0</h3>
+                    <p class="modal-precio-nota">
+                        <i class="bi bi-check-circle-fill"></i> Incluye mueble, armado y traslado
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center p-3 modal-custom-footer">
+                    <a href="formulario.html" id="btn-solicitar-producto"
+                        class="btn-solicitar w-100 justify-content-center py-2 modal-custom-btn">
+                        <i class="bi bi-send-check"></i> Solicitar este producto
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="custom-footer">
         <div class="container">

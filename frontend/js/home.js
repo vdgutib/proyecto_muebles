@@ -11,12 +11,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         container.innerHTML = muebles.map(m => {
-            const precioVenta = parseFloat(m.precio_venta || m.precio_costo || 0);
+            const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
             const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
             const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
-            const nombreEscaped = (m.nombre || '').replace(/'/g, "\\'").replace(/"]/g, '&quot;');
+            const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
+
+            const nombreEscaped = sanitize(m.nombre);
+            const catNameEscaped = sanitize(m.nombre_categoria || 'Sin Categoría');
+            const medidasEscaped = sanitize(m.medidas || 'N/A');
             const productoId = m.id_mueble || '';
-            const onClickStr = `window.location.href='formulario.html?producto=${encodeURIComponent(nombreEscaped)}&producto_id=${productoId}'`;
+            const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imgPath}', '${productoId}')`;
 
             return `
                 <div class="col-md-4">
@@ -39,3 +43,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '<div class="col-12 text-center"><p class="text-danger">Error al cargar productos destacados. Por favor, intenta más tarde.</p></div>';
     }
 });
+
+function abrirModal(nombre, precio, medidas, categoria, imagenSrc, productoId = '') {
+    document.getElementById('m-nombre').innerText = nombre;
+    document.getElementById('m-precio').innerText = precio;
+
+    const medidasLimpias = (medidas || '').replace(/^medidas:\s*/i, '').trim();
+    document.getElementById('m-medidas').innerText = medidasLimpias || 'N/A';
+
+    const catEl = document.getElementById('m-categoria');
+    const catRow = document.getElementById('m-categoria-row');
+    const medidasDiv = document.getElementById('m-medidas-col');
+    if (!categoria || categoria === 'Sin Categoría') {
+        if (catRow) catRow.style.display = 'none';
+        if (medidasDiv) {
+            medidasDiv.classList.remove('border-start', 'ps-3');
+        }
+    } else {
+        if (catRow) catRow.style.display = '';
+        if (medidasDiv) {
+            medidasDiv.classList.add('border-start', 'ps-3');
+        }
+        catEl.innerText = categoria;
+    }
+
+    document.getElementById('m-imagen').src = imagenSrc;
+    document.getElementById('m-imagen').onerror = function () {
+        this.src = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+    };
+    let url = 'formulario.html?producto=' + encodeURIComponent(nombre);
+    if (productoId) {
+        url += '&producto_id=' + encodeURIComponent(productoId);
+    }
+    document.getElementById('btn-solicitar-producto').href = url;
+
+    if (typeof bootstrap !== 'undefined') {
+        var modalElement = document.getElementById('modalProducto');
+        var myModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        myModal.show();
+    }
+}
