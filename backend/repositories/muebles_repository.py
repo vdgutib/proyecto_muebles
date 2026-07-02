@@ -248,3 +248,55 @@ class MueblesRepository:
             mueble['precio_costo'] = float(mueble['precio_costo'])
         if mueble.get('precio_venta') is not None:
             mueble['precio_venta'] = float(mueble['precio_venta'])
+
+    @staticmethod
+    def limpiar_todos_muebles():
+        """Elimina todos los registros de la tabla muebles. Devuelve la cantidad de registros eliminados."""
+        conexion = get_db_connection()
+        if not conexion:
+            raise Exception("No se pudo conectar a la base de datos")
+
+        cursor = None
+        try:
+            cursor = conexion.cursor()
+            cursor.execute("DELETE FROM muebles")
+            conexion.commit()
+            return cursor.rowcount
+        except mysql.connector.Error:
+            conexion.rollback()
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            conexion.close()
+
+    @staticmethod
+    def get_muebles_destacados():
+        """Devuelve los 3 muebles más caros ordenados por precio_venta descendente."""
+        conexion = get_db_connection()
+        if not conexion:
+            raise Exception("No se pudo conectar a la base de datos")
+
+        cursor = None
+        try:
+            cursor = conexion.cursor(dictionary=True)
+            sql = """
+                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.medidas,
+                       m.precio_costo, m.precio_venta, m.peso_kg, m.bultos,
+                       m.observaciones, c.nombre_categoria
+                FROM muebles m
+                LEFT JOIN categorias c ON m.id_categoria = c.id_categoria
+                ORDER BY m.precio_venta DESC
+                LIMIT 3
+            """
+            cursor.execute(sql)
+            muebles = cursor.fetchall()
+
+            for mueble in muebles:
+                MueblesRepository._castear_decimales(mueble)
+
+            return muebles
+        finally:
+            if cursor:
+                cursor.close()
+            conexion.close()

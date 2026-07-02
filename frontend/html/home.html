@@ -62,49 +62,10 @@
         <section class="featured-section">
             <div class="container">
                 <h2 class="section-title text-center mb-5">Productos Destacados</h2>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="product-item-clean">
-                            <div class="product-img-wrapper">
-                                <img src="../imagenes/producto1.jpeg" class="img-fluid" alt="Sillón Terraza" onerror="this.src='../imagenes/public/producto-placeholder.jpg'">
-                            </div>
-                            <div class="product-info mt-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h3 class="product-title m-0">Sillón Terraza</h3>
-                                    <span class="product-price">$120.000</span>
-                                </div>
-                                <p class="product-desc text-muted mt-2">Ideal para patios y espacios exteriores.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="product-item-clean">
-                            <div class="product-img-wrapper">
-                                <img src="../imagenes/producto2.jpeg" class="img-fluid" alt="Estante Minimalista" onerror="this.src='../imagenes/public/producto-placeholder.jpg'">
-                            </div>
-                            <div class="product-info mt-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h3 class="product-title m-0">Estante Minimalista</h3>
-                                    <span class="product-price">$60.000</span>
-                                </div>
-                                <p class="product-desc text-muted mt-2">Optimiza tu living con estilo y orden.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="product-item-clean">
-                            <div class="product-img-wrapper">
-                                <img src="../imagenes/producto3.jpg" class="img-fluid" alt="Servicio de Armado" onerror="this.src='../imagenes/public/producto-placeholder.jpg'">
-                            </div>
-                            <div class="product-info mt-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h3 class="product-title m-0">Servicio de Armado</h3>
-                                    <span class="product-price">$30.000</span>
-                                </div>
-                                <p class="product-desc text-muted mt-2">Camas, roperos y escritorios listos para usar.
-                                </p>
-                            </div>
-                        </div>
+                <div class="row g-4" id="destacados-container">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p>Cargando productos destacados...</p>
                     </div>
                 </div>
             </div>
@@ -165,6 +126,8 @@
     </footer>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/home.js"></script>
 
 </body>
 

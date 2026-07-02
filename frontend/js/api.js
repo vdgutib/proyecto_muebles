@@ -101,6 +101,36 @@ const api = {
             console.error('Error creando solicitud:', error);
             return { status: 'error', error: error.message };
         }
+    },
+
+    async limpiarBaseDatos() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles/limpiar`, {
+                method: 'POST',
+                headers: this.getAuthHeaders()
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error limpiando base de datos:', error);
+            return { status: 'error', error: error.message };
+        }
+    },
+
+    async getDestacados() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles/destacados`);
+            if (!response.ok) {
+                let errorData = null;
+                try {
+                    errorData = await response.json();
+                } catch(e) {}
+                throw new Error((errorData && errorData.error) ? errorData.error : 'Ocurrió un error al cargar los destacados');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching destacados:', error);
+            return { error: true, message: error.message };
+        }
     }
 
 };

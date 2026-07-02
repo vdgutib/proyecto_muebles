@@ -95,6 +95,9 @@ function abrirModal(nombre, precio, medidas, categoria, imagenSrc) {
     }
 
     document.getElementById('m-imagen').src = imagenSrc;
+    document.getElementById('m-imagen').onerror = function() {
+        this.src = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+    };
     document.getElementById('btn-solicitar-producto').href = 'formulario.html?producto=' + encodeURIComponent(nombre);
 
     if (typeof bootstrap !== 'undefined') {
@@ -170,7 +173,7 @@ async function cargarMuebles() {
                     ${items.map(m => {
             const precioVenta = parseFloat(m.precio_venta || m.precio_costo || 0);
             const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
-            const imgPath = m.imagen ? `../imagenes/public/${m.imagen}` : '../imagenes/public/producto-placeholder.jpg';
+            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
 
             const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
 
@@ -183,7 +186,7 @@ async function cargarMuebles() {
             return `
                         <div class="cat-card compra" onclick="${onClickStr}">
                             <div class="cat-card-img">
-                                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='../imagenes/public/producto-placeholder.jpg'">
+                                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
                             </div>
                             <div class="cat-card-info">
                                 <h5 class="cat-card-name">${nombreEscaped}</h5>

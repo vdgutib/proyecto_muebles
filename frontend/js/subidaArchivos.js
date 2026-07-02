@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imagePreviewGrid = document.getElementById('image-preview-grid');
 
     const btnFinalizar = document.getElementById('btn-finalizar');
+    const btnLimpiarBD = document.getElementById('btn-limpiar-bd');
 
     const formatBytes = (bytes, decimals = 1) => {
         if (!+bytes) return '0 Bytes';
@@ -125,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, false);
 
     fileInputImagenes.addEventListener('change', function(e) {
+        e.preventDefault();
         if(this.files.length > 0) processImages(this.files);
     });
 
@@ -163,6 +165,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnFinalizar.addEventListener('click', () => {
         window.location.href = 'catalogoProductos.html';
+    });
+
+    btnLimpiarBD.addEventListener('click', async () => {
+        if (!confirm('¿Estás seguro de que deseas borrar TODOS los registros de la base de datos? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        try {
+            const result = await api.limpiarBaseDatos();
+            if (result.status === 'success') {
+                alert(result.mensaje);
+                excelFileList.innerHTML = '';
+                imagePreviewGrid.innerHTML = '';
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (err) {
+            alert('Error de conexión al intentar limpiar la base de datos.');
+            console.error('Error limpiando BD:', err);
+        }
     });
 
     function preventDefaults(e) {

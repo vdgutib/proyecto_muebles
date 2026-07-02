@@ -11,7 +11,8 @@ class ExcelService:
     @staticmethod
     def procesar_archivo_excel(archivo, id_admin_actual=1):
         try:
-            df_raw = pd.read_excel(archivo, header=None, dtype=str)
+            # 🚀 ARREGLO 1: Agregamos .fillna("") para que NINGUNA celda vacía se vuelva 'float' (NaN)
+            df_raw = pd.read_excel(archivo, header=None, dtype=str).fillna("")
 
             header_idx = 0
             for i, row in df_raw.iterrows():
@@ -24,13 +25,16 @@ class ExcelService:
             df.columns = df.iloc[header_idx]
             df = df.iloc[header_idx + 1:].reset_index(drop=True)
 
-            df.columns = df.columns.astype(str).str.replace('\\n', ' ').str.replace('\\r', ' ').str.strip().str.upper()
-            df.columns = df.columns.str.replace(r'\\s+', ' ', regex=True)
+            # Limpiamos los nombres de las columnas
+            df.columns = df.columns.astype(str).str.replace('\n', ' ').str.replace('\r', ' ').str.strip().str.upper()
+            df.columns = df.columns.str.replace(r'\s+', ' ', regex=True)
 
             columnas = list(df.columns)
             has_nombre = 'NOMBRE' in columnas
             has_medidas = 'MEDIDAS' in columnas
-            has_precio = any('PRECIO' in col for col in columnas)
+            
+            # 🚀 ARREGLO 2: str(col) por si algún nombre de columna vacío se coló y quiere chocar
+            has_precio = any('PRECIO' in str(col) for col in columnas)
 
             if not (has_nombre and has_medidas and has_precio):
                 return {
@@ -43,21 +47,27 @@ class ExcelService:
             categoria_actual_nombre = None
 
             for _, row in df.iterrows():
-                valores_validos = row.dropna().astype(str).str.strip()
-                valores_validos = valores_validos[(valores_validos != '') & (valores_validos != 'nan')]
+                # Ya no necesitamos dropna() porque eliminamos los NaN con fillna()
+                valores_validos = row.astype(str).str.strip()
+                valores_validos = valores_validos[(valores_validos != '') & (valores_validos != 'NAN') & (valores_validos != 'nan')]
+                
+                # Si la fila está completamente vacía, la saltamos
+                if len(valores_validos) == 0:
+                    continue
 
+                # Si solo hay 1 valor en toda la fila, es la categoría (Ej: "LIVING")
                 if len(valores_validos) == 1:
                     categoria_actual_nombre = valores_validos.iloc[0].upper()
                     continue
 
                 sku_raw = str(row.get('SKU', '')).strip()
                 sku = sku_raw.replace('.0', '')
-                if sku == '' or sku == 'nan':
+                if sku == '' or sku.lower() == 'nan':
                     continue
 
                 nombre = str(row.get('NOMBRE', '')).strip()
                 medidas = str(row.get('MEDIDAS', '')).strip()
-                if medidas == 'nan':
+                if medidas.lower() == 'nan':
                     medidas = ''
 
                 precio_col = None
@@ -67,7 +77,7 @@ class ExcelService:
                         break
 
                 precio_raw = str(row.get(precio_col, '0')).strip() if precio_col else '0'
-                if precio_raw.lower() == 'nan':
+                if precio_raw.lower() == 'nan' or precio_raw == '':
                     precio_raw = '0'
 
                 precio_str = re.sub(r'\.0+$', '', precio_raw)
@@ -78,7 +88,7 @@ class ExcelService:
                     precio_costo = 0
 
                 peso_raw = str(row.get('PESO (KG)', '0')).strip().lower()
-                if peso_raw == 'nan':
+                if peso_raw == 'nan' or peso_raw == '':
                     peso_raw = '0'
                 peso_limpio = re.sub(r'[^\d,.]', '', peso_raw).replace(',', '.')
                 try:
@@ -87,13 +97,15 @@ class ExcelService:
                     peso_final = 0.0
 
                 bultos_raw = str(row.get('BULTOS (CAJAS)', '1')).strip()
+                if bultos_raw == '' or bultos_raw.lower() == 'nan':
+                    bultos_raw = '1'
                 try:
                     bultos = int(float(bultos_raw))
                 except ValueError:
                     bultos = 1
 
                 observaciones = str(row.get('OBSERVACIONES', '')).strip()
-                if observaciones == 'nan':
+                if observaciones.lower() == 'nan':
                     observaciones = ''
 
                 imagen = f"{sku}.jpg"
@@ -118,7 +130,6 @@ class ExcelService:
                     "columnas_encontradas": list(df.columns),
                 }
 
-
             nombres_categorias = [f['categoria_nombre'] for f in filas_muebles if f['categoria_nombre']]
             mapa_categorias = MueblesRepository.resolve_categorias_batch(nombres_categorias)
 
@@ -130,7 +141,6 @@ class ExcelService:
                 )
                 for f in filas_muebles
             ]
-
 
             muebles_insertados = MueblesRepository.upsert_muebles_batch(tuplas_muebles)
 

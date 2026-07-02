@@ -2,9 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const producto = params.get('producto');
     const spanProducto = document.getElementById('nombre-producto');
+    const inputProducto = document.getElementById('producto-input');
 
     if (producto) {
         spanProducto.textContent = producto;
+        if (inputProducto) {
+            inputProducto.value = producto;
+        }
     }
 
     function mostrarAlerta(mensaje, tipo = 'danger') {
@@ -20,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnEnviar) {
         btnEnviar.addEventListener('click', async () => {
 
-            const prod      = (spanProducto.textContent || '').trim();
+            const prod      = (inputProducto ? inputProducto.value : spanProducto.textContent || '').trim();
             const nombre    = document.getElementById('nombre').value.trim();
             const direccion = document.getElementById('direccion').value.trim();
             const contacto  = document.getElementById('contacto').value.trim();

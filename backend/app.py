@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import timedelta
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import (
     JWTManager, jwt_required, get_jwt_identity
@@ -24,7 +24,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 CORS(app)
 
 
@@ -36,6 +36,12 @@ jwt = JWTManager(app)
 @app.route('/')
 def home():
     return "El backend está funcionando correctamente"
+
+
+@app.route('/static/imagenes/<path:filename>')
+def servir_imagen(filename):
+    """Sirve archivos de imagen desde la carpeta static/imagenes"""
+    return send_from_directory(Config.IMAGENES_DIR, filename)
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -155,6 +161,32 @@ def eliminar_mueble(sku):
 
     except Exception:
         logger.exception("Error eliminando el mueble %s", sku)
+        return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
+
+
+@app.route('/api/muebles/limpiar', methods=['POST'])
+@jwt_required()
+def limpiar_muebles():
+    """Elimina todos los registros de muebles de la base de datos"""
+    try:
+        cantidad_eliminada = MueblesRepository.limpiar_todos_muebles()
+        return jsonify({
+            "status": "success",
+            "mensaje": f"Se eliminaron {cantidad_eliminada} registros de la base de datos."
+        }), 200
+    except Exception:
+        logger.exception("Error limpiando la base de datos de muebles")
+        return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
+
+
+@app.route('/api/muebles/destacados', methods=['GET'])
+def obtener_muebles_destacados():
+    """Devuelve los 3 muebles más caros para mostrar en el home"""
+    try:
+        muebles = MueblesRepository.get_muebles_destacados()
+        return jsonify(muebles), 200
+    except Exception:
+        logger.exception("Error obteniendo muebles destacados")
         return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
 
 
