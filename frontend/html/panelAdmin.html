@@ -54,24 +54,52 @@
                         
                         <form class="despiece-form" id="form-despiece">
                             
-                            <div class="despiece-row">
-                                <label for="input-alto" class="despiece-label">Alto (cm):</label>
-                                <input type="number" id="input-alto" name="alto" class="despiece-input" required>
+                            <div class="despiece-row mb-3">
+                                <label for="input-alto" class="despiece-label">Alto:</label>
+                                <div class="input-group" style="width: 160px;">
+                                    <input type="number" id="input-alto" name="alto" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <select class="form-select" id="unidad-alto" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
+                                        <option value="m">m</option>
+                                        <option value="cm" selected>cm</option>
+                                        <option value="mm">mm</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="despiece-row">
-                                <label for="input-ancho" class="despiece-label">Ancho (cm):</label>
-                                <input type="number" id="input-ancho" name="ancho" class="despiece-input" required>
+                            <div class="despiece-row mb-3">
+                                <label for="input-ancho" class="despiece-label">Ancho:</label>
+                                <div class="input-group" style="width: 160px;">
+                                    <input type="number" id="input-ancho" name="ancho" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <select class="form-select" id="unidad-ancho" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
+                                        <option value="m">m</option>
+                                        <option value="cm" selected>cm</option>
+                                        <option value="mm">mm</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="despiece-row">
-                                <label for="input-profundidad" class="despiece-label">Profundidad (cm):</label>
-                                <input type="number" id="input-profundidad" name="profundidad" class="despiece-input" required>
+                            <div class="despiece-row mb-3">
+                                <label for="input-profundidad" class="despiece-label">Profundidad:</label>
+                                <div class="input-group" style="width: 160px;">
+                                    <input type="number" id="input-profundidad" name="profundidad" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <select class="form-select" id="unidad-profundidad" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
+                                        <option value="m">m</option>
+                                        <option value="cm" selected>cm</option>
+                                        <option value="mm">mm</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="despiece-row">
-                                <label for="input-grosor" class="despiece-label">Grosor (mm):</label>
-                                <input type="number" id="input-grosor" name="grosor" class="despiece-input" required>
+                            <div class="despiece-row mb-3">
+                                <label for="input-grosor" class="despiece-label">Grosor:</label>
+                                <div class="input-group" style="width: 160px;">
+                                    <input type="number" id="input-grosor" name="grosor" class="form-control" style="border-color: var(--wisteria-2);" required>
+                                    <select class="form-select" id="unidad-grosor" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
+                                        <option value="m">m</option>
+                                        <option value="cm">cm</option>
+                                        <option value="mm" selected>mm</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-center mt-4">

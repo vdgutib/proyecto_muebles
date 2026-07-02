@@ -26,7 +26,13 @@ const api = {
     async getMuebles() {
         try {
             const response = await fetch(`${API_BASE_URL}/muebles`);
-            if (!response.ok) throw new Error('Network response was not ok');
+            if (!response.ok) {
+                let errorData = null;
+                try {
+                    errorData = await response.json();
+                } catch(e) {}
+                throw new Error((errorData && errorData.error) ? errorData.error : 'Ocurrió un error al cargar el catálogo');
+            }
             return await response.json();
         } catch (error) {
             console.error('Error fetching muebles:', error);

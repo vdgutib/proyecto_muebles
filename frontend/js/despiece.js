@@ -19,7 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
         feedback.className = 'invalid-feedback text-danger mt-1';
         feedback.style.fontSize = '0.85rem';
         feedback.textContent = mensaje;
-        input.parentNode.insertBefore(feedback, input.nextSibling);
+
+        if (input.parentElement.classList.contains('input-group')) {
+            feedback.style.display = 'block';
+            feedback.style.width = '100%';
+            feedback.style.textAlign = 'right';
+            const row = input.parentElement.parentElement;
+            row.style.flexWrap = 'wrap';
+            row.appendChild(feedback);
+        } else {
+            input.parentNode.insertBefore(feedback, input.nextSibling);
+        }
     }
 
     function mostrarResultados(piezas) {
@@ -54,28 +64,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const alertContainer = document.getElementById('alert-container-despiece');
         if (alertContainer) alertContainer.innerHTML = '';
 
-        const data = {
-            alto:        document.getElementById('input-alto').value,
-            ancho:       document.getElementById('input-ancho').value,
-            profundidad: document.getElementById('input-profundidad').value,
-            grosor:      document.getElementById('input-grosor').value
+        const rawData = {
+            alto:        parseFloat(document.getElementById('input-alto').value),
+            ancho:       parseFloat(document.getElementById('input-ancho').value),
+            profundidad: parseFloat(document.getElementById('input-profundidad').value),
+            grosor:      parseFloat(document.getElementById('input-grosor').value)
         };
 
-        // Validación local: todos los campos deben ser números positivos
+        const units = {
+            alto:        document.getElementById('unidad-alto').value,
+            ancho:       document.getElementById('unidad-ancho').value,
+            profundidad: document.getElementById('unidad-profundidad').value,
+            grosor:      document.getElementById('unidad-grosor').value
+        };
+
         let hasError = false;
         ['alto', 'ancho', 'profundidad', 'grosor'].forEach(key => {
-            const val = parseFloat(data[key]);
-            if (isNaN(val) || val <= 0) {
+            if (isNaN(rawData[key]) || rawData[key] <= 0) {
                 mostrarErrorCampo('input-' + key, 'Debe ser un número mayor a 0');
                 hasError = true;
             }
         });
 
-        // Validación grosor (mm) vs dimensiones (cm): convertir grosor a cm para comparar
+        const unitsToCm = { 'mm': 0.1, 'cm': 1, 'm': 100 };
+        const unitsToMm = { 'mm': 1, 'cm': 10, 'm': 1000 };
+
+        const data = {
+            alto: rawData.alto * unitsToCm[units.alto],
+            ancho: rawData.ancho * unitsToCm[units.ancho],
+            profundidad: rawData.profundidad * unitsToCm[units.profundidad],
+            grosor: rawData.grosor * unitsToMm[units.grosor]
+        };
+
         if (!hasError) {
-            const grosorCm = parseFloat(data.grosor) / 10;
-            if (grosorCm >= parseFloat(data.ancho) || grosorCm >= parseFloat(data.alto)) {
-                mostrarErrorCampo('input-grosor', 'El grosor no puede ser mayor o igual que el alto o ancho del mueble');
+            const grosorCm = data.grosor / 10;
+            if ((grosorCm * 2) >= data.ancho || grosorCm >= data.alto) {
+                mostrarErrorCampo('input-grosor', 'El grosor es demasiado grande para las dimensiones del mueble');
                 hasError = true;
             }
         }

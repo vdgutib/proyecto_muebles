@@ -26,4 +26,19 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(result.error || 'Error al iniciar sesión');
         }
     });
+
+    const passIcon = document.querySelector('.pass-icon');
+    if (passIcon) {
+        passIcon.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passIcon.classList.remove('bi-eye-fill');
+                passIcon.classList.add('bi-eye-slash-fill');
+            } else {
+                passwordInput.type = 'password';
+                passIcon.classList.remove('bi-eye-slash-fill');
+                passIcon.classList.add('bi-eye-fill');
+            }
+        });
+    }
 });

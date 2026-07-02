@@ -18,7 +18,10 @@
 
 body {
     font-family: 'Outfit', sans-serif;
-    background-color: #FAF8FD;
+    background-image: url('../imagenes/fondoPagina.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: var(--dark-amethyst);
     min-height: 100vh;
     padding: 0;
@@ -35,17 +38,16 @@ body {
 }
 
 .login-container {
-    border: 2px solid var(--wisteria-2);
-    border-radius: 32px;
+    border-radius: 28px;
     width: 100%;
-    max-width: 1100px;
-    height: 600px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 900px;
+    height: 550px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     display: flex;
     flex-direction: row;
     position: relative;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: #ffffff;
 }
 
 .login-form {
@@ -54,52 +56,69 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .title {
-    font-size: 2.4rem;
-    font-weight: 800;
-    color: var(--dark-amethyst);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--dark-amethyst-2);
     margin-bottom: 5px;
+    text-align: center;
+}
+
+.title-divider {
+    width: 80%;
+    height: 1px;
+    background-color: var(--royal-violet);
+    margin: 0 auto 20px auto;
 }
 
 .subtitle {
     font-size: 1.6rem;
     font-weight: 500;
-    border-bottom: 1px solid var(--wisteria-2);
-    display: inline-block;
-    color: var(--dark-amethyst);
+    color: var(--dark-amethyst-2);
     margin-bottom: 40px;
+    text-align: center;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 20px;
+    width: 100%;
+    max-width: 320px;
 }
 
 .input-group {
     display: flex;
     align-items: center;
-    border: 1px solid var(--wisteria-2);
-    border-radius: 20px;
-    padding: 8px 18px;
+    background-color: #e8e8e8;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    padding: 10px 18px;
     position: relative;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .input-group i {
-    color: #404040;
-    font-size: 1.2rem;
+    color: #333;
+    font-size: 1.1rem;
     margin-right: 12px;
+}
+
+.input-group .pass-icon {
+    margin-right: 0;
+    margin-left: 12px;
+    color: #888;
+    cursor: pointer;
 }
 
 .input-group input {
     border: none;
-    padding: 6px 0;
+    padding: 4px 0;
     flex: 1;
-    color: var(--dark-amethyst);
-    font-size: 1rem;
+    color: #333;
+    font-size: 0.95rem;
     background: transparent;
 }
 
@@ -107,36 +126,42 @@ form {
     outline: none;
 }
 
-.span-pass {
-    font-size: 0.7rem;
-    color: #707070;
-    margin-top: -8px;
-    margin-bottom: 15px;
-    margin-left: 2px;
-    opacity: 0.8;
+.input-group input::-ms-reveal,
+.input-group input::-ms-clear {
+    display: none;
+}
+
+.input-group input::placeholder {
+    color: #888;
 }
 
 .btn-login {
-    background-color: var(--dark-amethyst);
+    background-color: var(--dark-amethyst-2);
     color: #ffffff;
     border: none;
     padding: 12px 0;
-    border-radius: 20px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-top: 15px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .btn-login:hover {
-    background-color: var(--dark-amethyst-2);
+    background-color: var(--indigo-ink);
+    transform: translateY(-2px);
 }
 
 .login-image {
     flex: 1;
-    background-image: url('../imagenes/imagenLogin.png');
-    background-size: cover;
-    background-position: right center;
     position: relative;
-    z-index: 1;   
+    overflow: hidden;
+}
+
+.login-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
 }

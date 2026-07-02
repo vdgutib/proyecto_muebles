@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-    <link rel="stylesheet" href="../css/login.css" type="text/css">
+  <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
+  <link rel="stylesheet" href="../css/login.css" type="text/css">
 </head>
 
 <body>
@@ -12,35 +14,30 @@
   <div class="container">
     <div class="login-container">
       <div class="login-form">
-            <h1 class="title">Panel administrativo</h1>
-            <h2 class="subtitle">iniciar sesión</h2>
+        <h1 class="title">Panel Administrativo</h1>
+        <div class="title-divider"></div>
+        <h2 class="subtitle">Iniciar sesión</h2>
 
-          <form id="login-form">
-            <div class="input-group"> 
-              <i></i>
-              <input type="text" id="email" placeholder="Usuario" required>        
-            </div>
-            
-            <div class="input-group"> 
-              <i></i>
-              <input type="password" id="password" placeholder="contrasena" required>  
-              <i></i>      
-            </div>
-            <span class="span-pass">Contrasena</span>
-            
-            <div>
-              <input type="checkbox" id="recordarme">
-              <label for="recordarme">recordarme</label>
-            </div>
+        <form id="login-form">
+          <div class="input-group">
+            <i class="bi bi-person-fill"></i>
+            <input type="text" id="email" placeholder="Usuario" required>
+          </div>
 
-            <button type="submit" class="btn-login">Iniciar Sesión</button>
-  
-          </form>
-        </div>
+          <div class="input-group">
+            <i class="bi bi-lock-fill"></i>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <i class="bi bi-eye-fill pass-icon"></i>
+          </div>
 
-        <div class="login-image">
-            <div></div>
-        </div>
+          <button type="submit" class="btn-login">Iniciar sesión</button>
+
+        </form>
+      </div>
+
+      <div class="login-image">
+        <img src="../imagenes/imagenLogin.png">
+      </div>
 
     </div>
 
@@ -48,4 +45,5 @@
   <script src="../js/api.js"></script>
   <script src="../js/login.js"></script>
 </body>
+
 </html>

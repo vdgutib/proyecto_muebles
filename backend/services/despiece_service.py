@@ -35,17 +35,16 @@ class DespieceService:
         if grosor > LIMITE_GROSOR_MM:
             raise DespieceError(f"El grosor no puede superar {LIMITE_GROSOR_MM} mm")
 
-        if grosor >= ancho or grosor >= alto:
-            raise DespieceError("El grosor no puede ser mayor o igual que el alto/ancho del mueble")
+        if ((grosor / 10) * 2) >= ancho or (grosor / 10) >= alto:
+            raise DespieceError("El grosor es demasiado grande para las dimensiones del mueble")
 
         return alto, ancho, profundidad, grosor
 
     @staticmethod
-    def _calcular_piezas(alto_cm, ancho_cm, profundidad_cm, grosor_cm):
+    def _calcular_piezas(alto_cm, ancho_cm, profundidad_cm, grosor_mm):
         alto_mm = alto_cm * 10
         ancho_mm = ancho_cm * 10
         profundidad_mm = profundidad_cm * 10
-        grosor_mm = grosor_cm * 10
         tolerancia_mm = 2
 
         return [
