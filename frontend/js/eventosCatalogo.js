@@ -74,18 +74,19 @@ function filtrarCatalogo() {
     // Filtrar con lógica AND estricta: un producto SOLO pasa si cumple TODAS las condiciones
     const mueblesFiltrados = allMuebles.filter(m => {
         // Condición 1: Categoría (debe coincidir O ser "todos")
-        const cumpleCategoria = categoriaSeleccionada === 'todos' || 
+        const cumpleCategoria = categoriaSeleccionada === 'todos' ||
                                 toSlug(m.nombre_categoria || 'Sin Categoría') === categoriaSeleccionada;
-        
-        // Condición 2: Precio (debe ser <= al máximo del slider)
-        const precioProducto = Number(m.precio_venta || m.precio_costo || 0);
-        const cumplePrecio = precioProducto <= precioMaximo;
-        
+
+        // Condición 2: Precio (debe ser <= al máximo del slider). Number() convierte
+        // explícitamente strings numéricos a número real antes de comparar.
+        const precioProducto = Number(m.precio_venta ?? m.precio_costo ?? 0);
+        const cumplePrecio = !Number.isNaN(precioProducto) && precioProducto <= precioMaximo;
+
         // Condición 3: Búsqueda de texto (nombre debe incluir el texto buscado)
         const nombreProducto = (m.nombre || '').toLowerCase();
         const cumpleBusqueda = textoBusqueda === '' || nombreProducto.includes(textoBusqueda);
-        
-        // Lógica AND estricta: solo pasa si cumple las 3 condiciones
+
+        // Lógica AND estricta: solo pasa si cumple las 3 condiciones a la vez
         return cumpleCategoria && cumplePrecio && cumpleBusqueda;
     });
 
@@ -100,6 +101,24 @@ function renderizarCatalogoFiltrado(muebles) {
         container.innerHTML = '<div class="alert alert-info text-center">No se encontraron productos con los filtros actuales.</div>';
         return;
     }
+
+    // ── FIX CRÍTICO ──────────────────────────────────────────────────────
+    // Este era el bug raíz de los 4 síntomas reportados: antes esta función
+    // hacía `container.innerHTML += sectionHtml` sin limpiar primero. Como
+    // filtrarCatalogo() se dispara en CADA tecla, cada movimiento del slider
+    // y cada clic de categoría, el HTML viejo (sin filtrar) nunca se borraba:
+    // se apilaban secciones duplicadas con IDs repetidos (id="grid-racks",
+    // etc.), y document.getElementById() siempre agarra la PRIMERA coincidencia
+    // del documento. Resultado: la paginación/ocultamiento de tarjetas seguía
+    // operando sobre el bloque antiguo, mientras el bloque nuevo (ya filtrado
+    // correctamente) quedaba visible sin recortar. Por eso parecía que
+    // "todas las categorías siguen apareciendo" o que "precios de 130k se
+    // cuelan" aunque la lógica de comparación en sí era correcta.
+    container.innerHTML = '';
+    // Limpiamos también el registro de paginación para que categorías que
+    // ya no aparecen en este filtrado no dejen estado colgado.
+    Object.keys(paginacion).forEach(k => delete paginacion[k]);
+    // ─────────────────────────────────────────────────────────────────────
 
     const categorias = {};
     muebles.forEach(m => {
@@ -117,13 +136,10 @@ function renderizarCatalogoFiltrado(muebles) {
         const catSlug = toSlug(catName);
         const items = categorias[catName];
 
-        if (categoryFilters && !document.getElementById('btn-' + catSlug)) {
+        // Como category-filters se reconstruyó desde cero arriba, cada botón
+        // de categoría se agrega una sola vez por pasada de filtrado.
+        if (categoryFilters) {
             categoryFilters.innerHTML += `<button class="top-cat-btn ${currentCategory === catSlug ? 'active' : ''}" id="btn-${catSlug}" onclick="filtrarCategoria('${catSlug}')">${catName}</button>`;
-        } else if (categoryFilters) {
-            const btn = document.getElementById('btn-' + catSlug);
-            if (btn) {
-                btn.classList.toggle('active', currentCategory === catSlug);
-            }
         }
 
         const sectionHtml = `
@@ -144,7 +160,7 @@ function renderizarCatalogoFiltrado(muebles) {
                 </div>
                 <div class="catalog-grid" id="grid-${catSlug}">
                     ${items.map(m => {
-            const precioVenta = parseFloat(m.precio_venta || m.precio_costo || 0);
+            const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
             const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
             const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
 
@@ -251,7 +267,7 @@ async function cargarMuebles() {
     allMuebles = muebles;
 
     // Calcular precio máximo para el slider
-    const maxPrecio = Math.max(...muebles.map(m => parseFloat(m.precio_venta || m.precio_costo || 0)));
+    const maxPrecio = Math.max(...muebles.map(m => parseFloat(m.precio_venta ?? m.precio_costo ?? 0)).filter(p => !Number.isNaN(p)));
     const priceRange = document.getElementById('price-range');
     const priceValue = document.getElementById('price-value');
     
