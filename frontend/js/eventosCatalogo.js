@@ -1,61 +1,7 @@
-const paginacion = {};
 let allMuebles = [];
 let currentCategory = 'todos';
 let currentSearch = '';
 let currentMaxPrice = 1000000;
-
-function getPerPage() {
-    const w = window.innerWidth;
-    if (w < 576) return 1;
-    if (w < 992) return 2;
-    return 3;
-}
-
-function renderSeccion(sec) {
-    const grid = document.getElementById('grid-' + sec);
-    if (!grid) return;
-
-    const cards = Array.from(grid.querySelectorAll('.cat-card'));
-    const perPage = getPerPage();
-
-    if (paginacion[sec] === undefined) paginacion[sec] = 0;
-    const page = paginacion[sec];
-
-    const total = cards.length;
-    const totalPages = Math.ceil(total / perPage);
-    const start = page * perPage;
-    const end = Math.min(start + perPage, total);
-
-    cards.forEach(function (card, i) {
-        card.style.display = (i >= start && i < end) ? '' : 'none';
-    });
-
-    const counter = document.getElementById('counter-' + sec);
-    if (counter) {
-        counter.textContent = total > 0 ? (start + 1) + '-' + end + ' de ' + total : '';
-    }
-
-    const prevBtn = document.getElementById('prev-' + sec);
-    const nextBtn = document.getElementById('next-' + sec);
-
-    if (prevBtn) prevBtn.disabled = (page === 0);
-    if (nextBtn) nextBtn.disabled = (page >= totalPages - 1);
-
-    const navEl = document.getElementById('nav-' + sec);
-    if (navEl) {
-        navEl.style.display = (total <= perPage) ? 'none' : 'flex';
-    }
-}
-
-function navSection(sec, dir) {
-    const grid = document.getElementById('grid-' + sec);
-    if (!grid) return;
-
-    const total = grid.querySelectorAll('.cat-card').length;
-    const totalPages = Math.ceil(total / getPerPage());
-    paginacion[sec] = Math.max(0, Math.min((paginacion[sec] || 0) + dir, totalPages - 1));
-    renderSeccion(sec);
-}
 
 function filtrarCategoria(tipo) {
     currentCategory = tipo;
@@ -93,6 +39,36 @@ function filtrarCatalogo() {
     renderizarCatalogoFiltrado(mueblesFiltrados);
 }
 
+// Arma el HTML de una tarjeta de producto. Se extrajo a su propia función porque
+// ahora se genera igual tanto en modo carrusel (vista "Todos") como en modo grilla
+// completa (categoría específica); antes vivía inline dentro de un solo template.
+function crearTarjetaHtml(m, catName) {
+    const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
+    const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
+    const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+
+    const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
+
+    const nombreEscaped = sanitize(m.nombre);
+    const catNameEscaped = sanitize(catName);
+    const medidasEscaped = sanitize(m.medidas || 'N/A');
+
+    const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imgPath}', '${m.id_mueble || ''}')`;
+
+    return `
+        <div class="cat-card compra" onclick="${onClickStr}">
+            <div class="cat-card-img">
+                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+            </div>
+            <div class="cat-card-info">
+                <h5 class="cat-card-name">${nombreEscaped}</h5>
+                <p class="cat-card-desc">${m.observaciones || 'Sin descripción'}</p>
+                <span class="cat-card-price">${precioFormateado}</span>
+            </div>
+        </div>
+    `;
+}
+
 function renderizarCatalogoFiltrado(muebles) {
     const container = document.getElementById('dynamic-catalog-container');
     if (!container) return;
@@ -102,24 +78,9 @@ function renderizarCatalogoFiltrado(muebles) {
         return;
     }
 
-    // ── FIX CRÍTICO ──────────────────────────────────────────────────────
-    // Este era el bug raíz de los 4 síntomas reportados: antes esta función
-    // hacía `container.innerHTML += sectionHtml` sin limpiar primero. Como
-    // filtrarCatalogo() se dispara en CADA tecla, cada movimiento del slider
-    // y cada clic de categoría, el HTML viejo (sin filtrar) nunca se borraba:
-    // se apilaban secciones duplicadas con IDs repetidos (id="grid-racks",
-    // etc.), y document.getElementById() siempre agarra la PRIMERA coincidencia
-    // del documento. Resultado: la paginación/ocultamiento de tarjetas seguía
-    // operando sobre el bloque antiguo, mientras el bloque nuevo (ya filtrado
-    // correctamente) quedaba visible sin recortar. Por eso parecía que
-    // "todas las categorías siguen apareciendo" o que "precios de 130k se
-    // cuelan" aunque la lógica de comparación en sí era correcta.
-    container.innerHTML = '';
-    // Limpiamos también el registro de paginación para que categorías que
-    // ya no aparecen en este filtrado no dejen estado colgado.
-    Object.keys(paginacion).forEach(k => delete paginacion[k]);
-    // ─────────────────────────────────────────────────────────────────────
-
+    // Nota: seguimos limpiando el contenedor con una única asignación (no `+=`) en
+    // vez de ir acumulando HTML — eso fue lo que causaba que categorías/precios
+    // viejos quedaran pegados en el DOM cada vez que se filtraba (ver commit anterior).
     const categorias = {};
     muebles.forEach(m => {
         const cat = m.nombre_categoria || 'Sin Categoría';
@@ -127,72 +88,137 @@ function renderizarCatalogoFiltrado(muebles) {
         categorias[cat].push(m);
     });
 
-    const categoryFilters = document.getElementById('category-filters');
-    if (categoryFilters) {
-        categoryFilters.innerHTML = `<button class="top-cat-btn ${currentCategory === 'todos' ? 'active' : ''}" id="btn-todos" onclick="filtrarCategoria('todos')"><i class="bi bi-grid-fill"></i> Todos</button>`;
-    }
+    // Vista "Todos" → filas horizontales tipo carrusel (una por categoría).
+    // Categoría específica → una sola grilla vertical con TODOS sus productos,
+    // sin recorte ni paginación: el usuario solo desliza hacia abajo.
+    const esVistaGeneral = currentCategory === 'todos';
 
-    Object.keys(categorias).forEach(catName => {
+    let botonesHtml = `<button class="top-cat-btn ${currentCategory === 'todos' ? 'active' : ''}" id="btn-todos" onclick="filtrarCategoria('todos')"><i class="bi bi-grid-fill"></i> Todos</button>`;
+    let seccionesHtml = '';
+
+    Object.keys(categorias).forEach((catName, index) => {
         const catSlug = toSlug(catName);
         const items = categorias[catName];
+        const cantidadTexto = items.length + (items.length === 1 ? ' producto' : ' productos');
 
-        // Como category-filters se reconstruyó desde cero arriba, cada botón
-        // de categoría se agrega una sola vez por pasada de filtrado.
-        if (categoryFilters) {
-            categoryFilters.innerHTML += `<button class="top-cat-btn ${currentCategory === catSlug ? 'active' : ''}" id="btn-${catSlug}" onclick="filtrarCategoria('${catSlug}')">${catName}</button>`;
-        }
+        botonesHtml += `<button class="top-cat-btn ${currentCategory === catSlug ? 'active' : ''}" id="btn-${catSlug}" onclick="filtrarCategoria('${catSlug}')">${catName}</button>`;
 
-        const sectionHtml = `
-            <div class="catalog-section" id="seccion-${catSlug}" data-categoria="${catSlug}" style="display: ${currentCategory === 'todos' || currentCategory === catSlug ? 'block' : 'none'};">
+        const navHtml = esVistaGeneral
+            ? `<div class="section-nav" id="nav-${catSlug}">
+                    <span class="nav-counter">${cantidadTexto}</span>
+                    <button class="nav-arrow" id="prev-${catSlug}" onclick="scrollFila('${catSlug}', -1)" aria-label="Anterior">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="nav-arrow" id="next-${catSlug}" onclick="scrollFila('${catSlug}', 1)" aria-label="Siguiente">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+               </div>`
+            : `<span class="nav-counter nav-counter--static">${cantidadTexto}</span>`;
+
+        seccionesHtml += `
+            <div class="catalog-section" id="seccion-${catSlug}" data-categoria="${catSlug}" style="animation-delay: ${Math.min(index, 6) * 70}ms;">
                 <div class="section-top">
                     <h2 class="catalog-section-label">
                         <i class="bi bi-collection me-2"></i>${catName}
                     </h2>
-                    <div class="section-nav" id="nav-${catSlug}">
-                        <button class="nav-arrow" id="prev-${catSlug}" onclick="navSection('${catSlug}', -1)" disabled aria-label="Anterior">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <span class="nav-counter" id="counter-${catSlug}"></span>
-                        <button class="nav-arrow" id="next-${catSlug}" onclick="navSection('${catSlug}', 1)" aria-label="Siguiente">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
+                    ${navHtml}
                 </div>
-                <div class="catalog-grid" id="grid-${catSlug}">
-                    ${items.map(m => {
-            const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
-            const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
-            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
-
-            const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
-
-            const nombreEscaped = sanitize(m.nombre);
-            const catNameEscaped = sanitize(catName);
-            const medidasEscaped = sanitize(m.medidas || 'N/A');
-
-            const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imgPath}', '${m.id_mueble || ''}')`;
-
-            return `
-                        <div class="cat-card compra" onclick="${onClickStr}">
-                            <div class="cat-card-img">
-                                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
-                            </div>
-                            <div class="cat-card-info">
-                                <h5 class="cat-card-name">${nombreEscaped}</h5>
-                                <p class="cat-card-desc">${m.observaciones || 'Sin descripción'}</p>
-                                <span class="cat-card-price">${precioFormateado}</span>
-                            </div>
-                        </div>
-                        `;
-        }).join('')}
+                <div class="catalog-grid ${esVistaGeneral ? 'catalog-grid--carousel' : 'catalog-grid--full'}" id="grid-${catSlug}">
+                    ${items.map(m => crearTarjetaHtml(m, catName)).join('')}
                 </div>
             </div>
         `;
-
-        container.innerHTML += sectionHtml;
-        paginacion[catSlug] = 0;
-        renderSeccion(catSlug);
     });
+
+    const categoryFilters = document.getElementById('category-filters');
+    if (categoryFilters) categoryFilters.innerHTML = botonesHtml;
+    container.innerHTML = seccionesHtml;
+
+    // Carruseles: calcular si hay contenido suficiente para deslizar y dejar
+    // escuchando el scroll de cada fila para habilitar/deshabilitar sus flechas.
+    if (esVistaGeneral) initCarruseles();
+
+    // Animación de aparición: las tarjetas entran con un leve fade + desplazamiento
+    // a medida que se hacen visibles, en vez de "aparecer cortadas" de golpe.
+    activarRevealAnimado();
+}
+
+// ── Carrusel horizontal (vista "Todos") ────────────────────────────────────
+// Desliza una fila de categoría. Se mueve el ancho de ~2 tarjetas en desktop
+// y 1 en mobile, con scroll suave nativo (sin reflow manual ni recorte de tarjetas).
+function scrollFila(sec, dir) {
+    const grid = document.getElementById('grid-' + sec);
+    if (!grid) return;
+
+    const primeraCard = grid.querySelector('.cat-card');
+    const anchoCard = primeraCard ? primeraCard.getBoundingClientRect().width : 260;
+    const gap = 20;
+    const tarjetasPorSalto = window.innerWidth < 768 ? 1 : 2;
+
+    grid.scrollBy({ left: dir * (anchoCard + gap) * tarjetasPorSalto, behavior: 'smooth' });
+}
+
+// Habilita/deshabilita las flechas según cuánto se pueda seguir deslizando, y
+// oculta la navegación por completo si la fila ya cabe entera en pantalla.
+function actualizarFlechasCarrusel(grid) {
+    if (!grid) return;
+    const sec = grid.id.replace('grid-', '');
+    const prevBtn = document.getElementById('prev-' + sec);
+    const nextBtn = document.getElementById('next-' + sec);
+    const navEl = document.getElementById('nav-' + sec);
+
+    const maxScroll = grid.scrollWidth - grid.clientWidth;
+    const sePuedeDesplazar = maxScroll > 4;
+
+    if (navEl) {
+        navEl.querySelectorAll('.nav-arrow').forEach(f => {
+            f.style.display = sePuedeDesplazar ? '' : 'none';
+        });
+    }
+    if (prevBtn) prevBtn.disabled = grid.scrollLeft <= 4;
+    if (nextBtn) nextBtn.disabled = grid.scrollLeft >= maxScroll - 4;
+}
+
+// Registra el estado inicial de flechas de cada carrusel presente en el DOM y
+// deja un listener de scroll por fila para irlas actualizando mientras se desliza.
+// Se llama de nuevo en cada render, pero como los grids viejos se reemplazan por
+// completo (container.innerHTML), los listeners de las filas anteriores se
+// descartan junto con esos nodos — no hay acumulación de listeners huérfanos.
+function initCarruseles() {
+    document.querySelectorAll('.catalog-grid--carousel').forEach(grid => {
+        actualizarFlechasCarrusel(grid);
+        grid.addEventListener('scroll', () => actualizarFlechasCarrusel(grid), { passive: true });
+    });
+}
+
+// ── Animación de aparición ──────────────────────────────────────────────────
+// Cada tarjeta arranca "oculta" (opacity 0 + leve desplazamiento) y se revela con
+// una transición suave apenas entra en el viewport, en vez de aparecer de golpe.
+// Funciona igual para la grilla vertical (se revela al bajar) y para el carrusel
+// (se revela al deslizar hacia los lados, porque IntersectionObserver también
+// reacciona al scroll horizontal de un contenedor con overflow).
+function activarRevealAnimado() {
+    const cards = document.querySelectorAll('.catalog-grid .cat-card');
+    if (!cards.length) return;
+
+    if (!('IntersectionObserver' in window)) return; // sin soporte: quedan visibles por defecto
+
+    cards.forEach((card, i) => {
+        card.classList.add('reveal-ready');
+        card.style.transitionDelay = (Math.min(i % 9, 8) * 45) + 'ms';
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('reveal-ready');
+                entry.target.style.transitionDelay = '';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+    cards.forEach(card => observer.observe(card));
 }
 
 function abrirModal(nombre, precio, medidas, categoria, imagenSrc, productoId = '') {
@@ -307,10 +333,7 @@ var resizeTimer;
 window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
-        Object.keys(paginacion).forEach(sec => {
-            paginacion[sec] = 0;
-            renderSeccion(sec);
-        });
+        document.querySelectorAll('.catalog-grid--carousel').forEach(actualizarFlechasCarrusel);
     }, 150);
 });
 

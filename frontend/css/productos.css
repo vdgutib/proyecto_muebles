@@ -34,6 +34,7 @@
 
 .catalog-section {
     margin-bottom: 48px;
+    animation: sectionEnter 0.45s ease both;
 }
 
 .section-top {
@@ -98,10 +99,60 @@
     opacity: 0.75;
 }
 
+.nav-counter--static {
+    min-width: auto;
+    opacity: 0.6;
+    font-size: 0.82rem;
+}
+
+@keyframes sectionEnter {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .catalog-grid {
+    gap: 20px;
+}
+
+/* Categoría específica: grilla vertical con TODOS los productos, sin recorte.
+   El usuario simplemente desliza la página hacia abajo para ver más. */
+.catalog-grid--full {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+}
+
+/* Vista "Todos": fila horizontal deslizable, una por categoría (estilo Netflix).
+   Las tarjetas tienen ancho fijo y no se envuelven; se recorren con scroll
+   horizontal nativo (touch, trackpad o las flechas de la cabecera). */
+.catalog-grid--carousel {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x proximity;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--wisteria-2) transparent;
+}
+
+.catalog-grid--carousel .cat-card {
+    flex: 0 0 auto;
+    width: min(78vw, 260px);
+    scroll-snap-align: start;
+}
+
+.catalog-grid--carousel::-webkit-scrollbar {
+    height: 7px;
+}
+
+.catalog-grid--carousel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.catalog-grid--carousel::-webkit-scrollbar-thumb {
+    background-color: var(--wisteria-2);
+    border-radius: 10px;
 }
 
 .cat-card {
@@ -110,7 +161,15 @@
     overflow: hidden;
     border: 1px solid #ede8f5;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+}
+
+/* Estado inicial antes de entrar en el viewport (JS le quita esta clase al
+   revelarla). El transition de opacity/transform vive en .cat-card de base,
+   así el fade-in no pisa la animación de :hover una vez revelada la tarjeta. */
+.cat-card.reveal-ready {
+    opacity: 0;
+    transform: translateY(18px);
 }
 
 .cat-card:hover {
@@ -196,13 +255,13 @@
 }
 
 @media (max-width: 768px) {
-    .catalog-grid {
+    .catalog-grid--full {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 480px) {
-    .catalog-grid {
+    .catalog-grid--full {
         grid-template-columns: 1fr;
     }
 }
