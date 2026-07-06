@@ -32,7 +32,7 @@ main {
 }
 
 .nav-custom {
-    background-image: url('../imagenes/fondoNav.png');
+    background-image: url('../../imagenes/fondoNav.png');
     background-size: cover;
     background-position: center;
     border-bottom: 3px solid var(--royal-violet);

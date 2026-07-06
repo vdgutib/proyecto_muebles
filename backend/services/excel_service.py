@@ -11,7 +11,7 @@ class ExcelService:
     @staticmethod
     def procesar_archivo_excel(archivo, id_admin_actual=1):
         try:
-            # 🚀 ARREGLO 1: Agregamos .fillna("") para que NINGUNA celda vacía se vuelva 'float' (NaN)
+            # ARREGLO 1: Agregamos .fillna("") para que NINGUNA celda vacía se vuelva 'float' (NaN)
             df_raw = pd.read_excel(archivo, header=None, dtype=str).fillna("")
 
             header_idx = 0
@@ -33,7 +33,7 @@ class ExcelService:
             has_nombre = 'NOMBRE' in columnas
             has_medidas = 'MEDIDAS' in columnas
             
-            # 🚀 ARREGLO 2: str(col) por si algún nombre de columna vacío se coló y quiere chocar
+            # ARREGLO 2: str(col) por si algún nombre de columna vacío se coló y quiere chocar
             has_precio = any('PRECIO' in str(col) for col in columnas)
 
             if not (has_nombre and has_medidas and has_precio):
