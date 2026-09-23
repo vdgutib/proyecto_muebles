@@ -108,7 +108,19 @@ class ExcelService:
                 if observaciones.lower() == 'nan':
                     observaciones = ''
 
-                imagen = f"{sku}.jpg"
+                imagen_col = next((col for col in row.index if 'IMAGEN' in str(col).upper()), None)
+                if imagen_col:
+                    imagen_val = str(row.get(imagen_col, '')).strip()
+                    imagen = imagen_val if imagen_val and imagen_val.lower() != 'nan' else f"{sku}.jpg"
+                else:
+                    imagen = f"{sku}.jpg"
+
+                video_col = next((col for col in row.index if 'VIDEO' in str(col).upper()), None)
+                video_url = None
+                if video_col:
+                    vid = str(row.get(video_col, '')).strip()
+                    if vid and vid.lower() != 'nan':
+                        video_url = vid
 
                 filas_muebles.append({
                     'sku': sku,
@@ -119,6 +131,7 @@ class ExcelService:
                     'peso_kg': peso_final,
                     'bultos': bultos,
                     'observaciones': observaciones,
+                    'video_url': video_url,
                     'categoria_nombre': categoria_actual_nombre,
                 })
 
@@ -135,7 +148,7 @@ class ExcelService:
 
             tuplas_muebles = [
                 (
-                    f['sku'], f['nombre'], f['imagen'], f['medidas'], f['precio_costo'],
+                    f['sku'], f['nombre'], f['imagen'], f['video_url'], f['medidas'], f['precio_costo'],
                     f['peso_kg'], f['bultos'], f['observaciones'],
                     mapa_categorias.get(f['categoria_nombre']) if f['categoria_nombre'] else None,
                 )

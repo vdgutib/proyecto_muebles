@@ -52,13 +52,15 @@ function crearTarjetaHtml(m, catName) {
     const nombreEscaped = sanitize(m.nombre);
     const catNameEscaped = sanitize(catName);
     const medidasEscaped = sanitize(m.medidas || 'N/A');
+    const imagenesStr = sanitize(m.imagen || '');
+    const videoUrlStr = sanitize(m.video_url || '');
 
-    const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imgPath}', '${m.id_mueble || ''}')`;
+    const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imagenesStr}', '${videoUrlStr}', '${m.id_mueble || ''}')`;
 
     return `
         <div class="cat-card compra" onclick="${onClickStr}">
             <div class="cat-card-img">
-                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+                <img src="${imagenesStr ? 'http://localhost:5000/static/imagenes/' + imagenesStr.split(',')[0] : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg'}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
             </div>
             <div class="cat-card-info">
                 <h5 class="cat-card-name">${nombreEscaped}</h5>
@@ -221,7 +223,7 @@ function activarRevealAnimado() {
     cards.forEach(card => observer.observe(card));
 }
 
-function abrirModal(nombre, precio, medidas, categoria, imagenSrc, productoId = '') {
+function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr, productoId = '') {
     document.getElementById('m-nombre').innerText = nombre;
     document.getElementById('m-precio').innerText = precio;
 
@@ -244,10 +246,51 @@ function abrirModal(nombre, precio, medidas, categoria, imagenSrc, productoId = 
         catEl.innerText = categoria;
     }
 
-    document.getElementById('m-imagen').src = imagenSrc;
-    document.getElementById('m-imagen').onerror = function() {
-        this.src = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
-    };
+    const carruselInner = document.getElementById('m-carrusel-inner');
+    carruselInner.innerHTML = '';
+    
+    let itemsHtml = '';
+    let hasItems = false;
+    
+    if (imagenesStr) {
+        const imagenes = imagenesStr.split(',');
+        imagenes.forEach((img, index) => {
+            if(img.trim()){
+                itemsHtml += `
+                <div class="carousel-item ${!hasItems ? 'active' : ''}">
+                    <img src="http://localhost:5000/static/imagenes/${img.trim()}" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="${nombre}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+                </div>`;
+                hasItems = true;
+            }
+        });
+    }
+
+    if (videoUrlStr) {
+        // Asumiendo formato youtube
+        let embedUrl = videoUrlStr;
+        if(videoUrlStr.includes('watch?v=')){
+            embedUrl = videoUrlStr.replace('watch?v=', 'embed/');
+        } else if(videoUrlStr.includes('youtu.be/')){
+            embedUrl = videoUrlStr.replace('youtu.be/', 'youtube.com/embed/');
+        }
+        
+        itemsHtml += `
+        <div class="carousel-item ${!hasItems ? 'active' : ''}">
+            <div class="ratio ratio-16x9 w-100 rounded" style="max-height: 400px; background: #000;">
+                <iframe src="${embedUrl}" title="Video Producto" allowfullscreen></iframe>
+            </div>
+        </div>`;
+        hasItems = true;
+    }
+    
+    if (!hasItems) {
+        itemsHtml = `
+        <div class="carousel-item active">
+            <img src="http://localhost:5000/static/imagenes/producto-placeholder.jpg" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="Placeholder">
+        </div>`;
+    }
+    
+    carruselInner.innerHTML = itemsHtml;
     
     let url = 'formulario.html?producto=' + encodeURIComponent(nombre);
     if (productoId) {

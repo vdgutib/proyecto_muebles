@@ -301,3 +301,34 @@ main {
         align-items: center;
     }
 }
+
+/* Premium Own Furniture Section */
+.own-furniture-section {
+    border-bottom: 1px solid var(--wisteria-2);
+}
+
+.glassmorphism-card {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.glassmorphism-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+}
+
+.furniture-floating-img {
+    transition: transform 0.5s ease;
+}
+
+.glassmorphism-card:hover .furniture-floating-img {
+    transform: scale(1.05);
+}
+
+.own-furniture-btn {
+    transition: all 0.3s ease;
+}
+
+.own-furniture-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(123, 44, 191, 0.4) !important;
+}

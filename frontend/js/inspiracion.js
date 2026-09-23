@@ -1,19 +1,26 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const container = document.getElementById('destacados-container');
+    const container = document.getElementById('gallery-grid');
     if (!container) return;
 
     try {
-        const muebles = await api.getDestacados();
-
-        if (muebles.error || muebles.length === 0) {
-            container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No hay productos destacados disponibles en este momento.</p></div>';
+        const muebles = await api.getMuebles();
+        if (muebles.error) {
+            container.innerHTML = '<div class="col-12 text-center text-danger">Error al cargar la galería.</div>';
             return;
         }
 
-        container.innerHTML = muebles.map(m => {
+        // Filtrar muebles que tengan video
+        const mueblesConVideo = muebles.filter(m => m.video_url && m.video_url.trim() !== '');
+
+        if (mueblesConVideo.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center text-muted w-100 py-5">Aún no hay muebles con videos para mostrar en inspiración.</div>';
+            return;
+        }
+
+        container.innerHTML = mueblesConVideo.map(m => {
             const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
             const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
-            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen.split(',')[0]}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
             const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
 
             const nombreEscaped = sanitize(m.nombre);
@@ -24,25 +31,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             const productoId = m.id_mueble || '';
             const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imagenesStr}', '${videoUrlStr}', '${productoId}')`;
 
+            let embedUrl = videoUrlStr;
+            if(videoUrlStr.includes('watch?v=')){
+                embedUrl = videoUrlStr.replace('watch?v=', 'embed/');
+            } else if(videoUrlStr.includes('youtu.be/')){
+                embedUrl = videoUrlStr.replace('youtu.be/', 'youtube.com/embed/');
+            }
+
             return `
-                <div class="col-md-4">
-                    <div class="product-item-clean" style="cursor: pointer;" onclick="${onClickStr}">
-                        <div class="product-img-wrapper">
-                            <img src="${imagenesStr ? 'http://localhost:5000/static/imagenes/' + imagenesStr.split(',')[0] : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg'}" class="img-fluid" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
-                        </div>
-                        <div class="product-info mt-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="product-title m-0">${nombreEscaped}</h3>
-                                <span class="product-price">${precioFormateado}</span>
-                            </div>
-                        </div>
+                <div class="gallery-card" onclick="${onClickStr}" style="cursor: pointer;">
+                    <div class="ratio ratio-16x9 w-100" style="pointer-events: none;">
+                        <iframe src="${embedUrl}?controls=0&mute=1&showinfo=0&rel=0&autoplay=0" title="Video Producto" allowfullscreen></iframe>
+                    </div>
+                    <span class="card-tag">Premium</span>
+                    <div class="card-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; flex-direction: column; justify-content: flex-end;">
+                        <span class="card-category text-white mb-1"><i class="bi bi-play-circle-fill me-1"></i> Ver Detalles</span>
+                        <h3 class="card-title text-white">${nombreEscaped}</h3>
+                        <p class="card-desc text-white-50">${medidasEscaped}</p>
                     </div>
                 </div>
             `;
         }).join('');
     } catch (error) {
-        console.error('Error cargando destacados:', error);
-        container.innerHTML = '<div class="col-12 text-center"><p class="text-danger">Error al cargar productos destacados. Por favor, intenta más tarde.</p></div>';
+        console.error('Error cargando inspiración:', error);
+        container.innerHTML = '<div class="col-12 text-center text-danger w-100 py-5">Error al cargar los videos.</div>';
     }
 });
 
@@ -113,7 +125,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
     }
     
     carruselInner.innerHTML = itemsHtml;
-
+    
     let url = 'formulario.html?producto=' + encodeURIComponent(nombre);
     if (productoId) {
         url += '&producto_id=' + encodeURIComponent(productoId);

@@ -60,75 +60,10 @@
         <section class="gallery-section">
             <div class="gallery-grid" id="gallery-grid">
 
-                <div class="gallery-card" id="card-sala-1">
-                    <img src="../imagenes/mueble_sala.png" alt="Sala de estar moderna con muebles elegantes"
-                        onerror="this.style.display='none'">
-                    <div
-                        style="position:absolute;inset:0;background:linear-gradient(135deg,var(--wisteria),var(--indigo-velvet));display:flex;align-items:center;justify-content:center;z-index:-1;">
-                        <i class="bi bi-sofa" style="font-size:4rem;color:rgba(255,255,255,0.3);"></i>
-                    </div>
-                    <span class="card-tag">Destacado</span>
-                    <div class="card-overlay">
-                        <span class="card-category">Sala de Estar</span>
-                        <h3 class="card-title">Living Moderno Minimalista</h3>
-                        <p class="card-desc">Sofás en tonos neutros, acentos en morado y madera natural.</p>
-                    </div>
-                </div>
-
-                <div class="gallery-card" id="card-dormitorio-1">
-                    <img src="../imagenes/mueble_dormitorio.png" alt="Dormitorio con cama y cabecera en morado"
-                        onerror="this.style.display='none'">
-                    <div
-                        style="position:absolute;inset:0;background:linear-gradient(135deg,var(--indigo-velvet),var(--dark-amethyst-2));display:flex;align-items:center;justify-content:center;z-index:-1;">
-                        <i class="bi bi-moon-stars" style="font-size:3rem;color:rgba(255,255,255,0.3);"></i>
-                    </div>
-                    <span class="card-tag">Dormitorio</span>
-                    <div class="card-overlay">
-                        <span class="card-category">Dormitorio</span>
-                        <h3 class="card-title">Suite de Lujo Violeta</h3>
-                        <p class="card-desc">Cabecera tapizada, iluminación cálida y terminaciones premium.</p>
-                    </div>
-                </div>
-
-                <div class="gallery-card" id="card-comedor-1">
-                    <img src="../imagenes/mueble_comedor.png" alt="Comedor con mesa y sillas tapizadas en morado"
-                        onerror="this.style.display='none'">
-                    <div
-                        style="position:absolute;inset:0;background:linear-gradient(135deg,var(--royal-violet),var(--indigo-ink));display:flex;align-items:center;justify-content:center;z-index:-1;">
-                        <i class="bi bi-cup-hot" style="font-size:3rem;color:rgba(255,255,255,0.3);"></i>
-                    </div>
-                    <span class="card-tag">Comedor</span>
-                    <div class="card-overlay">
-                        <span class="card-category">Comedor</span>
-                        <h3 class="card-title">Mesa Redonda Elegante</h3>
-                        <p class="card-desc">Mesa de madera con sillas tapizadas en morado y araña moderna.</p>
-                    </div>
-                </div>
-
-                <div class="gallery-card" id="card-oficina-1">
-                    <div
-                        style="position:absolute;inset:0;background:linear-gradient(135deg,var(--bright-lavender),var(--royal-violet));display:flex;align-items:center;justify-content:center;">
-                        <i class="bi bi-laptop" style="font-size:4rem;color:rgba(255,255,255,0.5);"></i>
-                    </div>
-                    <span class="card-tag">Oficina</span>
-                    <div class="card-overlay" style="opacity:1;">
-                        <span class="card-category">Home Office</span>
-                        <h3 class="card-title">Oficina Productiva</h3>
-                        <p class="card-desc">Escritorios ergonómicos, sillas confortables y estanterías a medida.</p>
-                    </div>
-                </div>
-
-                <div class="gallery-card" id="card-sala-2">
-                    <div
-                        style="position:absolute;inset:0;background:linear-gradient(135deg,var(--dark-amethyst-2),var(--lavender-purple));display:flex;align-items:center;justify-content:center;">
-                        <i class="bi bi-tv" style="font-size:4rem;color:rgba(255,255,255,0.5);"></i>
-                    </div>
-                    <span class="card-tag">Sala</span>
-                    <div class="card-overlay" style="opacity:1;">
-                        <span class="card-category">Sala de Entretenimiento</span>
-                        <h3 class="card-title">Centro de Entretenimiento</h3>
-                        <p class="card-desc">Rack de TV moderno con luces LED y estantes flotantes.</p>
-                    </div>
+                <!-- Los videos se cargarán dinámicamente desde la BD -->
+                <div class="col-12 text-center text-muted py-5 w-100" id="loading-inspiracion">
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <p>Cargando videos de inspiración...</p>
                 </div>
 
             </div>
@@ -191,8 +126,57 @@
         </div>
     </footer>
 
+    <!-- MODAL PRODUCTO -->
+    <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-custom-content">
+                <div class="modal-header modal-custom-header">
+                    <h5 class="modal-title fw-bold" id="m-nombre">Nombre del Producto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div id="m-media-container" class="mb-4 shadow-sm rounded">
+                        <div id="m-carrusel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner rounded" id="m-carrusel-inner">
+                                <!-- Slides inyectados por JS -->
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#m-carrusel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: invert(1);"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#m-carrusel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true" style="filter: invert(1);"></span>
+                                <span class="visually-hidden">Siguiente</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-around mb-3 text-start bg-light p-3 rounded">
+                        <div id="m-categoria-row" class="pe-3">
+                            <small class="text-muted d-block">Categoría</small>
+                            <span id="m-categoria" class="fw-bold text-break"></span>
+                        </div>
+                        <div id="m-medidas-col" class="border-start ps-3">
+                            <small class="text-muted d-block">Medidas</small>
+                            <span id="m-medidas" class="fw-bold"></span>
+                        </div>
+                    </div>
+                    <h3 class="fw-bold mt-2 modal-custom-price" id="m-precio">$0</h3>
+                    <p class="modal-precio-nota">
+                        <i class="bi bi-check-circle-fill"></i> Incluye mueble, armado y traslado
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center p-3 modal-custom-footer">
+                    <a href="formulario.html" id="btn-solicitar-producto" class="btn-solicitar w-100 justify-content-center py-2 modal-custom-btn">
+                        <i class="bi bi-send-check"></i> Solicitar este producto
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/animationCards.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/inspiracion.js"></script>
 
 </body>
 
