@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!container) return;
 
     try {
-        const muebles = await api.getMuebles();
+        const muebles = await api.getMueblesPropios();
         if (muebles.error) {
             container.innerHTML = '<div class="col-12 text-center text-danger">Error al cargar la galería.</div>';
             return;
@@ -18,23 +18,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         container.innerHTML = mueblesConVideo.map(m => {
-            const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
+            const precioVenta = parseFloat(m.precio ?? 0);
             const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
-            const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen.split(',')[0]}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+
+            let imagenesStr = '';
+            let imgPath = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+            if (m.imagenes && m.imagenes.length > 0) {
+                imagenesStr = m.imagenes.join(',');
+                imgPath = `http://localhost:5000/static/imagenes/${m.imagenes[0]}`;
+            }
+
             const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
 
             const nombreEscaped = sanitize(m.nombre);
             const catNameEscaped = sanitize(m.nombre_categoria || 'Sin Categoría');
             const medidasEscaped = sanitize(m.medidas || 'N/A');
-            const imagenesStr = sanitize(m.imagen || '');
+            imagenesStr = sanitize(imagenesStr);
             const videoUrlStr = sanitize(m.video_url || '');
-            const productoId = m.id_mueble || '';
+            const productoId = m.id ? `P_${m.id}` : '';
             const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imagenesStr}', '${videoUrlStr}', '${productoId}')`;
 
             let embedUrl = videoUrlStr;
-            if(videoUrlStr.includes('watch?v=')){
+            if (videoUrlStr.includes('watch?v=')) {
                 embedUrl = videoUrlStr.replace('watch?v=', 'embed/');
-            } else if(videoUrlStr.includes('youtu.be/')){
+            } else if (videoUrlStr.includes('youtu.be/')) {
                 embedUrl = videoUrlStr.replace('youtu.be/', 'youtube.com/embed/');
             }
 
@@ -83,14 +90,14 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
 
     const carruselInner = document.getElementById('m-carrusel-inner');
     carruselInner.innerHTML = '';
-    
+
     let itemsHtml = '';
     let hasItems = false;
-    
+
     if (imagenesStr) {
         const imagenes = imagenesStr.split(',');
         imagenes.forEach((img, index) => {
-            if(img.trim()){
+            if (img.trim()) {
                 itemsHtml += `
                 <div class="carousel-item ${!hasItems ? 'active' : ''}">
                     <img src="http://localhost:5000/static/imagenes/${img.trim()}" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="${nombre}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
@@ -102,12 +109,12 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
 
     if (videoUrlStr) {
         let embedUrl = videoUrlStr;
-        if(videoUrlStr.includes('watch?v=')){
+        if (videoUrlStr.includes('watch?v=')) {
             embedUrl = videoUrlStr.replace('watch?v=', 'embed/');
-        } else if(videoUrlStr.includes('youtu.be/')){
+        } else if (videoUrlStr.includes('youtu.be/')) {
             embedUrl = videoUrlStr.replace('youtu.be/', 'youtube.com/embed/');
         }
-        
+
         itemsHtml += `
         <div class="carousel-item ${!hasItems ? 'active' : ''}">
             <div class="ratio ratio-16x9 w-100 rounded" style="max-height: 400px; background: #000;">
@@ -116,16 +123,16 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
         </div>`;
         hasItems = true;
     }
-    
+
     if (!hasItems) {
         itemsHtml = `
         <div class="carousel-item active">
             <img src="http://localhost:5000/static/imagenes/producto-placeholder.jpg" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="Placeholder">
         </div>`;
     }
-    
+
     carruselInner.innerHTML = itemsHtml;
-    
+
     let url = 'formulario.html?producto=' + encodeURIComponent(nombre);
     if (productoId) {
         url += '&producto_id=' + encodeURIComponent(productoId);

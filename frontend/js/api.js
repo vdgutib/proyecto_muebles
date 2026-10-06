@@ -30,7 +30,7 @@ const api = {
                 let errorData = null;
                 try {
                     errorData = await response.json();
-                } catch(e) {}
+                } catch (e) { }
                 throw new Error((errorData && errorData.error) ? errorData.error : 'Ocurrió un error al cargar el catálogo');
             }
             return await response.json();
@@ -123,13 +123,101 @@ const api = {
                 let errorData = null;
                 try {
                     errorData = await response.json();
-                } catch(e) {}
+                } catch (e) { }
                 throw new Error((errorData && errorData.error) ? errorData.error : 'Ocurrió un error al cargar los destacados');
             }
             return await response.json();
         } catch (error) {
             console.error('Error fetching destacados:', error);
             return { error: true, message: error.message };
+        }
+    },
+
+    // ==========================
+    // MUEBLES PROPIOS
+    // ==========================
+    async getCategoriasPropias() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/categorias-propias`);
+            if (!response.ok) throw new Error('Error al cargar categorías');
+            return await response.json();
+        } catch (error) {
+            console.error(error);
+            return { error: true, message: error.message };
+        }
+    },
+
+    async createCategoriaPropia(nombre) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/categorias-propias`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...this.getAuthHeaders() },
+                body: JSON.stringify({ nombre })
+            });
+            return await response.json();
+        } catch (error) {
+            return { status: 'error', error: error.message };
+        }
+    },
+
+    async deleteCategoriaPropia(id) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/categorias-propias/${id}`, {
+                method: 'DELETE',
+                headers: this.getAuthHeaders()
+            });
+            return await response.json();
+        } catch (error) {
+            return { status: 'error', error: error.message };
+        }
+    },
+
+    async getMueblesPropios() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles-propios`);
+            if (!response.ok) throw new Error('Error al cargar muebles propios');
+            return await response.json();
+        } catch (error) {
+            console.error(error);
+            return { error: true, message: error.message };
+        }
+    },
+
+    async createMueblePropio(data) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles-propios`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...this.getAuthHeaders() },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (error) {
+            return { status: 'error', error: error.message };
+        }
+    },
+
+    async updateMueblePropio(id, data) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles-propios/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...this.getAuthHeaders() },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (error) {
+            return { status: 'error', error: error.message };
+        }
+    },
+
+    async deleteMueblePropio(id) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles-propios/${id}`, {
+                method: 'DELETE',
+                headers: this.getAuthHeaders()
+            });
+            return await response.json();
+        } catch (error) {
+            return { status: 'error', error: error.message };
         }
     }
 

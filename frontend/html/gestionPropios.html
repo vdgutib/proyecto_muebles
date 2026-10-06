@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestión de Muebles Propios - Muebles LB">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
+    <link rel="stylesheet" href="../css/panelAdmin.css" type="text/css">
+    <link rel="stylesheet" href="../css/gestionPropios.css" type="text/css">
+    <title>Gestión Muebles Propios | Muebles LB</title>
+    <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark nav-custom">
+        <div class="container">
+            <a class="navbar-brand nav-brand" href="panelAdmin.html">
+                <img src="../imagenes/logo_empresa.jpeg" alt="Logo Muebles LB"
+                    style="height: 40px; margin-right: 20px; vertical-align: middle; transform: scale(1.6); transform-origin: left center;">
+                Muebles LB Admin
+            </a>
+            <div class="d-flex justify-content-end">
+                <button id="btn-logout" class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-container" style="max-width: 1200px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="panelAdmin.html" class="btn btn-outline-secondary" style="border-radius: 20px;">
+                <i class="bi bi-arrow-left me-2"></i> Volver al Panel
+            </a>
+            <h1 class="title mb-0">Línea Propia</h1>
+            <div>
+                <button class="btn btn-outline-primary me-2" id="btn-gestionar-categorias" style="border-radius: 20px;">
+                    <i class="bi bi-tags"></i> Categorías
+                </button>
+                <button class="btn btn-primary-custom" id="btn-nuevo-mueble" style="border-radius: 20px;">
+                    <i class="bi bi-plus-lg"></i> Nuevo Mueble
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-dashboard-box w-100" style="max-width: 100%;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle custom-table">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Video</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-muebles-propios">
+                        <tr>
+                            <td colspan="6" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mueble Propio -->
+    <div class="modal fade" id="modalMueblePropio" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header custom-modal-header">
+                    <h5 class="modal-title" id="modal-mueble-title">Agregar Mueble Propio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-mueble-propio">
+                        <input type="hidden" id="mueble-id">
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Nombre del Mueble *</label>
+                                <input type="text" class="form-control" id="mueble-nombre" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Categoría *</label>
+                                <select class="form-select" id="mueble-categoria" required>
+                                    <option value="">Seleccione...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Precio ($) *</label>
+                                <input type="number" class="form-control" id="mueble-precio" min="0" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Medidas</label>
+                                <input type="text" class="form-control" id="mueble-medidas"
+                                    placeholder="Ej: 120x80x40 cm">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" id="mueble-descripcion" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Link de YouTube (Opcional, para aparecer en Inspiración)</label>
+                            <input type="url" class="form-control" id="mueble-video"
+                                placeholder="Ej: https://www.youtube.com/watch?v=...">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Imágenes</label>
+                            <div class="border p-3 rounded text-center bg-light" id="drop-zone-imagenes"
+                                style="cursor: pointer; border-style: dashed !important;">
+                                <i class="bi bi-cloud-arrow-up fs-2 text-muted"></i>
+                                <p class="mb-0 text-muted">Haz clic o arrastra fotos aquí</p>
+                                <input type="file" id="file-imagenes" accept="image/*" multiple style="display: none;">
+                            </div>
+                            <div class="d-flex flex-wrap gap-2 mt-3" id="preview-imagenes"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-mueble"
+                        style="background-color: var(--royal-violet); border-color: var(--royal-violet);">Guardar
+                        Mueble</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Categorias -->
+    <div class="modal fade" id="modalCategorias" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header custom-modal-header">
+                    <h5 class="modal-title">Gestionar Categorías Propias</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-categoria" class="mb-4 d-flex gap-2">
+                        <input type="text" class="form-control" id="nueva-categoria-nombre"
+                            placeholder="Nueva categoría..." required>
+                        <button type="submit" class="btn btn-primary"
+                            style="background-color: var(--royal-violet); border-color: var(--royal-violet);"><i
+                                class="bi bi-plus-lg"></i></button>
+                    </form>
+                    <ul class="list-group" id="lista-categorias">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/gestionPropios.js"></script>
+</body>
+
+</html>

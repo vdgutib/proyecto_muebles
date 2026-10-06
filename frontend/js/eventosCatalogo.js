@@ -1,88 +1,121 @@
-let allMuebles = [];
-let currentCategory = 'todos';
+let allMueblesExternos = [];
+let allMueblesPropios = [];
+
+let currentCategoryExterno = 'todos';
+let currentCategoryPropio = 'todos';
+
 let currentSearch = '';
 let currentMaxPrice = 1000000;
 
 function filtrarCategoria(tipo) {
-    currentCategory = tipo;
-    document.querySelectorAll('.top-cat-btn').forEach(function (b) { b.classList.remove('active'); });
+    currentCategoryExterno = tipo;
+    document.querySelectorAll('#category-filters .top-cat-btn').forEach(function (b) { b.classList.remove('active'); });
     const targetBtn = document.getElementById('btn-' + tipo);
     if (targetBtn) targetBtn.classList.add('active');
-    filtrarCatalogo();
+    filtrarCatalogoExterno();
 }
 
-function filtrarCatalogo() {
-    // Leer estado actual de los 3 filtros
-    const categoriaSeleccionada = currentCategory;
-    const textoBusqueda = currentSearch.toLowerCase().trim();
-    const precioMaximo = Number(currentMaxPrice);
+function filtrarCategoriaPropios(tipo) {
+    currentCategoryPropio = tipo;
+    document.querySelectorAll('#category-filters-propios .top-cat-btn').forEach(function (b) { b.classList.remove('active'); });
+    const targetBtn = document.getElementById('btn-' + tipo + '-propios');
+    if (targetBtn) targetBtn.classList.add('active');
+    filtrarCatalogoPropio();
+}
 
-    // Filtrar con lógica AND estricta: un producto SOLO pasa si cumple TODAS las condiciones
-    const mueblesFiltrados = allMuebles.filter(m => {
-        // Condición 1: Categoría (debe coincidir O ser "todos")
-        const cumpleCategoria = categoriaSeleccionada === 'todos' ||
-                                toSlug(m.nombre_categoria || 'Sin Categoría') === categoriaSeleccionada;
+function aplicaFiltrosGlobales(m, catSlug, currentCat) {
+    const cumpleCategoria = currentCat === 'todos' || catSlug === currentCat;
+    const precioProducto = Number(m.precio_venta ?? m.precio_costo ?? m.precio ?? 0);
+    const cumplePrecio = !Number.isNaN(precioProducto) && precioProducto <= currentMaxPrice;
+    const nombreProducto = (m.nombre || '').toLowerCase();
+    const cumpleBusqueda = currentSearch === '' || nombreProducto.includes(currentSearch);
+    
+    return cumpleCategoria && cumplePrecio && cumpleBusqueda;
+}
 
-        // Condición 2: Precio (debe ser <= al máximo del slider). Number() convierte
-        // explícitamente strings numéricos a número real antes de comparar.
-        const precioProducto = Number(m.precio_venta ?? m.precio_costo ?? 0);
-        const cumplePrecio = !Number.isNaN(precioProducto) && precioProducto <= precioMaximo;
-
-        // Condición 3: Búsqueda de texto (nombre debe incluir el texto buscado)
-        const nombreProducto = (m.nombre || '').toLowerCase();
-        const cumpleBusqueda = textoBusqueda === '' || nombreProducto.includes(textoBusqueda);
-
-        // Lógica AND estricta: solo pasa si cumple las 3 condiciones a la vez
-        return cumpleCategoria && cumplePrecio && cumpleBusqueda;
+function filtrarCatalogoExterno() {
+    const filtrados = allMueblesExternos.filter(m => {
+        const catSlug = toSlug(m.nombre_categoria || 'Sin Categoría');
+        return aplicaFiltrosGlobales(m, catSlug, currentCategoryExterno);
     });
-
-    renderizarCatalogoFiltrado(mueblesFiltrados);
+    renderizarCatalogo(filtrados, 'dynamic-catalog-container', 'category-filters', currentCategoryExterno, false, false);
 }
 
-// Arma el HTML de una tarjeta de producto. Se extrajo a su propia función porque
-// ahora se genera igual tanto en modo carrusel (vista "Todos") como en modo grilla
-// completa (categoría específica); antes vivía inline dentro de un solo template.
-function crearTarjetaHtml(m, catName) {
-    const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? 0);
+function filtrarCatalogoPropio() {
+    const filtrados = allMueblesPropios.filter(m => {
+        const catSlug = toSlug(m.nombre_categoria || 'Sin Categoría');
+        return aplicaFiltrosGlobales(m, catSlug, currentCategoryPropio);
+    });
+    renderizarCatalogo(filtrados, 'dynamic-propios-container', 'category-filters-propios', currentCategoryPropio, true, true);
+}
+
+
+function crearTarjetaHtml(m, catName, isPropio) {
+    const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? m.precio ?? 0);
     const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
-    const imgPath = m.imagen ? `http://localhost:5000/static/imagenes/${m.imagen}` : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+    
+    let imgPath = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+    let imagenesStr = '';
+    
+    if (isPropio) {
+        if(m.imagenes && m.imagenes.length > 0) {
+            imgPath = `http://localhost:5000/static/imagenes/${m.imagenes[0]}`;
+            imagenesStr = m.imagenes.join(',');
+        }
+    } else {
+        if(m.imagen) {
+            imgPath = `http://localhost:5000/static/imagenes/${m.imagen.split(',')[0]}`;
+            imagenesStr = m.imagen;
+        }
+    }
 
     const sanitize = (str) => String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/[\r\n]+/g, ' ');
 
     const nombreEscaped = sanitize(m.nombre);
     const catNameEscaped = sanitize(catName);
     const medidasEscaped = sanitize(m.medidas || 'N/A');
-    const imagenesStr = sanitize(m.imagen || '');
+    imagenesStr = sanitize(imagenesStr);
     const videoUrlStr = sanitize(m.video_url || '');
 
-    const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imagenesStr}', '${videoUrlStr}', '${m.id_mueble || ''}')`;
+    // Para evitar colisiones de ID al pedir, agregamos el tipo al ID
+    const prodId = isPropio ? `P_${m.id}` : `E_${m.id_mueble}`;
+
+    const onClickStr = `abrirModal('${nombreEscaped}', '${precioFormateado}', '${medidasEscaped}', '${catNameEscaped}', '${imagenesStr}', '${videoUrlStr}', '${prodId}')`;
+
+    let extraBadge = '';
+    let extraIcon = '';
+    if (isPropio) {
+        extraBadge = `<span class="badge position-absolute top-0 end-0 m-2" style="background-color: var(--royal-violet); z-index: 2;">Línea Propia</span>`;
+        if (m.video_url) {
+            extraIcon = `<div class="position-absolute bottom-0 start-0 m-2" style="z-index: 2;"><i class="bi bi-play-circle-fill fs-4 text-white" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"></i></div>`;
+        }
+    }
 
     return `
-        <div class="cat-card compra" onclick="${onClickStr}">
-            <div class="cat-card-img">
-                <img src="${imagenesStr ? 'http://localhost:5000/static/imagenes/' + imagenesStr.split(',')[0] : 'http://localhost:5000/static/imagenes/producto-placeholder.jpg'}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+        <div class="cat-card compra position-relative" onclick="${onClickStr}">
+            ${extraBadge}
+            <div class="cat-card-img position-relative">
+                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+                ${extraIcon}
             </div>
             <div class="cat-card-info">
                 <h5 class="cat-card-name">${nombreEscaped}</h5>
-                <p class="cat-card-desc">${m.observaciones || 'Sin descripción'}</p>
+                <p class="cat-card-desc">${m.observaciones || m.descripcion || 'Sin descripción'}</p>
                 <span class="cat-card-price">${precioFormateado}</span>
             </div>
         </div>
     `;
 }
 
-function renderizarCatalogoFiltrado(muebles) {
-    const container = document.getElementById('dynamic-catalog-container');
+function renderizarCatalogo(muebles, containerId, filtersId, currentCat, isPropio, isPremium) {
+    const container = document.getElementById(containerId);
     if (!container) return;
 
     if (muebles.length === 0) {
-        container.innerHTML = '<div class="alert alert-info text-center">No se encontraron productos con los filtros actuales.</div>';
+        container.innerHTML = '<div class="alert alert-info text-center">No se encontraron productos en esta sección con los filtros actuales.</div>';
         return;
     }
 
-    // Nota: seguimos limpiando el contenedor con una única asignación (no `+=`) en
-    // vez de ir acumulando HTML — eso fue lo que causaba que categorías/precios
-    // viejos quedaran pegados en el DOM cada vez que se filtraba (ver commit anterior).
     const categorias = {};
     muebles.forEach(m => {
         const cat = m.nombre_categoria || 'Sin Categoría';
@@ -90,12 +123,11 @@ function renderizarCatalogoFiltrado(muebles) {
         categorias[cat].push(m);
     });
 
-    // Vista "Todos" → filas horizontales tipo carrusel (una por categoría).
-    // Categoría específica → una sola grilla vertical con TODOS sus productos,
-    // sin recorte ni paginación: el usuario solo desliza hacia abajo.
-    const esVistaGeneral = currentCategory === 'todos';
+    const esVistaGeneral = currentCat === 'todos';
+    const funcFiltro = isPropio ? 'filtrarCategoriaPropios' : 'filtrarCategoria';
+    const suffix = isPropio ? '-propios' : '';
 
-    let botonesHtml = `<button class="top-cat-btn ${currentCategory === 'todos' ? 'active' : ''}" id="btn-todos" onclick="filtrarCategoria('todos')"><i class="bi bi-grid-fill"></i> Todos</button>`;
+    let botonesHtml = `<button class="top-cat-btn ${currentCat === 'todos' ? 'active' : ''}" id="btn-todos${suffix}" onclick="${funcFiltro}('todos')"><i class="bi bi-grid-fill"></i> Todos</button>`;
     let seccionesHtml = '';
 
     Object.keys(categorias).forEach((catName, index) => {
@@ -103,51 +135,44 @@ function renderizarCatalogoFiltrado(muebles) {
         const items = categorias[catName];
         const cantidadTexto = items.length + (items.length === 1 ? ' producto' : ' productos');
 
-        botonesHtml += `<button class="top-cat-btn ${currentCategory === catSlug ? 'active' : ''}" id="btn-${catSlug}" onclick="filtrarCategoria('${catSlug}')">${catName}</button>`;
+        botonesHtml += `<button class="top-cat-btn ${currentCat === catSlug ? 'active' : ''}" id="btn-${catSlug}${suffix}" onclick="${funcFiltro}('${catSlug}')">${catName}</button>`;
 
         const navHtml = esVistaGeneral
-            ? `<div class="section-nav" id="nav-${catSlug}">
+            ? `<div class="section-nav" id="nav-${catSlug}${suffix}">
                     <span class="nav-counter">${cantidadTexto}</span>
-                    <button class="nav-arrow" id="prev-${catSlug}" onclick="scrollFila('${catSlug}', -1)" aria-label="Anterior">
+                    <button class="nav-arrow" id="prev-${catSlug}${suffix}" onclick="scrollFila('${catSlug}${suffix}', -1)" aria-label="Anterior">
                         <i class="bi bi-chevron-left"></i>
                     </button>
-                    <button class="nav-arrow" id="next-${catSlug}" onclick="scrollFila('${catSlug}', 1)" aria-label="Siguiente">
+                    <button class="nav-arrow" id="next-${catSlug}${suffix}" onclick="scrollFila('${catSlug}${suffix}', 1)" aria-label="Siguiente">
                         <i class="bi bi-chevron-right"></i>
                     </button>
                </div>`
             : `<span class="nav-counter nav-counter--static">${cantidadTexto}</span>`;
 
         seccionesHtml += `
-            <div class="catalog-section" id="seccion-${catSlug}" data-categoria="${catSlug}" style="animation-delay: ${Math.min(index, 6) * 70}ms;">
+            <div class="catalog-section" id="seccion-${catSlug}${suffix}" style="animation-delay: ${Math.min(index, 6) * 70}ms;">
                 <div class="section-top">
-                    <h2 class="catalog-section-label">
-                        <i class="bi bi-collection me-2"></i>${catName}
+                    <h2 class="catalog-section-label" style="${isPremium ? 'color: var(--indigo-velvet);' : ''}">
+                        <i class="bi ${isPremium ? 'bi-star' : 'bi-collection'} me-2"></i>${catName}
                     </h2>
                     ${navHtml}
                 </div>
-                <div class="catalog-grid ${esVistaGeneral ? 'catalog-grid--carousel' : 'catalog-grid--full'}" id="grid-${catSlug}">
-                    ${items.map(m => crearTarjetaHtml(m, catName)).join('')}
+                <div class="catalog-grid ${esVistaGeneral ? 'catalog-grid--carousel' : 'catalog-grid--full'}" id="grid-${catSlug}${suffix}">
+                    ${items.map(m => crearTarjetaHtml(m, catName, isPropio)).join('')}
                 </div>
             </div>
         `;
     });
 
-    const categoryFilters = document.getElementById('category-filters');
+    const categoryFilters = document.getElementById(filtersId);
     if (categoryFilters) categoryFilters.innerHTML = botonesHtml;
     container.innerHTML = seccionesHtml;
 
-    // Carruseles: calcular si hay contenido suficiente para deslizar y dejar
-    // escuchando el scroll de cada fila para habilitar/deshabilitar sus flechas.
-    if (esVistaGeneral) initCarruseles();
-
-    // Animación de aparición: las tarjetas entran con un leve fade + desplazamiento
-    // a medida que se hacen visibles, en vez de "aparecer cortadas" de golpe.
-    activarRevealAnimado();
+    if (esVistaGeneral) initCarruseles(suffix);
+    activarRevealAnimado(containerId);
 }
 
-// ── Carrusel horizontal (vista "Todos") ────────────────────────────────────
-// Desliza una fila de categoría. Se mueve el ancho de ~2 tarjetas en desktop
-// y 1 en mobile, con scroll suave nativo (sin reflow manual ni recorte de tarjetas).
+
 function scrollFila(sec, dir) {
     const grid = document.getElementById('grid-' + sec);
     if (!grid) return;
@@ -160,8 +185,6 @@ function scrollFila(sec, dir) {
     grid.scrollBy({ left: dir * (anchoCard + gap) * tarjetasPorSalto, behavior: 'smooth' });
 }
 
-// Habilita/deshabilita las flechas según cuánto se pueda seguir deslizando, y
-// oculta la navegación por completo si la fila ya cabe entera en pantalla.
 function actualizarFlechasCarrusel(grid) {
     if (!grid) return;
     const sec = grid.id.replace('grid-', '');
@@ -181,29 +204,18 @@ function actualizarFlechasCarrusel(grid) {
     if (nextBtn) nextBtn.disabled = grid.scrollLeft >= maxScroll - 4;
 }
 
-// Registra el estado inicial de flechas de cada carrusel presente en el DOM y
-// deja un listener de scroll por fila para irlas actualizando mientras se desliza.
-// Se llama de nuevo en cada render, pero como los grids viejos se reemplazan por
-// completo (container.innerHTML), los listeners de las filas anteriores se
-// descartan junto con esos nodos — no hay acumulación de listeners huérfanos.
-function initCarruseles() {
-    document.querySelectorAll('.catalog-grid--carousel').forEach(grid => {
+function initCarruseles(suffix) {
+    document.querySelectorAll(`.catalog-grid--carousel[id$="${suffix}"]`).forEach(grid => {
         actualizarFlechasCarrusel(grid);
         grid.addEventListener('scroll', () => actualizarFlechasCarrusel(grid), { passive: true });
     });
 }
 
-// ── Animación de aparición ──────────────────────────────────────────────────
-// Cada tarjeta arranca "oculta" (opacity 0 + leve desplazamiento) y se revela con
-// una transición suave apenas entra en el viewport, en vez de aparecer de golpe.
-// Funciona igual para la grilla vertical (se revela al bajar) y para el carrusel
-// (se revela al deslizar hacia los lados, porque IntersectionObserver también
-// reacciona al scroll horizontal de un contenedor con overflow).
-function activarRevealAnimado() {
-    const cards = document.querySelectorAll('.catalog-grid .cat-card');
+function activarRevealAnimado(containerId) {
+    const cards = document.querySelectorAll(`#${containerId} .catalog-grid .cat-card`);
     if (!cards.length) return;
 
-    if (!('IntersectionObserver' in window)) return; // sin soporte: quedan visibles por defecto
+    if (!('IntersectionObserver' in window)) return;
 
     cards.forEach((card, i) => {
         card.classList.add('reveal-ready');
@@ -227,7 +239,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
     document.getElementById('m-nombre').innerText = nombre;
     document.getElementById('m-precio').innerText = precio;
 
-    const medidasLimpias = medidas.replace(/^medidas:\s*/i, '').trim();
+    const medidasLimpias = (medidas || '').replace(/^medidas:\s*/i, '').trim();
     document.getElementById('m-medidas').innerText = medidasLimpias || 'N/A';
 
     const catEl = document.getElementById('m-categoria');
@@ -235,14 +247,10 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
     const medidasDiv = document.getElementById('m-medidas-col');
     if (!categoria || categoria === 'Sin Categoría') {
         if (catRow) catRow.style.display = 'none';
-        if (medidasDiv) {
-            medidasDiv.classList.remove('border-start', 'ps-3');
-        }
+        if (medidasDiv) medidasDiv.classList.remove('border-start', 'ps-3');
     } else {
         if (catRow) catRow.style.display = '';
-        if (medidasDiv) {
-            medidasDiv.classList.add('border-start', 'ps-3');
-        }
+        if (medidasDiv) medidasDiv.classList.add('border-start', 'ps-3');
         catEl.innerText = categoria;
     }
 
@@ -266,7 +274,6 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
     }
 
     if (videoUrlStr) {
-        // Asumiendo formato youtube
         let embedUrl = videoUrlStr;
         if(videoUrlStr.includes('watch?v=')){
             embedUrl = videoUrlStr.replace('watch?v=', 'embed/');
@@ -314,29 +321,29 @@ function toSlug(text) {
         .replace(/-+$/, '');
 }
 
-async function cargarMuebles() {
-    const container = document.getElementById('dynamic-catalog-container');
-    if (!container) return;
+async function cargarMueblesTodos() {
+    const contExt = document.getElementById('dynamic-catalog-container');
+    const contPro = document.getElementById('dynamic-propios-container');
+    
+    if(contExt) contExt.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-primary"></div></div>';
+    if(contPro) contPro.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-primary"></div></div>';
 
-    container.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-primary" role="status"></div><p>Cargando catálogo...</p></div>';
+    const [mueblesExt, mueblesPro] = await Promise.all([
+        api.getMuebles(),
+        api.getMueblesPropios()
+    ]);
 
-    const muebles = await api.getMuebles();
-    container.innerHTML = '';
+    if (!mueblesExt.error) allMueblesExternos = mueblesExt;
+    if (!mueblesPro.error) allMueblesPropios = mueblesPro;
 
-    if (muebles.error) {
-        container.innerHTML = '<div class="alert alert-danger text-center">Servicio no disponible en este momento. Por favor, intenta de nuevo más tarde.</div>';
-        return;
-    }
+    // Calcular max precio combinado
+    let maxPrecio = 1000000;
+    const preciosExt = allMueblesExternos.map(m => parseFloat(m.precio_venta ?? m.precio_costo ?? 0)).filter(p => !Number.isNaN(p));
+    const preciosPro = allMueblesPropios.map(m => parseFloat(m.precio ?? 0)).filter(p => !Number.isNaN(p));
+    
+    const maxCombo = Math.max(0, ...preciosExt, ...preciosPro);
+    if (maxCombo > 0) maxPrecio = maxCombo;
 
-    if (muebles.length === 0) {
-        container.innerHTML = '<div class="alert alert-info text-center">No hay productos disponibles en este momento. El catálogo está en actualización.</div>';
-        return;
-    }
-
-    allMuebles = muebles;
-
-    // Calcular precio máximo para el slider
-    const maxPrecio = Math.max(...muebles.map(m => parseFloat(m.precio_venta ?? m.precio_costo ?? 0)).filter(p => !Number.isNaN(p)));
     const priceRange = document.getElementById('price-range');
     const priceValue = document.getElementById('price-value');
     
@@ -349,12 +356,12 @@ async function cargarMuebles() {
         priceValue.textContent = '$' + maxPrecio.toLocaleString('es-CL');
     }
 
-    // Configurar event listeners para filtros
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            currentSearch = e.target.value;
-            filtrarCatalogo();
+            currentSearch = e.target.value.toLowerCase().trim();
+            filtrarCatalogoExterno();
+            filtrarCatalogoPropio();
         });
     }
 
@@ -364,12 +371,18 @@ async function cargarMuebles() {
             if (priceValue) {
                 priceValue.textContent = '$' + currentMaxPrice.toLocaleString('es-CL');
             }
-            filtrarCatalogo();
+            filtrarCatalogoExterno();
+            filtrarCatalogoPropio();
         });
     }
 
-    // Renderizar catálogo inicial con todos los productos
-    filtrarCatalogo();
+    // Ocultar sección de propios si no hay propios
+    if (allMueblesPropios.length === 0 && document.getElementById('propios-catalog-container')) {
+        document.getElementById('propios-catalog-container').style.display = 'none';
+    }
+
+    filtrarCatalogoExterno();
+    filtrarCatalogoPropio();
 }
 
 var resizeTimer;
@@ -381,5 +394,5 @@ window.addEventListener('resize', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    cargarMuebles();
+    cargarMueblesTodos();
 });

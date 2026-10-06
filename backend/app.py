@@ -11,6 +11,7 @@ from config import Config
 from routers.auth_router import auth_bp
 from routers.upload_router import upload_bp
 from routers.muebles_router import muebles_bp
+from routers.muebles_propios_router import muebles_propios_bp
 from routers.despiece_router import despiece_bp
 from routers.solicitudes_router import solicitudes_bp
 
@@ -31,6 +32,7 @@ jwt = JWTManager(app)
 app.register_blueprint(auth_bp)
 app.register_blueprint(upload_bp)
 app.register_blueprint(muebles_bp)
+app.register_blueprint(muebles_propios_bp)
 app.register_blueprint(despiece_bp)
 app.register_blueprint(solicitudes_bp)
 

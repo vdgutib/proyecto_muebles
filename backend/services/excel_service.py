@@ -58,6 +58,11 @@ class ExcelService:
                 # Si solo hay 1 valor en toda la fila, es la categoría (Ej: "LIVING")
                 if len(valores_validos) == 1:
                     categoria_actual_nombre = valores_validos.iloc[0].upper()
+                    if categoria_actual_nombre == "MUEBLES PROPIOS":
+                        return {
+                            "status": "error",
+                            "error": "El Excel contiene la categoría 'MUEBLES PROPIOS'. Por favor, elimina esta categoría del Excel. Ahora los Muebles Propios se gestionan directamente desde su propia sección en el Panel Administrativo."
+                        }
                     continue
 
                 sku_raw = str(row.get('SKU', '')).strip()
@@ -115,13 +120,6 @@ class ExcelService:
                 else:
                     imagen = f"{sku}.jpg"
 
-                video_col = next((col for col in row.index if 'VIDEO' in str(col).upper()), None)
-                video_url = None
-                if video_col:
-                    vid = str(row.get(video_col, '')).strip()
-                    if vid and vid.lower() != 'nan':
-                        video_url = vid
-
                 filas_muebles.append({
                     'sku': sku,
                     'nombre': nombre,
@@ -131,7 +129,6 @@ class ExcelService:
                     'peso_kg': peso_final,
                     'bultos': bultos,
                     'observaciones': observaciones,
-                    'video_url': video_url,
                     'categoria_nombre': categoria_actual_nombre,
                 })
 
@@ -148,7 +145,7 @@ class ExcelService:
 
             tuplas_muebles = [
                 (
-                    f['sku'], f['nombre'], f['imagen'], f['video_url'], f['medidas'], f['precio_costo'],
+                    f['sku'], f['nombre'], f['imagen'], f['medidas'], f['precio_costo'],
                     f['peso_kg'], f['bultos'], f['observaciones'],
                     mapa_categorias.get(f['categoria_nombre']) if f['categoria_nombre'] else None,
                 )

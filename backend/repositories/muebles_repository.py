@@ -67,7 +67,7 @@ class MueblesRepository:
     def upsert_muebles_batch(muebles):
         """
         muebles: lista de tuplas
-            (sku, nombre, imagen, video_url, medidas, precio_costo, peso_kg, bultos,
+            (sku, nombre, imagen, medidas, precio_costo, peso_kg, bultos,
              observaciones, id_categoria)
 
         Devuelve la cantidad de filas procesadas (insertadas o actualizadas).
@@ -81,12 +81,11 @@ class MueblesRepository:
 
         sql = """
             INSERT INTO muebles
-                (sku, nombre, imagen, video_url, medidas, precio_costo, peso_kg, bultos, observaciones, id_categoria)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (sku, nombre, imagen, medidas, precio_costo, peso_kg, bultos, observaciones, id_categoria)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 nombre = VALUES(nombre),
                 imagen = VALUES(imagen),
-                video_url = VALUES(video_url),
                 medidas = VALUES(medidas),
                 precio_costo = VALUES(precio_costo),
                 precio_venta = ROUND(VALUES(precio_costo) * 1.60),
@@ -146,7 +145,7 @@ class MueblesRepository:
         try:
             cursor = conexion.cursor(dictionary=True)
             sql = """
-                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.video_url, m.medidas,
+                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.medidas,
                        m.precio_costo, m.precio_venta, m.peso_kg, m.bultos,
                        m.observaciones, c.nombre_categoria
                 FROM muebles m
@@ -176,7 +175,7 @@ class MueblesRepository:
         try:
             cursor = conexion.cursor(dictionary=True)
             sql = """
-                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.video_url, m.medidas,
+                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.medidas,
                        m.precio_costo, m.precio_venta, m.peso_kg, m.bultos,
                        m.observaciones, c.id_categoria, c.nombre_categoria
                 FROM muebles m
@@ -282,7 +281,7 @@ class MueblesRepository:
         try:
             cursor = conexion.cursor(dictionary=True)
             sql = """
-                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.video_url, m.medidas,
+                SELECT m.id_mueble, m.sku, m.nombre, m.imagen, m.medidas,
                        m.precio_costo, m.precio_venta, m.peso_kg, m.bultos,
                        m.observaciones, c.nombre_categoria
                 FROM muebles m

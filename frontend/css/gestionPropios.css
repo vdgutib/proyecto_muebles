@@ -1,0 +1,72 @@
+.custom-modal-header {
+    background-color: var(--dark-amethyst-2);
+    color: white;
+    border-bottom: 3px solid var(--royal-violet);
+}
+
+.custom-modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.custom-table th {
+    background-color: var(--thistle);
+    color: var(--dark-amethyst-2);
+    font-weight: 600;
+}
+
+.custom-table td {
+    vertical-align: middle;
+}
+
+.img-thumbnail-table {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--wisteria);
+}
+
+.preview-img-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.preview-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--wisteria-2);
+}
+
+.preview-img-container .btn-remove {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-primary-custom {
+    background: var(--indigo-ink);
+    border: 2px solid var(--royal-violet);
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+    background: var(--royal-violet);
+    color: #ffffff;
+    box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+    transform: translateY(-2px);
+}
