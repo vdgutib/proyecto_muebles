@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = '';
             await cargarCategorias();
         } else {
-            alert(res.error || 'Error al crear categoría');
+            mostrarModalError(res.error || 'Error al crear categoría');
         }
     });
 
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const precio = document.getElementById('mueble-precio').value;
         
         if(!nombre || !categoria_id || !precio) {
-            alert('Nombre, Categoría y Precio son obligatorios');
+            mostrarModalAdvertencia('Nombre, Categoría y Precio son obligatorios');
             return;
         }
 
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const urlsExistentes = archivosImagenes.filter(f => typeof f === 'string');
                 data.imagenes = [...urlsExistentes, ...uploadRes.guardadas];
             } else {
-                alert('Error al subir imágenes: ' + uploadRes.error);
+                mostrarModalError('Error al subir imágenes: ' + uploadRes.error);
                 return;
             }
         } else {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bootstrap.Modal.getInstance(document.getElementById('modalMueblePropio')).hide();
             cargarMuebles();
         } else {
-            alert(res.error || 'Error al guardar mueble');
+            mostrarModalError(res.error || 'Error al guardar mueble');
         }
     });
 
@@ -174,6 +174,17 @@ window.removerImagen = function(index) {
     actualizarPreviewImagenes();
 };
 
+// modal.js usa un unico modal global. Despues de confirmar, ese modal se esta cerrando y
+// Bootstrap ignora un show() hecho mientras tanto, asi que se espera a que termine de cerrarse
+// antes de mostrar un mensaje de error.
+function esperarCierreModalGlobal() {
+    return new Promise(resolve => {
+        const el = document.getElementById('global-modal');
+        if (!el || getComputedStyle(el).display === 'none') return resolve();
+        el.addEventListener('hidden.bs.modal', () => resolve(), { once: true });
+    });
+}
+
 async function cargarCategorias() {
     categoriasPropias = await api.getCategoriasPropias();
     if(categoriasPropias.error) return;
@@ -200,21 +211,27 @@ async function cargarCategorias() {
     });
 }
 
-window.eliminarCategoria = async function(id) {
-    if(!confirm('¿Seguro que deseas eliminar esta categoría? Si hay muebles asociados a ella, no se podrá eliminar.')) return;
-    const res = await api.deleteCategoriaPropia(id);
-    if(res.status === 'success') {
-        cargarCategorias();
-    } else {
-        alert(res.error || 'Error al eliminar');
-    }
+window.eliminarCategoria = function(id) {
+    mostrarModalConfirmacion(
+        'Eliminar categoría',
+        '¿Seguro que deseas eliminar esta categoría? Si hay muebles asociados a ella, no se podrá eliminar.',
+        async () => {
+            const res = await api.deleteCategoriaPropia(id);
+            if(res.status === 'success') {
+                cargarCategorias();
+            } else {
+                await esperarCierreModalGlobal();
+                mostrarModalError(res.error || 'Error al eliminar');
+            }
+        }
+    );
 };
 
 async function cargarMuebles() {
     const tbody = document.getElementById('tabla-muebles-propios');
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
     
-    mueblesPropios = await api.getMueblesPropios(false);
+    mueblesPropios = await api.getMueblesPropios(true); // solo activos: los eliminados (borrado logico) no deben aparecer
     tbody.innerHTML = '';
     
     if(mueblesPropios.error) {
@@ -270,14 +287,20 @@ window.editarMueble = function(id) {
     modal.show();
 };
 
-window.eliminarMueble = async function(id) {
-    if(!confirm('¿Seguro que deseas eliminar este mueble propio?')) return;
-    const res = await api.deleteMueblePropio(id);
-    if(res.status === 'success') {
-        cargarMuebles();
-    } else {
-        alert(res.error || 'Error al eliminar');
-    }
+window.eliminarMueble = function(id) {
+    mostrarModalConfirmacion(
+        'Eliminar mueble',
+        '¿Seguro que deseas eliminar este mueble propio?',
+        async () => {
+            const res = await api.deleteMueblePropio(id);
+            if(res.status === 'success') {
+                cargarMuebles();
+            } else {
+                await esperarCierreModalGlobal();
+                mostrarModalError(res.error || 'Error al eliminar');
+            }
+        }
+    );
 };
 
 window.cerrarSesion = function() {
