@@ -70,3 +70,6 @@
     box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
     transform: translateY(-2px);
 }
+
+/* Muebles desactivados: fila atenuada, acciones visibles */
+tr.fila-inactiva td:not(:last-child) { opacity: .55; }

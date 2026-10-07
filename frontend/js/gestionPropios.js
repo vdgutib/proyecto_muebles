@@ -214,7 +214,7 @@ async function cargarCategorias() {
 window.eliminarCategoria = function(id) {
     mostrarModalConfirmacion(
         'Eliminar categoría',
-        '¿Seguro que deseas eliminar esta categoría? Si hay muebles asociados a ella, no se podrá eliminar.',
+        '¿Seguro que deseas eliminar esta categoría? Si hay muebles asociados (activos o inactivos), no se podrá eliminar.',
         async () => {
             const res = await api.deleteCategoriaPropia(id);
             if(res.status === 'success') {
@@ -231,7 +231,7 @@ async function cargarMuebles() {
     const tbody = document.getElementById('tabla-muebles-propios');
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
     
-    mueblesPropios = await api.getMueblesPropios(true); // solo activos: los eliminados (borrado logico) no deben aparecer
+    mueblesPropios = await api.getMueblesPropios(false); // todos: activos e inactivos (el admin puede reactivar)
     tbody.innerHTML = '';
     
     if(mueblesPropios.error) {
@@ -250,16 +250,20 @@ async function cargarMuebles() {
             imgHtml = `<img src="http://localhost:5000/static/imagenes/${m.imagenes[0]}" class="img-thumbnail-table">`;
         }
 
+        const activo = !!m.activo;
         const tr = document.createElement('tr');
+        if(!activo) tr.classList.add('fila-inactiva');
         tr.innerHTML = `
             <td>${imgHtml}</td>
-            <td class="fw-bold">${m.nombre}</td>
+            <td class="fw-bold">${m.nombre}${activo ? '' : ' <span class="badge bg-secondary ms-1">Inactivo</span>'}</td>
             <td><span class="badge" style="background-color: var(--royal-violet);">${m.nombre_categoria}</span></td>
             <td>$${m.precio.toLocaleString('es-CL')}</td>
             <td>${m.video_url ? '<i class="bi bi-check-circle-fill text-success"></i> Sí' : '<i class="bi bi-x-circle text-muted"></i> No'}</td>
             <td>
                 <button class="btn btn-sm btn-outline-primary" onclick="editarMueble(${m.id})"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" onclick="eliminarMueble(${m.id})"><i class="bi bi-trash"></i></button>
+                ${activo
+                    ? `<button class="btn btn-sm btn-outline-secondary" title="Desactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye-slash"></i></button>`
+                    : `<button class="btn btn-sm btn-outline-success" title="Reactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye"></i></button>`}
             </td>
         `;
         tbody.appendChild(tr);
@@ -287,19 +291,29 @@ window.editarMueble = function(id) {
     modal.show();
 };
 
-window.eliminarMueble = function(id) {
-    mostrarModalConfirmacion(
-        'Eliminar mueble',
-        '¿Seguro que deseas eliminar este mueble propio?',
-        async () => {
-            const res = await api.deleteMueblePropio(id);
-            if(res.status === 'success') {
-                cargarMuebles();
-            } else {
-                await esperarCierreModalGlobal();
-                mostrarModalError(res.error || 'Error al eliminar');
-            }
+window.cambiarEstadoMueble = function(id) {
+    const m = mueblesPropios.find(x => x.id === id);
+    if(!m) return;
+    const activar = !m.activo;
+
+    const aplicar = async () => {
+        const res = await api.updateMueblePropio(id, { activo: activar });
+        if(res.status === 'success') {
+            cargarMuebles();
+        } else {
+            await esperarCierreModalGlobal();
+            mostrarModalError(res.error || 'No se pudo cambiar el estado del mueble');
         }
+    };
+
+    if(activar) {
+        aplicar();
+        return;
+    }
+    mostrarModalConfirmacion(
+        'Desactivar mueble',
+        'El mueble dejará de mostrarse en el catálogo, pero se conservará y podrás reactivarlo cuando quieras.',
+        aplicar
     );
 };
 

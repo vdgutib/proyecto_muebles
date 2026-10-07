@@ -54,7 +54,7 @@ def delete_categoria(cat_id):
         muebles = MueblesPropiosRepository.get_all(activos_solo=False)
         en_uso = any(m.get('categoria_id') == cat_id for m in muebles)
         if en_uso:
-            return jsonify({"status": "error", "error": "No se puede eliminar la categoría porque hay muebles asociados"}), 409
+            return jsonify({"status": "error", "error": "No se puede eliminar la categoría porque tiene muebles asociados (activos o inactivos)"}), 409
             
         success = MueblesPropiosRepository.delete_categoria(cat_id)
         if success:
