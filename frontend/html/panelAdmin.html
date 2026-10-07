@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
-    <link rel="stylesheet" href="../css/panelAdmin.css" type="text/css">
+    <link rel="stylesheet" href="../css/panelAdmin.css?v=2" type="text/css">
     <title>Panel Administrativo | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
@@ -31,99 +31,84 @@
         </div>
     </nav>
 
-    <div class="admin-container">
+    <main class="admin-container">
 
-        <h1 class="title">Panel Administrativo</h1>
+        <header class="page-header">
+            <h1 class="page-title">Panel de administración</h1>
+            <p class="page-subtitle">Gestiona el catálogo, sincroniza el inventario y calcula medidas de corte.</p>
+        </header>
 
-        <main class="admin-dashboard-box">
-            
-            <div class="row w-100 m-0">
-                
-                <div class="col-lg-5 left-panel">
-                    <h2 class="panel-subtitle">Panel de Administración</h2>
-                    
-                    <div class="upload-btn-container" style="flex-direction: column; gap: 15px;">
-                        <a href="gestionPropios.html" class="btn-ghost w-100" id="btn-propios" style="background-color: var(--royal-violet); color: white;">
-                            <i class="bi bi-star-fill me-2"></i> Gestión Muebles Propios
-                        </a>
-                        <a href="subidaArchivos.html" class="btn-ghost w-100" id="btn-upload">
-                            <i class="bi bi-cloud-arrow-up me-2"></i> Ir a Subida de Archivos
-                        </a>
-                    </div>
-                </div>
+        <section class="quick-grid" aria-label="Accesos rápidos">
+            <a href="gestionPropios.html" class="quick-card" id="btn-propios">
+                <span class="icon-tile"><i class="bi bi-star-fill"></i></span>
+                <span class="quick-text">
+                    <strong>Muebles propios</strong>
+                    <small>Agrega, edita y elimina tu línea propia y sus categorías.</small>
+                </span>
+                <i class="bi bi-arrow-right quick-arrow"></i>
+            </a>
+            <a href="subidaArchivos.html" class="quick-card" id="btn-upload">
+                <span class="icon-tile"><i class="bi bi-cloud-arrow-up"></i></span>
+                <span class="quick-text">
+                    <strong>Subida de archivos</strong>
+                    <small>Actualiza el inventario con Excel y sube imágenes de productos.</small>
+                </span>
+                <i class="bi bi-arrow-right quick-arrow"></i>
+            </a>
+        </section>
 
-                <div class="col-lg-7 right-panel">
-                    
-                    <h3 class="tool-heading text-center mb-3">Herramienta de Despiece</h3>
-                    
-                    <div class="despiece-container">
-                        <div id="alert-container-despiece"></div>
-                        
-                        <form class="despiece-form" id="form-despiece">
-                            
-                            <div class="despiece-row mb-3">
-                                <label for="input-alto" class="despiece-label">Alto:</label>
-                                <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-alto" name="alto" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
-                                    <select class="form-select" id="unidad-alto" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
-                                        <option value="m">m</option>
-                                        <option value="cm" selected>cm</option>
-                                        <option value="mm">mm</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="despiece-row mb-3">
-                                <label for="input-ancho" class="despiece-label">Ancho:</label>
-                                <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-ancho" name="ancho" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
-                                    <select class="form-select" id="unidad-ancho" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
-                                        <option value="m">m</option>
-                                        <option value="cm" selected>cm</option>
-                                        <option value="mm">mm</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="despiece-row mb-3">
-                                <label for="input-profundidad" class="despiece-label">Profundidad:</label>
-                                <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-profundidad" name="profundidad" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
-                                    <select class="form-select" id="unidad-profundidad" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
-                                        <option value="m">m</option>
-                                        <option value="cm" selected>cm</option>
-                                        <option value="mm">mm</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="despiece-row mb-3">
-                                <label for="input-grosor" class="despiece-label">Grosor:</label>
-                                <div class="input-group" style="width: 160px;">
-                                    <input type="number" id="input-grosor" name="grosor" class="form-control" style="border-color: var(--wisteria-2);" min="0.1" step="0.1" required>
-                                    <select class="form-select" id="unidad-grosor" style="max-width: 65px; padding-left: 5px; padding-right: 20px; border-color: var(--wisteria-2);">
-                                        <option value="m">m</option>
-                                        <option value="cm">cm</option>
-                                        <option value="mm" selected>mm</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-center mt-4">
-                                <button type="submit" class="btn-ghost" id="btn-calcular">Calcular</button>
-                            </div>
-
-                        </form>
-                        
-                        <div id="despiece-resultados" style="display: none;" class="mt-4"></div>
-                    </div>
-
+        <section class="tool-card">
+            <div class="tool-header">
+                <span class="icon-tile"><i class="bi bi-rulers"></i></span>
+                <div>
+                    <h2 class="tool-title">Herramienta de despiece</h2>
+                    <p class="tool-desc">Ingresa las medidas del mueble para obtener las dimensiones de corte del material.</p>
                 </div>
             </div>
 
-        </main>
+            <div id="alert-container-despiece"></div>
 
-    </div>
+            <form class="despiece-form" id="form-despiece">
+                <div class="row g-3">
+                        <div class="col-6 col-lg-3">
+                            <label for="input-alto" class="field-label">Alto</label>
+                            <div class="input-group">
+                                <input type="number" id="input-alto" name="alto" class="form-control" min="0.1" step="0.1" required>
+                                <select class="form-select unit-select" id="unidad-alto"><option value="m">m</option><option value="cm" selected>cm</option><option value="mm">mm</option></select>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <label for="input-ancho" class="field-label">Ancho</label>
+                            <div class="input-group">
+                                <input type="number" id="input-ancho" name="ancho" class="form-control" min="0.1" step="0.1" required>
+                                <select class="form-select unit-select" id="unidad-ancho"><option value="m">m</option><option value="cm" selected>cm</option><option value="mm">mm</option></select>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <label for="input-profundidad" class="field-label">Profundidad</label>
+                            <div class="input-group">
+                                <input type="number" id="input-profundidad" name="profundidad" class="form-control" min="0.1" step="0.1" required>
+                                <select class="form-select unit-select" id="unidad-profundidad"><option value="m">m</option><option value="cm" selected>cm</option><option value="mm">mm</option></select>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <label for="input-grosor" class="field-label">Grosor</label>
+                            <div class="input-group">
+                                <input type="number" id="input-grosor" name="grosor" class="form-control" min="0.1" step="0.1" required>
+                                <select class="form-select unit-select" id="unidad-grosor"><option value="m">m</option><option value="cm">cm</option><option value="mm" selected>mm</option></select>
+                            </div>
+                        </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-ghost" id="btn-calcular"><i class="bi bi-calculator me-2"></i>Calcular</button>
+                </div>
+            </form>
+
+            <div id="despiece-resultados" style="display: none;"></div>
+        </section>
+
+    </main>
+
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/api.js?v=2"></script>
     <script src="../js/modal.js"></script>
