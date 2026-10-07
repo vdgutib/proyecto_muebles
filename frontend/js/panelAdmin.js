@@ -9,5 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.cerrarSesion = function() {
     localStorage.removeItem('token');
-    window.location.href = 'home.html';
+    window.location.replace('login.html');
+};
+
+window.volverInicio = function() {
+    localStorage.removeItem('token');
+    window.location.replace('home.html');
 };

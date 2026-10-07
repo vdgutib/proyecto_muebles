@@ -1,5 +1,6 @@
 import os
 import logging
+import uuid
 from werkzeug.utils import secure_filename
 
 from config import Config
@@ -16,47 +17,47 @@ class ImagenService:
         )
 
     @staticmethod
+    def _tipo_real_valido(header):
+        if header.startswith(b'\xff\xd8'): return 'jpg'
+        if header.startswith(b'\x89PNG\r\n\x1a\n'): return 'png'
+        if header.startswith(b'RIFF') and header[8:12] == b'WEBP': return 'webp'
+        return None
+
+    @staticmethod
     def guardar_imagenes(archivos):
- 
         os.makedirs(Config.IMAGENES_DIR, exist_ok=True)
         directorio_destino = os.path.realpath(Config.IMAGENES_DIR)
 
         guardadas = []
         rechazadas = []
+        MAX_SIZE = 5 * 1024 * 1024  # 5MB
 
         for archivo in archivos:
             filename_original = archivo.filename or ''
-
             if filename_original == '':
                 continue
 
-            if not ImagenService._extension_permitida(filename_original):
-                rechazadas.append({
-                    "archivo": filename_original,
-                    "motivo": "Extensión no permitida (solo .jpg, .jpeg, .png)"
-                })
+            archivo.seek(0, os.SEEK_END)
+            size = archivo.tell()
+            archivo.seek(0)
+
+            if size > MAX_SIZE:
+                rechazadas.append({"archivo": filename_original, "motivo": "Excede tamaño máximo de 5MB"})
                 continue
 
-            nombre_seguro = secure_filename(filename_original)
-            if not nombre_seguro:
-                rechazadas.append({
-                    "archivo": filename_original,
-                    "motivo": "Nombre de archivo inválido"
-                })
+            header = archivo.read(512)
+            archivo.seek(0)
+            
+            ext_real = ImagenService._tipo_real_valido(header)
+            if not ext_real:
+                rechazadas.append({"archivo": filename_original, "motivo": "El contenido no es una imagen válida (jpg, png, webp)"})
                 continue
 
-            destino = os.path.realpath(os.path.join(directorio_destino, nombre_seguro))
-
-            if os.path.commonpath([directorio_destino, destino]) != directorio_destino:
-                logger.warning("Intento de path traversal bloqueado: %s", filename_original)
-                rechazadas.append({
-                    "archivo": filename_original,
-                    "motivo": "Ruta de destino inválida"
-                })
-                continue
+            nuevo_nombre = f"{uuid.uuid4().hex}.{ext_real}"
+            destino = os.path.realpath(os.path.join(directorio_destino, nuevo_nombre))
 
             archivo.save(destino)
-            guardadas.append(nombre_seguro)
+            guardadas.append(nuevo_nombre)
 
         return guardadas, rechazadas
 

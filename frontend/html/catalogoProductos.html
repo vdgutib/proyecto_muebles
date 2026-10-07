@@ -9,15 +9,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
-    <link rel="stylesheet" href="../css/home.css" type="text/css">
-    <link rel="stylesheet" href="../css/productos.css" type="text/css">
+    <link rel="stylesheet" href="../css/home.css?v=3" type="text/css">
+    <link rel="stylesheet" href="../css/productos.css?v=3" type="text/css">
     <title>Catálogo de Productos | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark nav-custom">
+    <nav class="navbar navbar-expand-lg navbar-dark nav-custom sticky-top" id="main-navbar" style="z-index: 1050; transition: all 0.3s ease;">
         <div class="container">
             <a class="navbar-brand nav-brand" href="home.html">
                 <img src="../imagenes/logo_empresa.jpeg" alt="Logo Muebles LB" style="height: 40px; margin-right: 20px; vertical-align: middle; transform: scale(1.6); transform-origin: left center;"> Muebles LB Especialistas
@@ -37,68 +37,124 @@
         </div>
     </nav>
 
-    <main class="container py-4">
-        <div class="catalog-main px-2 px-md-3">
-
-            <div class="text-center mb-4">
-                <h1 class="catalog-page-title">
-                    <i class="bi bi-journal-bookmark-fill me-2"></i>Catálogo de Productos
-                </h1>
+    <main class="container-fluid py-4 px-lg-5 catalog-layout">
+        <div class="row gx-4">
+            
+            <!-- Botón móvil para filtros -->
+            <div class="col-12 d-lg-none mb-3 text-end sticky-top" style="top: 80px; z-index: 1020;">
+                <button class="btn btn-primary rounded-pill shadow-sm px-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtrosOffcanvas" aria-controls="filtrosOffcanvas">
+                    <i class="bi bi-funnel-fill"></i> Filtros (<span id="filtros-count-mobile">0</span>)
+                </button>
             </div>
 
-            <div id="propios-catalog-container" class="mb-5">
-                <div class="text-center mb-4 mt-5">
-                    <h2 class="catalog-page-title" style="color: var(--indigo-velvet); font-size: 2rem;">
-                        <i class="bi bi-star-fill me-2" style="color: gold;"></i>Nuestra Línea Propia
-                    </h2>
-                    <p class="text-muted">Conoce los diseños exclusivos fabricados por nosotros</p>
-                </div>
-                <!-- Filtros para propios -->
-                <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap" id="category-filters-propios">
-                    <button class="top-cat-btn active" id="btn-todos-propios" onclick="filtrarCategoriaPropios('todos')">
-                        <i class="bi bi-grid-fill"></i> Todos
-                    </button>
-                </div>
-                <div id="dynamic-propios-container"></div>
-            </div>
-
-            <hr class="my-5" style="border-color: var(--wisteria-2);">
-
-            <div id="externos-catalog-container">
-                <div class="text-center mb-4 mt-4">
-                    <h2 class="catalog-page-title" style="color: var(--dark-amethyst-2); font-size: 1.8rem;">
-                        <i class="bi bi-shop me-2"></i>Catálogo por Tiendas
-                    </h2>
-                    <p class="text-muted">Encuentra y cotiza muebles de las principales tiendas del país</p>
-                </div>
-                <!-- Filtros para externos -->
-                <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap" id="category-filters">
-                    <button class="top-cat-btn active" id="btn-todos" onclick="filtrarCategoria('todos')">
-                        <i class="bi bi-grid-fill"></i> Todos
-                    </button>
-                </div>
-                
-                <div class="filter-toolbar mb-4 p-3 bg-light rounded">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-6">
+            <!-- Panel lateral izquierdo (Escritorio) -->
+            <aside class="col-lg-3 d-none d-lg-block sidebar-filters">
+                <div class="filters-container" id="filters-desktop-container">
+                    <div id="filters-content">
+                        <!-- Buscador -->
+                        <div class="filter-group mb-4">
+                            <label class="form-label fw-bold text-dark mb-2">Buscar</label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                <input type="text" id="search-input" class="form-control" placeholder="Buscar por nombre...">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" id="filter-search" class="form-control border-start-0 ps-0 shadow-none" placeholder="Nombre del producto...">
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label mb-1">Precio máximo: <span id="price-value" class="fw-bold text-primary">$0</span></label>
-                            <input type="range" id="price-range" class="form-range" min="0" max="1000000" step="10000" value="1000000">
+
+                        <!-- Origen -->
+                        <div class="filter-group mb-4">
+                            <label class="form-label fw-bold text-dark mb-2">Origen</label>
+                            <div class="form-check custom-radio mb-2">
+                                <input class="form-check-input filter-origin" type="radio" name="origen" id="origen-todos" value="todos" checked>
+                                <label class="form-check-label" for="origen-todos">Todos</label>
+                            </div>
+                            <div class="form-check custom-radio mb-2">
+                                <input class="form-check-input filter-origin" type="radio" name="origen" id="origen-propia" value="propia">
+                                <label class="form-check-label" for="origen-propia">Línea Propia</label>
+                            </div>
+                            <div class="form-check custom-radio">
+                                <input class="form-check-input filter-origin" type="radio" name="origen" id="origen-tiendas" value="tiendas">
+                                <label class="form-check-label" for="origen-tiendas">Tiendas</label>
+                            </div>
                         </div>
+
+                        <!-- Categorías -->
+                        <div class="filter-group mb-4">
+                            <label class="form-label fw-bold text-dark mb-2">Categoría</label>
+                            <div id="filter-categories-container" class="category-list">
+                                <!-- Generado por JS -->
+                            </div>
+                        </div>
+
+                        <!-- Precio -->
+                        <div class="filter-group mb-4">
+                            <label class="form-label fw-bold text-dark mb-2">Precio</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm shadow-none" id="filter-price-min" placeholder="Mínimo" min="0">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm shadow-none" id="filter-price-max" placeholder="Máximo" min="0">
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary w-100 mt-2" id="btn-aplicar-precio">Aplicar precio</button>
+                        </div>
+
+                        <!-- Solo con video -->
+                        <div class="filter-group mb-4" id="video-filter-container">
+                            <div class="form-check form-switch custom-switch">
+                                <input class="form-check-input" type="checkbox" id="filter-video">
+                                <label class="form-check-label" for="filter-video">Solo con video</label>
+                            </div>
+                        </div>
+
+                        <!-- Ordenar -->
+                        <div class="filter-group mb-4">
+                            <label class="form-label fw-bold text-dark mb-2">Ordenar por</label>
+                            <select class="form-select shadow-none" id="filter-sort">
+                                <option value="relevancia">Relevancia</option>
+                                <option value="precio-asc">Precio: Menor a Mayor</option>
+                                <option value="precio-desc">Precio: Mayor a Menor</option>
+                                <option value="nombre-asc">Nombre: A-Z</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-outline-secondary w-100 rounded-pill mt-2" id="btn-limpiar-filtros">Limpiar filtros</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Offcanvas para filtros en móvil -->
+            <div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="filtrosOffcanvas" aria-labelledby="filtrosOffcanvasLabel">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title fw-bold" id="filtrosOffcanvasLabel" style="color: var(--dark-amethyst-2);">Filtros</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body" id="mobile-filters-container">
+                    <!-- Se moverá el contenido aquí por JS en móvil -->
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="col-lg-9 catalog-content-col">
+                <!-- Chips y Resumen -->
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap pb-2 border-bottom">
+                    <h5 class="mb-0 text-muted fs-6"><span id="resultados-count" class="fw-bold text-dark">0</span> productos encontrados</h5>
+                    <div id="active-filters-chips" class="d-flex gap-2 flex-wrap mt-2 mt-md-0 align-items-center">
+                        <!-- Chips inyectados por JS -->
                     </div>
                 </div>
 
-                <div id="dynamic-catalog-container"></div>
+                <div id="catalog-content-area">
+                    <!-- Generado dinámicamente -->
+                    <div id="catalog-loading" class="text-center py-5 w-100">
+                        <div class="spinner-border text-primary" role="status"></div>
+                    </div>
+                </div>
             </div>
-
         </div>
     </main>
 
+    <!-- MODAL PRODUCTO (Igual que antes) -->
     <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-custom-content">
@@ -163,8 +219,8 @@
     </footer>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="../js/eventosCatalogo.js"></script>
+    <script src="../js/api.js?v=4"></script>
+    <script src="../js/eventosCatalogo.js?v=4"></script>
 
 </body>
 

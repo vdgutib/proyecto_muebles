@@ -12,12 +12,15 @@ def login():
     password = datos.get('password')
 
     try:
-        access_token = AuthService.autenticar(nombre_usuario, password)
+        resultado = AuthService.autenticar(nombre_usuario, password)
     except Exception:
         logger.exception("Error inesperado durante el login")
         return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
 
-    if not access_token:
-        return jsonify({"status": "error", "error": "Usuario o contraseña incorrectos"}), 401
+    if not resultado:
+        return jsonify({"status": "error", "error": "Datos inválidos"}), 400
 
-    return jsonify({"status": "success", "access_token": access_token}), 200
+    if not resultado.get("success"):
+        return jsonify({"status": "error", "error": resultado.get("error"), "attempts_left": resultado.get("attempts_left")}), 401
+
+    return jsonify({"status": "success", "access_token": resultado.get("access_token")}), 200

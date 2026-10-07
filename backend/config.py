@@ -37,6 +37,5 @@ class Config:
 
     JWT_ACCESS_TOKEN_EXPIRES_MIN = int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES_MIN', 60))
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    # Carpeta interna del backend para imágenes estáticas servidas por Flask
     IMAGENES_DIR = os.path.join(BASE_DIR, 'backend', 'static', 'imagenes')
-    EXTENSIONES_IMAGEN_PERMITIDAS = {'jpg', 'jpeg', 'png'}
+    EXTENSIONES_IMAGEN_PERMITIDAS = {'jpg', 'jpeg', 'png', 'webp'}

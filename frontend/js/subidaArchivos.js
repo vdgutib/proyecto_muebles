@@ -194,3 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
     }
 });
+
+window.cerrarSesion = function() {
+    localStorage.removeItem('token');
+    window.location.replace('login.html');
+};
+
+window.volverInicio = function() {
+    localStorage.removeItem('token');
+    window.location.replace('home.html');
+};

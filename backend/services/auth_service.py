@@ -24,7 +24,7 @@ class AuthService:
         if username in _bloqueos:
             if datetime.now() < _bloqueos[username]:
                 logger.warning("Intento de acceso a usuario bloqueado: %s", username)
-                return None  # Bloqueado
+                return {"success": False, "locked": True, "error": "Demasiados intentos. Usuario bloqueado temporalmente."}
             else:
                 del _bloqueos[username]
                 if username in _intentos_fallidos:
@@ -34,7 +34,10 @@ class AuthService:
         if not admin:
             # Aunque no exista, simulamos un fallo para evitar enumeración (CU-003)
             AuthService._registrar_fallo(username)
-            return None
+            intentos = _intentos_fallidos.get(username, 0)
+            if intentos >= 3:
+                return {"success": False, "locked": True, "error": "Demasiados intentos. Usuario bloqueado por 15 minutos."}
+            return {"success": False, "attempts_left": 3 - intentos, "error": f"Usuario o contraseña incorrectos. Intentos restantes: {3 - intentos}"}
 
         password_almacenada = admin['password']
 
@@ -51,7 +54,10 @@ class AuthService:
 
         if not es_valido:
             AuthService._registrar_fallo(username)
-            return None
+            intentos = _intentos_fallidos.get(username, 0)
+            if intentos >= 3:
+                return {"success": False, "locked": True, "error": "Demasiados intentos. Usuario bloqueado por 15 minutos."}
+            return {"success": False, "attempts_left": 3 - intentos, "error": f"Usuario o contraseña incorrectos. Intentos restantes: {3 - intentos}"}
 
         # Exito: resetear fallos
         if username in _intentos_fallidos:
@@ -61,7 +67,7 @@ class AuthService:
             identity=str(admin['id_admin']),
             additional_claims={"usuario": admin['nombre_usuario']}
         )
-        return access_token
+        return {"success": True, "access_token": access_token}
 
     @staticmethod
     def _registrar_fallo(username):

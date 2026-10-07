@@ -15,7 +15,9 @@ const api = {
                 body: JSON.stringify({ usuario, password })
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Error en el login');
+            if (!response.ok) {
+                return { status: 'error', error: data.error, attempts_left: data.attempts_left, locked: data.locked };
+            }
             return data;
         } catch (error) {
             console.error('Error en el login:', error);
@@ -172,9 +174,12 @@ const api = {
         }
     },
 
-    async getMueblesPropios() {
+    async getMueblesPropios(activosSolo = true) {
         try {
-            const response = await fetch(`${API_BASE_URL}/muebles-propios`);
+            const query = activosSolo ? '' : '?activos=false';
+            const response = await fetch(`${API_BASE_URL}/muebles-propios${query}`, {
+                headers: this.getAuthHeaders()
+            });
             if (!response.ok) throw new Error('Error al cargar muebles propios');
             return await response.json();
         } catch (error) {

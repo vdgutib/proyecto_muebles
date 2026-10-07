@@ -1,16 +1,14 @@
 import logging
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, verify_jwt_in_request
+import re
 from repositories.muebles_propios_repository import MueblesPropiosRepository
 from services.imagen_service import ImagenService
 
 logger = logging.getLogger(__name__)
 muebles_propios_bp = Blueprint('muebles_propios_bp', __name__)
 
-# ==========================
 # CATEGORIAS PROPIAS
-# ==========================
-
 @muebles_propios_bp.route('/api/categorias-propias', methods=['GET'])
 def get_categorias():
     try:
@@ -52,6 +50,12 @@ def update_categoria(cat_id):
 @jwt_required()
 def delete_categoria(cat_id):
     try:
+        # Check if used
+        muebles = MueblesPropiosRepository.get_all(activos_solo=False)
+        en_uso = any(m.get('categoria_id') == cat_id for m in muebles)
+        if en_uso:
+            return jsonify({"status": "error", "error": "No se puede eliminar la categoría porque hay muebles asociados"}), 409
+            
         success = MueblesPropiosRepository.delete_categoria(cat_id)
         if success:
             return jsonify({"status": "success", "mensaje": "Categoria eliminada"}), 200
@@ -60,14 +64,23 @@ def delete_categoria(cat_id):
         logger.exception("Error eliminando categoria")
         return jsonify({"status": "error", "error": "Error interno o categoria en uso"}), 500
 
-# ==========================
-# MUEBLES PROPIOS
-# ==========================
+def extract_youtube_id(url):
+    if not url: return ''
+    url = url.strip()
+    if re.match(r'^[a-zA-Z0-9_-]{11}$', url):
+        return url
+    pattern = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+    match = re.search(pattern, url)
+    return match.group(1) if match else None
 
+# MUEBLES PROPIOS
 @muebles_propios_bp.route('/api/muebles-propios', methods=['GET'])
 def get_muebles_propios():
     try:
         activos_solo = request.args.get('activos', 'true').lower() == 'true'
+        if not activos_solo:
+            verify_jwt_in_request()
+            
         muebles = MueblesPropiosRepository.get_all(activos_solo=activos_solo)
         return jsonify(muebles), 200
     except Exception as e:
@@ -95,6 +108,22 @@ def create_mueble_propio():
             if req not in data:
                 return jsonify({"status": "error", "error": f"Campo {req} es requerido"}), 400
                 
+        # Normalizar
+        data['nombre'] = str(data['nombre']).strip()
+        try:
+            precio_val = int(data['precio'])
+            if precio_val < 0: raise ValueError()
+            data['precio'] = precio_val
+        except:
+            return jsonify({"status": "error", "error": "Precio debe ser un entero positivo"}), 400
+            
+        vid = data.get('video_url', '').strip()
+        if vid:
+            yt_id = extract_youtube_id(vid)
+            if not yt_id:
+                return jsonify({"status": "error", "error": "URL de video de YouTube inválida"}), 400
+            data['video_url'] = yt_id
+            
         imagenes = data.get('imagenes', [])
         mueble_id = MueblesPropiosRepository.create(data, imagenes)
         return jsonify({"status": "success", "id": mueble_id, "mensaje": "Mueble creado correctamente"}), 201
@@ -107,6 +136,26 @@ def create_mueble_propio():
 def update_mueble_propio(mueble_id):
     try:
         data = request.json
+        
+        if 'nombre' in data:
+            data['nombre'] = str(data['nombre']).strip()
+        if 'precio' in data:
+            try:
+                precio_val = int(data['precio'])
+                if precio_val < 0: raise ValueError()
+                data['precio'] = precio_val
+            except:
+                return jsonify({"status": "error", "error": "Precio debe ser un entero positivo"}), 400
+        if 'video_url' in data:
+            vid = data['video_url'].strip()
+            if vid:
+                yt_id = extract_youtube_id(vid)
+                if not yt_id:
+                    return jsonify({"status": "error", "error": "URL de video de YouTube inválida"}), 400
+                data['video_url'] = yt_id
+            else:
+                data['video_url'] = ''
+        
         imagenes = data.get('imagenes')
         # Limpiar imagenes de data para que no choque con el update del repositorio
         if 'imagenes' in data:

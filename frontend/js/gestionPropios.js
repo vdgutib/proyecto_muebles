@@ -214,7 +214,7 @@ async function cargarMuebles() {
     const tbody = document.getElementById('tabla-muebles-propios');
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
     
-    mueblesPropios = await api.getMueblesPropios();
+    mueblesPropios = await api.getMueblesPropios(false);
     tbody.innerHTML = '';
     
     if(mueblesPropios.error) {
@@ -280,7 +280,12 @@ window.eliminarMueble = async function(id) {
     }
 };
 
-function cerrarSesion() {
+window.cerrarSesion = function() {
     localStorage.removeItem('token');
-    window.location.href = 'login.html';
+    window.location.replace('login.html');
+}
+
+window.volverInicio = function() {
+    localStorage.removeItem('token');
+    window.location.replace('home.html');
 }

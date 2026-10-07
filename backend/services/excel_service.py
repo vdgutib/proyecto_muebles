@@ -11,7 +11,6 @@ class ExcelService:
     @staticmethod
     def procesar_archivo_excel(archivo, id_admin_actual=1):
         try:
-            # 🚀 ARREGLO 1: Agregamos .fillna("") para que NINGUNA celda vacía se vuelva 'float' (NaN)
             df_raw = pd.read_excel(archivo, header=None, dtype=str).fillna("")
 
             header_idx = 0
@@ -25,7 +24,6 @@ class ExcelService:
             df.columns = df.iloc[header_idx]
             df = df.iloc[header_idx + 1:].reset_index(drop=True)
 
-            # Limpiamos los nombres de las columnas
             df.columns = df.columns.astype(str).str.replace('\n', ' ').str.replace('\r', ' ').str.strip().str.upper()
             df.columns = df.columns.str.replace(r'\s+', ' ', regex=True)
 
@@ -33,7 +31,6 @@ class ExcelService:
             has_nombre = 'NOMBRE' in columnas
             has_medidas = 'MEDIDAS' in columnas
             
-            # 🚀 ARREGLO 2: str(col) por si algún nombre de columna vacío se coló y quiere chocar
             has_precio = any('PRECIO' in str(col) for col in columnas)
 
             if not (has_nombre and has_medidas and has_precio):
@@ -47,15 +44,12 @@ class ExcelService:
             categoria_actual_nombre = None
 
             for _, row in df.iterrows():
-                # Ya no necesitamos dropna() porque eliminamos los NaN con fillna()
                 valores_validos = row.astype(str).str.strip()
                 valores_validos = valores_validos[(valores_validos != '') & (valores_validos != 'NAN') & (valores_validos != 'nan')]
                 
-                # Si la fila está completamente vacía, la saltamos
                 if len(valores_validos) == 0:
                     continue
 
-                # Si solo hay 1 valor en toda la fila, es la categoría (Ej: "LIVING")
                 if len(valores_validos) == 1:
                     categoria_actual_nombre = valores_validos.iloc[0].upper()
                     if categoria_actual_nombre == "MUEBLES PROPIOS":

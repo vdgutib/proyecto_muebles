@@ -167,8 +167,10 @@
 }
 .tips-section {
     background: linear-gradient(135deg, rgba(123, 44, 191, 0.06), rgba(210, 183, 229, 0.2));
-    border-top: 2px solid var(--wisteria);
+    border: 2px solid var(--wisteria);
+    border-radius: 20px;
     padding: 50px;
+    margin-bottom: 50px;
     animation: fadeInUp 0.7s ease 0.5s both;
 }
 .tips-title {
@@ -229,7 +231,7 @@
     line-height: 1.5;
 }
 .cta-banner {
-    margin: 0 40px 50px;
+    margin: 50px 0 50px;
     background: linear-gradient(135deg, var(--dark-amethyst-2), var(--indigo-velvet));
     border-radius: 20px;
     padding: 40px 50px;
@@ -319,7 +321,7 @@
         grid-column: 1;
     }
     .tips-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
     }
     .page-header,
     .gallery-section,

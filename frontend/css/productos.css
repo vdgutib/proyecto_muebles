@@ -1,10 +1,10 @@
 .catalog-page-title {
     color: var(--dark-amethyst-2);
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 800;
     display: inline-block;
-    padding-bottom: 6px;
-    border-bottom: 3px solid var(--royal-violet);
+    padding-bottom: 2px;
+    border-bottom: none;
 }
 
 .top-cat-btn {
@@ -47,7 +47,7 @@
 }
 
 .catalog-section-label {
-    font-size: 1.2rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--dark-amethyst-2);
     margin: 0;
@@ -106,8 +106,15 @@
 }
 
 @keyframes sectionEnter {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .catalog-grid {
@@ -119,6 +126,8 @@
 .catalog-grid--full {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    padding-top: 15px;
+    margin-top: -10px;
 }
 
 /* Vista "Todos": fila horizontal deslizable, una por categoría (estilo Netflix).
@@ -131,7 +140,9 @@
     scroll-snap-type: x proximity;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 12px;
+    padding-top: 15px;
+    padding-bottom: 25px;
+    margin-top: -10px;
     scrollbar-width: thin;
     scrollbar-color: var(--wisteria-2) transparent;
 }
@@ -164,12 +175,9 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
 }
 
-/* Estado inicial antes de entrar en el viewport (JS le quita esta clase al
-   revelarla). El transition de opacity/transform vive en .cat-card de base,
-   así el fade-in no pisa la animación de :hover una vez revelada la tarjeta. */
-.cat-card.reveal-ready {
-    opacity: 0;
-    transform: translateY(18px);
+.cat-card--propio {
+    border: 1.5px solid var(--royal-violet);
+    box-shadow: 0 4px 15px rgba(123, 44, 191, 0.08);
 }
 
 .cat-card:hover {
@@ -270,7 +278,7 @@
     border-radius: 18px;
     overflow: hidden;
     border: none;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .modal-custom-header {
@@ -279,13 +287,24 @@
     border-bottom: none;
 }
 
+/* Permitir clics a través del área invisible del control del carrusel hacia el iframe */
+#modalProducto .carousel-control-prev,
+#modalProducto .carousel-control-next {
+    pointer-events: none;
+}
+
+#modalProducto .carousel-control-prev-icon,
+#modalProducto .carousel-control-next-icon {
+    pointer-events: auto;
+}
+
 .modal-custom-img {
     max-height: 220px;
     width: 100%;
     object-fit: contain;
     background-color: #ffffff;
     padding: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .modal-custom-price {
@@ -317,4 +336,54 @@
 
 .modal-precio-nota i {
     font-size: 1rem;
+}
+
+/* Layout Catálogo */
+.sidebar-filters {
+    position: sticky;
+    top: 90px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    padding-bottom: 20px;
+}
+
+.sidebar-filters::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-filters::-webkit-scrollbar-thumb {
+    background-color: var(--wisteria-2);
+    border-radius: 10px;
+}
+
+.filters-container {
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid var(--wisteria-2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.filter-group .form-check-label {
+    font-size: 0.9rem;
+}
+
+.custom-radio input[type="radio"]:checked {
+    background-color: var(--royal-violet);
+    border-color: var(--royal-violet);
+}
+
+.custom-range::-webkit-slider-thumb {
+    background: var(--royal-violet);
+}
+
+.custom-switch .form-check-input:checked {
+    background-color: var(--royal-violet);
+    border-color: var(--royal-violet);
+}
+
+.category-list {
+    overflow-x: hidden;
 }
