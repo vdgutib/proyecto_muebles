@@ -12,6 +12,7 @@ let state = {
 };
 
 let maxGlobalPrecio = 1000000;
+let minGlobalPrecio = 0;
 
 function initFiltersFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -99,8 +100,18 @@ function bindEvents() {
     const btnPrecio = document.getElementById('btn-aplicar-precio');
     if (btnPrecio) {
         btnPrecio.addEventListener('click', () => {
-            const minV = Number(document.getElementById('filter-price-min').value);
-            const maxV = Number(document.getElementById('filter-price-max').value);
+            const minInput = document.getElementById('filter-price-min');
+            const maxInput = document.getElementById('filter-price-max');
+            let minV = Number(minInput.value);
+            let maxV = Number(maxInput.value);
+
+            // Mantener los valores dentro del rango real de precios del catalogo
+            if (minV > 0) minV = Math.min(Math.max(minV, minGlobalPrecio), maxGlobalPrecio);
+            if (maxV > 0) maxV = Math.min(Math.max(maxV, minGlobalPrecio), maxGlobalPrecio);
+            if (minV > 0 && maxV > 0 && minV > maxV) [minV, maxV] = [maxV, minV];
+            minInput.value = minV > 0 ? minV : '';
+            maxInput.value = maxV > 0 && maxV < maxGlobalPrecio ? maxV : '';
+
             state.precioMin = minV > 0 ? minV : 0;
             state.precioMax = maxV > 0 ? maxV : maxGlobalPrecio;
             applyFilters();
@@ -647,9 +658,25 @@ async function cargarMueblesTodos() {
     // No re-establecer max global sobre el filtro
     maxGlobalPrecio = maxCombo > 0 ? maxCombo : 1000000;
     
+    // Limite inferior acorde a los precios reales del catalogo (redondeado hacia abajo a miles)
+    const preciosValidos = [...preciosExt, ...preciosPro].filter(p => p > 0);
+    minGlobalPrecio = preciosValidos.length ? Math.floor(Math.min(...preciosValidos) / 1000) * 1000 : 0;
+
+    const minInput = document.getElementById('filter-price-min');
     const maxInput = document.getElementById('filter-price-max');
-    if (maxInput) {
-        maxInput.placeholder = 'Máx: $' + maxGlobalPrecio.toLocaleString('es-CL');
+    [minInput, maxInput].forEach(input => {
+        if (!input) return;
+        input.min = minGlobalPrecio;
+        input.max = maxGlobalPrecio;
+        input.step = 1000;
+    });
+    if (minInput) minInput.placeholder = 'Mín: $' + minGlobalPrecio.toLocaleString('es-CL');
+    if (maxInput) maxInput.placeholder = 'Máx: $' + maxGlobalPrecio.toLocaleString('es-CL');
+
+    // Un precio minimo tomado de la URL no puede quedar bajo el piso del catalogo
+    if (state.precioMin > 0 && state.precioMin < minGlobalPrecio) {
+        state.precioMin = minGlobalPrecio;
+        syncUIWithState();
     }
     
     bindEvents();
