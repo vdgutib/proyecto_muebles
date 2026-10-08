@@ -214,9 +214,9 @@ const api = {
         }
     },
 
-    async deleteMueblePropio(id) {
+    async deleteMueblePropio(id, fisico = false) {
         try {
-            const response = await fetch(`${API_BASE_URL}/muebles-propios/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/muebles-propios/${id}${fisico ? '?fisico=true' : ''}`, {
                 method: 'DELETE',
                 headers: this.getAuthHeaders()
             });

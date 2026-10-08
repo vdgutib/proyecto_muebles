@@ -12,6 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarCategorias();
     cargarMuebles();
 
+    // Busqueda, filtros y orden (se aplican sobre los datos ya cargados)
+    ['buscador-muebles'].forEach(id => document.getElementById(id).addEventListener('input', renderMuebles));
+    ['filtro-categoria', 'filtro-estado', 'orden-muebles'].forEach(id => document.getElementById(id).addEventListener('change', renderMuebles));
+    document.getElementById('btn-limpiar-filtros').addEventListener('click', () => {
+        document.getElementById('buscador-muebles').value = '';
+        document.getElementById('filtro-categoria').value = '';
+        document.getElementById('filtro-estado').value = 'todos';
+        document.getElementById('orden-muebles').value = 'recientes';
+        renderMuebles();
+    });
+
     // Eventos modales
     document.getElementById('btn-gestionar-categorias').addEventListener('click', () => {
         const modal = new bootstrap.Modal(document.getElementById('modalCategorias'));
@@ -209,6 +220,8 @@ async function cargarCategorias() {
             </li>
         `;
     });
+
+    poblarFiltroCategorias();
 }
 
 window.eliminarCategoria = function(id) {
@@ -227,24 +240,78 @@ window.eliminarCategoria = function(id) {
     );
 };
 
+function normalizarTexto(t) {
+    return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function escaparHtml(t) {
+    return String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Mantiene el filtro de categorias sincronizado con las categorias existentes
+function poblarFiltroCategorias() {
+    const select = document.getElementById('filtro-categoria');
+    const seleccionada = select.value;
+    select.innerHTML = '<option value="">Todas las categorías</option>' +
+        categoriasPropias.map(c => `<option value="${c.id}">${escaparHtml(c.nombre)}</option>`).join('');
+    select.value = [...select.options].some(o => o.value === seleccionada) ? seleccionada : '';
+    if(mueblesPropios.length) renderMuebles(); // evita mostrar "sin muebles" antes de que lleguen los datos
+}
+
 async function cargarMuebles() {
     const tbody = document.getElementById('tabla-muebles-propios');
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
-    
+
     mueblesPropios = await api.getMueblesPropios(false); // todos: activos e inactivos (el admin puede reactivar)
-    tbody.innerHTML = '';
-    
+
     if(mueblesPropios.error) {
+        mueblesPropios = [];
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error cargando muebles</td></tr>';
         return;
     }
+    renderMuebles();
+}
+
+function renderMuebles() {
+    const tbody = document.getElementById('tabla-muebles-propios');
+    const contador = document.getElementById('contador-muebles');
+    if(!Array.isArray(mueblesPropios)) return;
+    tbody.innerHTML = '';
 
     if(mueblesPropios.length === 0) {
+        contador.textContent = '';
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Aún no has agregado muebles propios.</td></tr>';
         return;
     }
 
-    mueblesPropios.forEach(m => {
+    const texto = normalizarTexto(document.getElementById('buscador-muebles').value.trim());
+    const categoria = document.getElementById('filtro-categoria').value;
+    const estado = document.getElementById('filtro-estado').value;
+    const orden = document.getElementById('orden-muebles').value;
+
+    const lista = mueblesPropios.filter(m => {
+        if(categoria && String(m.categoria_id) !== categoria) return false;
+        if(estado === 'activos' && !m.activo) return false;
+        if(estado === 'inactivos' && m.activo) return false;
+        if(texto && !normalizarTexto(`${m.nombre} ${m.nombre_categoria} ${m.descripcion || ''}`).includes(texto)) return false;
+        return true;
+    });
+
+    lista.sort((a, b) => {
+        if(orden === 'nombre') return a.nombre.localeCompare(b.nombre, 'es');
+        if(orden === 'precio-asc') return a.precio - b.precio;
+        if(orden === 'precio-desc') return b.precio - a.precio;
+        return b.id - a.id; // recientes
+    });
+
+    contador.textContent = `Mostrando ${lista.length} de ${mueblesPropios.length}`;
+
+    if(lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Ningún mueble coincide con la búsqueda o los filtros.</td></tr>';
+        return;
+    }
+
+    lista.forEach(m => {
         let imgHtml = '<div style="width:60px;height:60px;background:#f8f9fa;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;"><i class="bi bi-image text-muted"></i></div>';
         if(m.imagenes && m.imagenes.length > 0) {
             imgHtml = `<img src="http://localhost:5000/static/imagenes/${m.imagenes[0]}" class="img-thumbnail-table">`;
@@ -260,15 +327,37 @@ async function cargarMuebles() {
             <td>$${m.precio.toLocaleString('es-CL')}</td>
             <td>${m.video_url ? '<i class="bi bi-check-circle-fill text-success"></i> Sí' : '<i class="bi bi-x-circle text-muted"></i> No'}</td>
             <td>
-                <button class="btn btn-sm btn-outline-primary" onclick="editarMueble(${m.id})"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-primary" title="Editar" onclick="editarMueble(${m.id})"><i class="bi bi-pencil"></i></button>
                 ${activo
                     ? `<button class="btn btn-sm btn-outline-secondary" title="Desactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye-slash"></i></button>`
                     : `<button class="btn btn-sm btn-outline-success" title="Reactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye"></i></button>`}
+                <button class="btn btn-sm btn-outline-danger" title="Eliminar definitivamente" onclick="eliminarMuebleDefinitivo(${m.id})"><i class="bi bi-trash"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
+
+window.eliminarMuebleDefinitivo = function(id) {
+    const m = mueblesPropios.find(x => x.id === id);
+    if(!m) return;
+
+    mostrarModalConfirmacionPeligro(
+        'Eliminar definitivamente',
+        `¿Seguro que deseas eliminar <strong>${escaparHtml(m.nombre)}</strong> de forma permanente? ` +
+        'Se borrarán también sus imágenes y <strong>no se podrá deshacer</strong>. ' +
+        'Si solo quieres ocultarlo del catálogo, usa "Desactivar".',
+        async () => {
+            const res = await api.deleteMueblePropio(id, true);
+            if(res.status === 'success') {
+                cargarMuebles();
+            } else {
+                await esperarCierreModalGlobal();
+                mostrarModalError(res.error || 'No se pudo eliminar el mueble');
+            }
+        }
+    );
+};
 
 window.editarMueble = function(id) {
     const m = mueblesPropios.find(x => x.id === id);

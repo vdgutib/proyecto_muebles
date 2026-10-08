@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
     <link rel="stylesheet" href="../css/panelAdmin.css" type="text/css">
-    <link rel="stylesheet" href="../css/gestionPropios.css?v=2" type="text/css">
+    <link rel="stylesheet" href="../css/gestionPropios.css?v=3" type="text/css">
     <title>Gestión Muebles Propios | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
@@ -51,6 +51,28 @@
         </div>
 
         <div class="admin-dashboard-box w-100" style="max-width: 100%;">
+            <div class="toolbar-muebles">
+                <div class="input-group toolbar-search">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="search" id="buscador-muebles" class="form-control" placeholder="Buscar mueble..." aria-label="Buscar mueble">
+                </div>
+                <select id="filtro-categoria" class="form-select toolbar-select" aria-label="Filtrar por categoría">
+                    <option value="">Todas las categorías</option>
+                </select>
+                <select id="filtro-estado" class="form-select toolbar-select" aria-label="Filtrar por estado">
+                    <option value="todos">Todos los estados</option>
+                    <option value="activos">Solo activos</option>
+                    <option value="inactivos">Solo inactivos</option>
+                </select>
+                <select id="orden-muebles" class="form-select toolbar-select" aria-label="Ordenar muebles">
+                    <option value="recientes">Más recientes</option>
+                    <option value="nombre">Nombre (A-Z)</option>
+                    <option value="precio-asc">Precio: menor a mayor</option>
+                    <option value="precio-desc">Precio: mayor a menor</option>
+                </select>
+                <button type="button" id="btn-limpiar-filtros" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x-circle me-1"></i>Limpiar</button>
+                <span id="contador-muebles" class="toolbar-count"></span>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle custom-table">
                     <thead>
@@ -167,9 +189,9 @@
     </div>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/api.js?v=2"></script>
+    <script src="../js/api.js?v=3"></script>
     <script src="../js/modal.js"></script>
-    <script src="../js/gestionPropios.js?v=4"></script>
+    <script src="../js/gestionPropios.js?v=5"></script>
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 // Sistema de Modales Globales - Reemplazo de alert() y confirm()
 
-function mostrarModal(titulo, mensaje, tipo = 'info', onConfirm = null) {
+function mostrarModal(titulo, mensaje, tipo = 'info', onConfirm = null, textoConfirmar = 'Confirmar') {
     // Crear modal si no existe
     let modalElement = document.getElementById('global-modal');
     if (!modalElement) {
@@ -46,6 +46,10 @@ function mostrarModal(titulo, mensaje, tipo = 'info', onConfirm = null) {
             btnClass = 'btn-warning';
             icon = '<i class="bi bi-exclamation-circle-fill text-warning me-2"></i>';
             break;
+        case 'confirm-danger':
+            btnClass = 'btn-danger';
+            icon = '<i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>';
+            break;
         case 'confirm':
             btnClass = 'btn-primary';
             icon = '<i class="bi bi-question-circle-fill text-primary me-2"></i>';
@@ -58,10 +62,10 @@ function mostrarModal(titulo, mensaje, tipo = 'info', onConfirm = null) {
     bodyElement.innerHTML = mensaje;
 
     // Configurar footer según tipo
-    if (tipo === 'confirm' && onConfirm) {
+    if ((tipo === 'confirm' || tipo === 'confirm-danger') && onConfirm) {
         footerElement.innerHTML = `
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn ${btnClass}" id="global-modal-confirm">Confirmar</button>
+            <button type="button" class="btn ${btnClass}" id="global-modal-confirm">${textoConfirmar}</button>
         `;
         document.getElementById('global-modal-confirm').addEventListener('click', () => {
             if (onConfirm) onConfirm();
@@ -80,6 +84,10 @@ function mostrarModal(titulo, mensaje, tipo = 'info', onConfirm = null) {
 }
 
 // Funciones de conveniencia
+function mostrarModalConfirmacionPeligro(titulo, mensaje, onConfirm, textoConfirmar = 'Eliminar') {
+    mostrarModal(titulo, mensaje, 'confirm-danger', onConfirm, textoConfirmar);
+}
+
 function mostrarModalExito(mensaje) {
     mostrarModal('Éxito', mensaje, 'success');
 }

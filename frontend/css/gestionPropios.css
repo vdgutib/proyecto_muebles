@@ -73,3 +73,13 @@
 
 /* Muebles desactivados: fila atenuada, acciones visibles */
 tr.fila-inactiva td:not(:last-child) { opacity: .55; }
+
+
+/* Busqueda y filtros */
+.toolbar-muebles { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+.toolbar-search { flex: 1 1 260px; min-width: 220px; }
+.toolbar-select { flex: 0 1 210px; }
+.toolbar-muebles .form-control, .toolbar-muebles .form-select, .toolbar-muebles .input-group-text { border-color: var(--wisteria-2); }
+.toolbar-muebles .input-group-text { background: var(--light-bg); color: var(--indigo-velvet); }
+.toolbar-muebles .form-control:focus, .toolbar-muebles .form-select:focus { border-color: var(--royal-violet); box-shadow: 0 0 0 .2rem rgba(123, 44, 191, 0.18); }
+.toolbar-count { margin-left: auto; font-size: .9rem; color: #6b5b7e; white-space: nowrap; }
