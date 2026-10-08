@@ -74,10 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = document.getElementById(`${id}-text`);
         const bar = document.getElementById(`${id}-bar`);
 
+        let progresoTimer;
         try {
-            setTimeout(() => { if(bar.style.width === '10%') { bar.style.width = '40%'; text.innerText = 'Progreso: 40%'; } }, 500);
+            progresoTimer = setTimeout(() => { if(bar.style.width === '10%') { bar.style.width = '40%'; text.innerText = 'Progreso: 40%'; } }, 500);
             
             const result = await api.uploadExcel(file);
+            clearTimeout(progresoTimer);
             
             if (result.status === 'success') {
                 badge.className = 'file-badge success';
@@ -94,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 mostrarModalError('Error: ' + result.error);
             }
         } catch (err) {
+            clearTimeout(progresoTimer);
             badge.className = 'file-badge';
             badge.style.backgroundColor = '#e53e3e';
             badge.innerText = 'Error';
