@@ -42,6 +42,19 @@ def main():
         )
     """)
     
+    # 4. solicitudes: vinculo con muebles propios (producto_id solo apunta a muebles externos)
+    cur.execute("""
+        SELECT COUNT(*) FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'solicitudes' AND COLUMN_NAME = 'mueble_propio_id'
+    """)
+    if cur.fetchone()[0] == 0:
+        cur.execute("ALTER TABLE solicitudes ADD COLUMN mueble_propio_id INT NULL")
+        cur.execute("""
+            ALTER TABLE solicitudes
+            ADD CONSTRAINT fk_solicitudes_mueble_propio
+            FOREIGN KEY (mueble_propio_id) REFERENCES muebles_propios(id) ON DELETE SET NULL
+        """)
+
     conn.commit()
     cur.close()
     conn.close()
