@@ -127,3 +127,9 @@ CREATE TABLE muebles_propios_imagenes (
     orden INT DEFAULT 0,
     FOREIGN KEY (mueble_id) REFERENCES muebles_propios(id) ON DELETE CASCADE
 );
+
+-- Vinculo de solicitudes con muebles propios (producto_id solo apunta a muebles externos)
+ALTER TABLE solicitudes ADD COLUMN mueble_propio_id INT NULL;
+ALTER TABLE solicitudes
+ADD CONSTRAINT fk_solicitudes_mueble_propio
+FOREIGN KEY (mueble_propio_id) REFERENCES muebles_propios(id) ON DELETE SET NULL;
