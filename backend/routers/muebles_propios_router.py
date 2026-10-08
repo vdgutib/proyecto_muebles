@@ -2,6 +2,7 @@ import logging
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, verify_jwt_in_request
 import re
+import mysql.connector
 from repositories.muebles_propios_repository import MueblesPropiosRepository
 from services.imagen_service import ImagenService
 
@@ -27,8 +28,17 @@ def create_categoria():
         if not data or 'nombre' not in data:
             return jsonify({"status": "error", "error": "Nombre es requerido"}), 400
             
-        cat_id = MueblesPropiosRepository.create_categoria(data['nombre'], data.get('orden', 0))
+        nombre = str(data['nombre']).strip()
+        if not nombre:
+            return jsonify({"status": "error", "error": "Nombre es requerido"}), 400
+
+        cat_id = MueblesPropiosRepository.create_categoria(nombre, data.get('orden', 0))
         return jsonify({"status": "success", "id": cat_id, "mensaje": "Categoria creada"}), 201
+    except mysql.connector.IntegrityError as e:
+        if e.errno == 1062:  # entrada duplicada: el nombre de categoria es UNIQUE
+            return jsonify({"status": "error", "error": "Ya existe una categoría con ese nombre"}), 409
+        logger.exception("Error de integridad creando categoria")
+        return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
     except Exception as e:
         logger.exception("Error creando categoria")
         return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
