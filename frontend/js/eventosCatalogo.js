@@ -375,17 +375,17 @@ function crearTarjetaHtml(m) {
     const precioVenta = parseFloat(m.precio_venta ?? m.precio_costo ?? m.precio ?? 0);
     const precioFormateado = '$' + precioVenta.toLocaleString('es-CL');
 
-    let imgPath = 'http://localhost:5000/static/imagenes/producto-placeholder.jpg';
+    let imgPath = '/static/imagenes/producto-placeholder.jpg';
     let imagenesStr = '';
 
     if (isPropio) {
         if (m.imagenes && m.imagenes.length > 0) {
-            imgPath = `http://localhost:5000/static/imagenes/${m.imagenes[0]}`;
+            imgPath = `/static/imagenes/${m.imagenes[0]}`;
             imagenesStr = m.imagenes.join(',');
         }
     } else {
         if (m.imagen) {
-            imgPath = `http://localhost:5000/static/imagenes/${m.imagen.split(',')[0]}`;
+            imgPath = `/static/imagenes/${m.imagen.split(',')[0]}`;
             imagenesStr = m.imagen;
         }
     }
@@ -418,7 +418,7 @@ function crearTarjetaHtml(m) {
         <div class="${cardClass}" onclick="${onClickStr}">
             ${extraBadge}
             <div class="cat-card-img position-relative">
-                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+                <img src="${imgPath}" alt="${nombreEscaped}" onerror="this.src='/static/imagenes/producto-placeholder.jpg'">
                 ${extraIcon}
             </div>
             <div class="cat-card-info">
@@ -719,7 +719,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
             if (img.trim()) {
                 itemsHtml += `
                 <div class="carousel-item ${numItems === 0 ? 'active' : ''}">
-                    <img src="http://localhost:5000/static/imagenes/${img.trim()}" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="${nombre}" onerror="this.src='http://localhost:5000/static/imagenes/producto-placeholder.jpg'">
+                    <img src="/static/imagenes/${img.trim()}" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="${nombre}" onerror="this.src='/static/imagenes/producto-placeholder.jpg'">
                 </div>`;
                 numItems++;
             }
@@ -749,7 +749,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
     if (numItems === 0) {
         itemsHtml = `
         <div class="carousel-item active">
-            <img src="http://localhost:5000/static/imagenes/producto-placeholder.jpg" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="Placeholder">
+            <img src="/static/imagenes/producto-placeholder.jpg" class="d-block w-100 rounded modal-custom-img" style="object-fit: contain; max-height: 400px; background: #f8f9fa;" alt="Placeholder">
         </div>`;
         numItems = 1;
     }

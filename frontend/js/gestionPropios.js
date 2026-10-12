@@ -160,7 +160,7 @@ function actualizarPreviewImagenes() {
         
         let src = '';
         if(typeof item === 'string') {
-            src = `http://localhost:5000/static/imagenes/${item}`;
+            src = `/static/imagenes/${item}`;
         } else {
             src = URL.createObjectURL(item);
         }
@@ -314,7 +314,7 @@ function renderMuebles() {
     lista.forEach(m => {
         let imgHtml = '<div style="width:60px;height:60px;background:#f8f9fa;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;"><i class="bi bi-image text-muted"></i></div>';
         if(m.imagenes && m.imagenes.length > 0) {
-            imgHtml = `<img src="http://localhost:5000/static/imagenes/${m.imagenes[0]}" class="img-thumbnail-table">`;
+            imgHtml = `<img src="/static/imagenes/${m.imagenes[0]}" class="img-thumbnail-table">`;
         }
 
         const activo = !!m.activo;

@@ -2,7 +2,7 @@ import logging
 import os
 from datetime import timedelta
 
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, redirect, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -37,9 +37,19 @@ app.register_blueprint(despiece_bp)
 app.register_blueprint(solicitudes_bp)
 
 
+FRONTEND_DIR = os.path.join(Config.BASE_DIR, 'frontend')
+
+
 @app.route('/')
 def home():
-    return "El backend está funcionando correctamente"
+    return redirect('/html/home.html')
+
+
+@app.route('/<any(html,css,js,imagenes):carpeta>/<path:filename>')
+def servir_frontend(carpeta, filename):
+    """Sirve el frontend (html, css, js, imagenes) desde Flask, en el mismo
+    origen que la API. Así funciona igual en PC, celular y Dev Tunnels."""
+    return send_from_directory(os.path.join(FRONTEND_DIR, carpeta), filename)
 
 
 @app.route('/static/imagenes/<path:filename>')
