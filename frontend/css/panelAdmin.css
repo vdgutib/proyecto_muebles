@@ -81,7 +81,7 @@ body {
 .field-label { display: block; font-size: .9rem; font-weight: 500; color: var(--indigo-ink); margin-bottom: 6px; }
 .tool-card .form-control, .tool-card .form-select { border-color: var(--wisteria-2); font-family: 'Outfit', sans-serif; }
 .tool-card .form-control:focus, .tool-card .form-select:focus { border-color: var(--royal-violet); box-shadow: 0 0 0 .2rem rgba(123, 44, 191, 0.18); }
-.unit-select { max-width: 72px; background-color: var(--light-bg); }
+.unit-select { flex: 0 0 76px; max-width: none; padding-left: .55rem; padding-right: 1.6rem; background-position: right .4rem center; background-color: var(--light-bg); }
 .form-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
 
 #despiece-resultados { margin-top: 24px; padding-top: 4px; border-top: 1px solid var(--thistle); }
@@ -118,4 +118,11 @@ body {
     .quick-grid { grid-template-columns: 1fr; }
     .tool-card { padding: 20px 16px; }
     .form-actions .btn-ghost { width: 100%; }
+}
+
+/* Barra de admin en movil: botones solo con icono para que quepan en una fila */
+@media (max-width: 575.98px) {
+    .nav-custom .btn-label { display: none; }
+    .nav-custom .btn.btn-sm { padding: .45rem .7rem; font-size: 1rem; }
+    .nav-brand { font-size: 1.1rem; margin-right: 0; }
 }

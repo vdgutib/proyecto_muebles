@@ -332,3 +332,21 @@ main {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(123, 44, 191, 0.4) !important;
 }
+
+/* Menu movil: panel solido para que los enlaces se lean sobre el fondo con diseño */
+@media (max-width: 991.98px) {
+    .nav-custom .navbar-collapse {
+        background: rgba(16, 0, 43, 0.94);
+        border-radius: 14px;
+        margin-top: 12px;
+        padding: 8px;
+    }
+    .nav-links .nav-link {
+        color: #ffffff !important;
+        padding: 12px 16px !important;
+        font-size: 1rem;
+    }
+}
+@media (max-width: 575.98px) {
+    .nav-brand { font-size: 1.05rem; margin-right: 0; }
+}

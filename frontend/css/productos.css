@@ -387,3 +387,16 @@
 .category-list {
     overflow-x: hidden;
 }
+
+/* Filtros en movil */
+.filtros-sticky { top: 82px; z-index: 1020; }
+.btn-filtros-movil {
+    background: var(--indigo-ink); border: 2px solid var(--royal-violet); color: #ffffff; font-weight: 500;
+}
+.btn-filtros-movil:hover, .btn-filtros-movil:focus, .btn-filtros-movil:active {
+    background: var(--royal-violet); border-color: var(--royal-violet); color: #ffffff;
+}
+/* La barra de navegacion tiene z-index 1050: sin esto tapaba el titulo y la X del panel de filtros,
+   y como el panel medía 400px no quedaba fondo donde tocar para cerrarlo. */
+#filtrosOffcanvas { z-index: 1065; --bs-offcanvas-width: min(88vw, 360px); }
+.offcanvas-backdrop { z-index: 1060; }

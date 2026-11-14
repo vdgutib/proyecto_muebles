@@ -174,3 +174,10 @@ body {
     .btn-finish { width: 100%; }
     .danger-zone .btn-danger-custom { width: 100%; justify-content: center; }
 }
+
+/* Barra de admin en movil: botones solo con icono para que quepan en una fila */
+@media (max-width: 575.98px) {
+    .nav-custom .btn-label { display: none; }
+    .nav-custom .btn.btn-sm { padding: .45rem .7rem; font-size: 1rem; }
+    .nav-brand { font-size: 1.1rem; margin-right: 0; }
+}

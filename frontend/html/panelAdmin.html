@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
-    <link rel="stylesheet" href="../css/panelAdmin.css?v=2" type="text/css">
+    <link rel="stylesheet" href="../css/panelAdmin.css?v=3" type="text/css">
     <title>Panel Administrativo | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
@@ -21,11 +21,11 @@
                 <img src="../imagenes/logo_empresa.jpeg" alt="Logo Muebles LB" style="height: 40px; margin-right: 20px; vertical-align: middle; transform: scale(1.6); transform-origin: left center;"> Muebles LB Admin
             </a>
             <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-outline-light btn-sm" onclick="volverInicio()">
-                    <i class="bi bi-house-door"></i> Volver al Inicio
+                <button class="btn btn-outline-light btn-sm" onclick="volverInicio()" title="Volver al Inicio" aria-label="Volver al Inicio">
+                    <i class="bi bi-house-door"></i><span class="btn-label"> Volver al Inicio</span>
                 </button>
-                <button id="btn-logout" class="btn btn-outline-light btn-sm" onclick="cerrarSesion()">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                <button id="btn-logout" class="btn btn-outline-light btn-sm" onclick="cerrarSesion()" title="Cerrar Sesión" aria-label="Cerrar Sesión">
+                    <i class="bi bi-box-arrow-right"></i><span class="btn-label"> Cerrar Sesión</span>
                 </button>
             </div>
         </div>
