@@ -192,4 +192,5 @@ const FormatoMuebles = (() => {
         errorDePrecio, sugerenciasDePrecio, etiquetaMagnitud, enlazarPrecio, medidasDesdeTexto, evaluarMedidas, enlazarMedidas };
 })();
 
-// xd
+// xd estaba pensando en lo siguiente, que era hacer varios muebles a la vez, 
+// ignoren el commit anterior, ahorita si en el commit siguiente viene el cambio de hacer varios muebles a la vez
