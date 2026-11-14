@@ -5,6 +5,7 @@ import re
 import mysql.connector
 from repositories.muebles_propios_repository import MueblesPropiosRepository
 from services.imagen_service import ImagenService
+from services.validacion_muebles import validar_nombre, validar_precio, normalizar_medidas
 
 logger = logging.getLogger(__name__)
 muebles_propios_bp = Blueprint('muebles_propios_bp', __name__)
@@ -112,21 +113,20 @@ def get_mueble_propio(mueble_id):
 @jwt_required()
 def create_mueble_propio():
     try:
-        data = request.json
+        data = request.json or {}
         required = ['nombre', 'precio', 'categoria_id']
         for req in required:
             if req not in data:
                 return jsonify({"status": "error", "error": f"Campo {req} es requerido"}), 400
-                
-        # Normalizar
-        data['nombre'] = str(data['nombre']).strip()
+
+        # Validar y normalizar (mismas reglas que en la carga por lote)
         try:
-            precio_val = int(data['precio'])
-            if precio_val < 0: raise ValueError()
-            data['precio'] = precio_val
-        except:
-            return jsonify({"status": "error", "error": "Precio debe ser un entero positivo"}), 400
-            
+            data['nombre'] = validar_nombre(data['nombre'])
+            data['precio'] = validar_precio(data['precio'])
+            data['medidas'] = normalizar_medidas(data.get('medidas'))
+        except ValueError as e:
+            return jsonify({"status": "error", "error": str(e)}), 400
+
         vid = data.get('video_url', '').strip()
         if vid:
             yt_id = extract_youtube_id(vid)
@@ -145,17 +145,17 @@ def create_mueble_propio():
 @jwt_required()
 def update_mueble_propio(mueble_id):
     try:
-        data = request.json
-        
-        if 'nombre' in data:
-            data['nombre'] = str(data['nombre']).strip()
-        if 'precio' in data:
-            try:
-                precio_val = int(data['precio'])
-                if precio_val < 0: raise ValueError()
-                data['precio'] = precio_val
-            except:
-                return jsonify({"status": "error", "error": "Precio debe ser un entero positivo"}), 400
+        data = request.json or {}
+
+        try:
+            if 'nombre' in data:
+                data['nombre'] = validar_nombre(data['nombre'])
+            if 'precio' in data:
+                data['precio'] = validar_precio(data['precio'])
+            if 'medidas' in data:
+                data['medidas'] = normalizar_medidas(data['medidas'])
+        except ValueError as e:
+            return jsonify({"status": "error", "error": str(e)}), 400
         if 'video_url' in data:
             vid = data['video_url'].strip()
             if vid:
