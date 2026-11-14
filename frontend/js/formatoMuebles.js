@@ -191,3 +191,5 @@ const FormatoMuebles = (() => {
     return { PRECIO_MIN, PRECIO_MAX, MEDIDA_MIN, MEDIDA_MAX, conPuntos, formatearPrecio, parsePrecio,
         errorDePrecio, sugerenciasDePrecio, etiquetaMagnitud, enlazarPrecio, medidasDesdeTexto, evaluarMedidas, enlazarMedidas };
 })();
+
+// xd
