@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
     <link rel="stylesheet" href="../css/panelAdmin.css?v=3" type="text/css">
-    <link rel="stylesheet" href="../css/gestionPropios.css?v=6" type="text/css">
+    <link rel="stylesheet" href="../css/gestionPropios.css?v=7" type="text/css">
     <title>Gestión Muebles Propios | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
@@ -45,6 +45,9 @@
             <div class="header-actions">
                 <button class="btn btn-outline-violet" id="btn-gestionar-categorias">
                     <i class="bi bi-tags"></i> Categorías
+                </button>
+                <button class="btn btn-outline-violet" id="btn-carga-multiple">
+                    <i class="bi bi-collection"></i> Varios muebles
                 </button>
                 <button class="btn btn-primary-custom" id="btn-nuevo-mueble">
                     <i class="bi bi-plus-lg"></i> Nuevo mueble
@@ -188,6 +191,47 @@
         </div>
     </div>
 
+    <!-- Modal carga multiple: varios muebles de una misma categoria -->
+    <div class="modal fade" id="modalLote" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header custom-modal-header">
+                    <h5 class="modal-title">Agregar varios muebles</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="lote-cabecera">
+                        <div class="lote-categoria">
+                            <label class="form-label" for="lote-categoria">Categoría para todos *</label>
+                            <select class="form-select" id="lote-categoria"></select>
+                        </div>
+                        <p class="lote-ayuda">
+                            Completa una fila por mueble. <strong>Nombre y precio</strong> son obligatorios; medidas, fotos,
+                            descripción y video son opcionales. Las filas vacías se ignoran. Si falla algo, no se guarda ninguno.
+                            Con <kbd>Enter</kbd> en el campo "Alto" pasas a la fila siguiente.
+                        </p>
+                    </div>
+
+                    <div class="lote-encabezados" aria-hidden="true">
+                        <span>#</span><span>Nombre</span><span>Precio</span><span>Medidas (cm)</span><span>Fotos</span><span></span>
+                    </div>
+                    <div id="lote-filas"></div>
+
+                    <div class="lote-agregar">
+                        <button type="button" class="btn btn-outline-violet btn-sm" id="lote-agregar-fila"><i class="bi bi-plus-lg"></i> Agregar fila</button>
+                        <button type="button" class="btn btn-outline-violet btn-sm" id="lote-agregar-cinco"><i class="bi bi-plus-lg"></i> Agregar 5 filas</button>
+                    </div>
+                </div>
+                <div class="modal-footer lote-pie">
+                    <span class="lote-resumen" id="lote-resumen" aria-live="polite"></span>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="lote-cancelar">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="lote-guardar"
+                        style="background-color: var(--royal-violet); border-color: var(--royal-violet);">Guardar muebles</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Categorias -->
     <div class="modal fade" id="modalCategorias" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -212,10 +256,11 @@
     </div>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/api.js?v=3"></script>
+    <script src="../js/api.js?v=5"></script>
     <script src="../js/modal.js"></script>
     <script src="../js/formatoMuebles.js"></script>
     <script src="../js/gestionPropios.js?v=7"></script>
+    <script src="../js/cargaMultiple.js?v=1"></script>
 </body>
 
 </html>

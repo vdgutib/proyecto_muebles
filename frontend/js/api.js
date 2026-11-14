@@ -201,6 +201,20 @@ const api = {
         }
     },
 
+    // Crea varios muebles de una categoria en una sola operacion (todos o ninguno)
+    async createMueblesLote(data) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/muebles-propios/lote`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...this.getAuthHeaders() },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        } catch (error) {
+            return { status: 'error', error: error.message };
+        }
+    },
+
     async updateMueblePropio(id, data) {
         try {
             const response = await fetch(`${API_BASE_URL}/muebles-propios/${id}`, {
