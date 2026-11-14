@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
     <link rel="stylesheet" href="../css/panelAdmin.css?v=3" type="text/css">
-    <link rel="stylesheet" href="../css/gestionPropios.css?v=5" type="text/css">
+    <link rel="stylesheet" href="../css/gestionPropios.css?v=6" type="text/css">
     <title>Gestión Muebles Propios | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
@@ -114,7 +114,7 @@
                                 <label class="form-label">Nombre del Mueble *</label>
                                 <input type="text" class="form-control" id="mueble-nombre" required>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 mt-3 mt-md-0">
                                 <label class="form-label">Categoría *</label>
                                 <select class="form-select" id="mueble-categoria" required>
                                     <option value="">Seleccione...</option>
@@ -122,15 +122,36 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Precio ($) *</label>
-                                <input type="number" class="form-control" id="mueble-precio" min="0" required>
+                        <div class="row mb-3 g-3">
+                            <div class="col-md-5">
+                                <label class="form-label" for="mueble-precio">Precio *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" inputmode="numeric" autocomplete="off" class="form-control" id="mueble-precio"
+                                        placeholder="150.000" aria-describedby="precio-hint">
+                                </div>
+                                <div class="campo-ayuda" id="precio-hint" data-tono="neutro"></div>
+                                <div class="chips-precio" id="precio-chips"></div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Medidas</label>
-                                <input type="text" class="form-control" id="mueble-medidas"
-                                    placeholder="Ej: 120x80x40 cm">
+                            <div class="col-md-7">
+                                <label class="form-label" for="medida-ancho">Medidas <span class="text-muted small">(cm)</span></label>
+                                <div class="medidas-grid">
+                                    <div class="medida-campo">
+                                        <input type="text" inputmode="decimal" autocomplete="off" class="form-control" id="medida-ancho" placeholder="Ancho" aria-label="Ancho en centímetros">
+                                    </div>
+                                    <span class="medida-x">×</span>
+                                    <div class="medida-campo">
+                                        <input type="text" inputmode="decimal" autocomplete="off" class="form-control" id="medida-prof" placeholder="Profund." aria-label="Profundidad en centímetros">
+                                    </div>
+                                    <span class="medida-x">×</span>
+                                    <div class="medida-campo">
+                                        <input type="text" inputmode="decimal" autocomplete="off" class="form-control" id="medida-alto" placeholder="Alto" aria-label="Alto en centímetros">
+                                    </div>
+                                </div>
+                                <div class="campo-ayuda" id="medidas-vista" data-tono="neutro"></div>
+                                <div class="campo-ayuda campo-ayuda--aviso" id="medidas-antiguo" hidden>
+                                    Medidas guardadas antes en otro formato: «<span data-texto-antiguo></span>». Se conservarán si no completas los campos.
+                                </div>
                             </div>
                         </div>
 
@@ -193,7 +214,8 @@
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/api.js?v=3"></script>
     <script src="../js/modal.js"></script>
-    <script src="../js/gestionPropios.js?v=6"></script>
+    <script src="../js/formatoMuebles.js"></script>
+    <script src="../js/gestionPropios.js?v=7"></script>
 </body>
 
 </html>

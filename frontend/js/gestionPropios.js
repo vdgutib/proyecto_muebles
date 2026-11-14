@@ -1,6 +1,8 @@
 let categoriasPropias = [];
 let mueblesPropios = [];
 let archivosImagenes = [];
+let precioCtl = null;   // controles de formato del formulario (formatoMuebles.js)
+let medidasCtl = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('token');
@@ -29,8 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.show();
     });
 
+    // Precio y medidas con formato guiado (ver formatoMuebles.js)
+    precioCtl = FormatoMuebles.enlazarPrecio(document.getElementById('mueble-precio'), {
+        hint: document.getElementById('precio-hint'),
+        chips: document.getElementById('precio-chips')
+    });
+    medidasCtl = FormatoMuebles.enlazarMedidas({
+        ancho: document.getElementById('medida-ancho'),
+        prof: document.getElementById('medida-prof'),
+        alto: document.getElementById('medida-alto')
+    }, {
+        vista: document.getElementById('medidas-vista'),
+        antiguo: document.getElementById('medidas-antiguo')
+    });
+
     document.getElementById('btn-nuevo-mueble').addEventListener('click', () => {
         document.getElementById('form-mueble-propio').reset();
+        precioCtl.reiniciar();
+        medidasCtl.reiniciar();
         document.getElementById('mueble-id').value = '';
         document.getElementById('modal-mueble-title').innerText = 'Agregar Mueble Propio';
         archivosImagenes = [];
@@ -60,21 +78,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = document.getElementById('mueble-id').value;
         const nombre = document.getElementById('mueble-nombre').value.trim();
         const categoria_id = document.getElementById('mueble-categoria').value;
-        const precio = document.getElementById('mueble-precio').value;
-        
-        if(!nombre || !categoria_id || !precio) {
-            mostrarModalAdvertencia('Nombre, Categoría y Precio son obligatorios');
+
+        if(!nombre || !categoria_id) {
+            mostrarModalAdvertencia('Nombre y Categoría son obligatorios');
+            return;
+        }
+        const errorPrecio = precioCtl.error();
+        if(errorPrecio) {
+            mostrarModalAdvertencia(errorPrecio);
+            return;
+        }
+        const medidas = medidasCtl.valor();
+        if(medidas.estado === 'incompleto' || medidas.estado === 'invalido') {
+            mostrarModalAdvertencia(medidas.mensaje);
             return;
         }
 
         const data = {
             nombre,
             categoria_id: parseInt(categoria_id),
-            precio: parseInt(precio),
+            precio: precioCtl.valor(),
             descripcion: document.getElementById('mueble-descripcion').value.trim(),
-            video_url: document.getElementById('mueble-video').value.trim(),
-            medidas: document.getElementById('mueble-medidas').value.trim()
+            video_url: document.getElementById('mueble-video').value.trim()
         };
+        // Medidas en formato antiguo y sin tocar: no se envian, para no sobrescribirlas
+        if(medidas.estado !== 'antiguo') data.medidas = medidas.texto;
 
         // Subir imagenes si hay nuevas
         const inputFiles = document.getElementById('file-imagenes').files;
@@ -366,8 +394,8 @@ window.editarMueble = function(id) {
     document.getElementById('mueble-id').value = m.id;
     document.getElementById('mueble-nombre').value = m.nombre;
     document.getElementById('mueble-categoria').value = m.categoria_id;
-    document.getElementById('mueble-precio').value = m.precio;
-    document.getElementById('mueble-medidas').value = m.medidas || '';
+    precioCtl.establecer(m.precio);
+    medidasCtl.establecer(m.medidas);
     document.getElementById('mueble-descripcion').value = m.descripcion || '';
     document.getElementById('mueble-video').value = m.video_url || '';
     

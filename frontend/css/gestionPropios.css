@@ -141,3 +141,22 @@ tr.fila-inactiva td:not(:last-child) { opacity: .55; }
     .toolbar-muebles { grid-template-columns: 1fr; }
     #btn-limpiar-filtros { justify-self: start; }
 }
+
+/* ===== Formulario: precio y medidas guiados ===== */
+.campo-ayuda { font-size: .82rem; margin-top: 6px; color: #6b5b7e; min-height: 1.2em; }
+.campo-ayuda[data-tono="ok"] { color: #2f855a; font-weight: 500; }
+.campo-ayuda[data-tono="error"] { color: #c53030; }
+.campo-ayuda--aviso { color: #8a5a00; background: #fff8e6; border: 1px solid #f3d99a; border-radius: 8px; padding: 6px 10px; }
+.chips-precio { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip-precio {
+    display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.2;
+    background: var(--light-bg); border: 1.5px solid var(--royal-violet); color: var(--indigo-velvet);
+    border-radius: 12px; padding: 6px 12px; font-weight: 600; cursor: pointer; transition: all .2s ease;
+}
+.chip-precio small { font-weight: 400; font-size: .72rem; color: #6b5b7e; }
+.chip-precio:hover { background: var(--royal-violet); color: #fff; }
+.chip-precio:hover small { color: #f0e6fa; }
+.medidas-grid { display: flex; align-items: center; gap: 8px; }
+.medida-campo { flex: 1; min-width: 0; }
+.medida-x { color: #8a7a9b; font-weight: 600; }
+#modalMueblePropio .form-control:focus, #modalMueblePropio .form-select:focus { border-color: var(--royal-violet); box-shadow: 0 0 0 .2rem rgba(123, 44, 191, 0.18); }
