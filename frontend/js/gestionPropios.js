@@ -321,17 +321,17 @@ function renderMuebles() {
         const tr = document.createElement('tr');
         if(!activo) tr.classList.add('fila-inactiva');
         tr.innerHTML = `
-            <td>${imgHtml}</td>
-            <td class="fw-bold">${m.nombre}${activo ? '' : ' <span class="badge bg-secondary ms-1">Inactivo</span>'}</td>
-            <td><span class="badge" style="background-color: var(--royal-violet);">${m.nombre_categoria}</span></td>
-            <td>$${m.precio.toLocaleString('es-CL')}</td>
-            <td>${m.video_url ? '<i class="bi bi-check-circle-fill text-success"></i> Sí' : '<i class="bi bi-x-circle text-muted"></i> No'}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary" title="Editar" onclick="editarMueble(${m.id})"><i class="bi bi-pencil"></i></button>
+            <td data-label="Imagen">${imgHtml}</td>
+            <td data-label="Nombre" class="fw-bold">${m.nombre}${activo ? '' : ' <span class="badge bg-secondary ms-1">Inactivo</span>'}</td>
+            <td data-label="Categoría"><span class="badge" style="background-color: var(--royal-violet);">${m.nombre_categoria}</span></td>
+            <td data-label="Precio">$${m.precio.toLocaleString('es-CL')}</td>
+            <td data-label="Video">${m.video_url ? '<i class="bi bi-check-circle-fill text-success"></i> Sí' : '<i class="bi bi-x-circle text-muted"></i> No'}</td>
+            <td data-label="Acciones" class="acciones-celda">
+                <button class="btn btn-sm btn-outline-primary" title="Editar" aria-label="Editar" onclick="editarMueble(${m.id})"><i class="bi bi-pencil"></i></button>
                 ${activo
-                    ? `<button class="btn btn-sm btn-outline-secondary" title="Desactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye-slash"></i></button>`
-                    : `<button class="btn btn-sm btn-outline-success" title="Reactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye"></i></button>`}
-                <button class="btn btn-sm btn-outline-danger" title="Eliminar definitivamente" onclick="eliminarMuebleDefinitivo(${m.id})"><i class="bi bi-trash"></i></button>
+                    ? `<button class="btn btn-sm btn-outline-secondary" title="Desactivar" aria-label="Desactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye-slash"></i></button>`
+                    : `<button class="btn btn-sm btn-outline-success" title="Reactivar" aria-label="Reactivar" onclick="cambiarEstadoMueble(${m.id})"><i class="bi bi-eye"></i></button>`}
+                <button class="btn btn-sm btn-outline-danger" title="Eliminar definitivamente" aria-label="Eliminar definitivamente" onclick="eliminarMuebleDefinitivo(${m.id})"><i class="bi bi-trash"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
