@@ -225,6 +225,52 @@ class MueblesPropiosRepository:
             conexion.close()
 
     @staticmethod
+    def create_many(categoria_id, items):
+        """Crea varios muebles de una categoria en una sola transaccion: o se guardan todos o ninguno.
+
+        items: lista de dicts ya validados (nombre, precio, medidas, descripcion, video_url, imagenes).
+        Devuelve la lista de ids creados, en el mismo orden.
+        """
+        conexion = get_db_connection()
+        if not conexion:
+            raise Exception("No se pudo conectar a la base de datos")
+
+        cursor = None
+        try:
+            cursor = conexion.cursor()
+            sql = """
+                INSERT INTO muebles_propios
+                (nombre, descripcion, video_url, medidas, precio, categoria_id, activo)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """
+            img_sql = "INSERT INTO muebles_propios_imagenes (mueble_id, imagen_url, orden) VALUES (%s, %s, %s)"
+            ids = []
+            for item in items:
+                cursor.execute(sql, (
+                    item['nombre'],
+                    item.get('descripcion', ''),
+                    item.get('video_url', ''),
+                    item.get('medidas', ''),
+                    item['precio'],
+                    categoria_id,
+                    True
+                ))
+                mueble_id = cursor.lastrowid
+                ids.append(mueble_id)
+                imagenes = item.get('imagenes') or []
+                if imagenes:
+                    cursor.executemany(img_sql, [(mueble_id, url, idx) for idx, url in enumerate(imagenes)])
+            conexion.commit()
+            return ids
+        except mysql.connector.Error:
+            conexion.rollback()
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            conexion.close()
+
+    @staticmethod
     def update(mueble_id, data, imagenes=None):
         conexion = get_db_connection()
         if not conexion:

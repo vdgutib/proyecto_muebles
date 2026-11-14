@@ -141,6 +141,79 @@ def create_mueble_propio():
         logger.exception("Error creando mueble propio")
         return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
 
+LOTE_MAX = 50           # muebles por carga multiple
+IMAGENES_MAX = 10       # fotos por mueble
+
+@muebles_propios_bp.route('/api/muebles-propios/lote', methods=['POST'])
+@jwt_required()
+def create_muebles_lote():
+    """Crea varios muebles de una misma categoria. Valida todas las filas antes de guardar:
+    si alguna tiene errores no se crea ninguna y se responde con el detalle por fila."""
+    try:
+        data = request.json or {}
+
+        try:
+            categoria_id = int(data.get('categoria_id'))
+        except (TypeError, ValueError):
+            return jsonify({"status": "error", "error": "Selecciona una categoría"}), 400
+        if not any(c['id'] == categoria_id for c in MueblesPropiosRepository.get_categorias(activas_solo=False)):
+            return jsonify({"status": "error", "error": "La categoría seleccionada no existe"}), 400
+
+        filas = data.get('muebles')
+        if not isinstance(filas, list) or not filas:
+            return jsonify({"status": "error", "error": "No hay muebles para crear"}), 400
+        if len(filas) > LOTE_MAX:
+            return jsonify({"status": "error", "error": f"Puedes crear hasta {LOTE_MAX} muebles por vez"}), 400
+
+        errores = []
+        validos = []
+        vistos = {}   # nombre en minusculas -> numero de fila
+        for pos, fila in enumerate(filas, start=1):
+            # "fila" es el numero que ve el usuario en pantalla (puede saltarse filas vacias)
+            n = fila.get('fila') if isinstance(fila, dict) and isinstance(fila.get('fila'), int) else pos
+            try:
+                if not isinstance(fila, dict):
+                    raise ValueError("Datos de mueble inválidos")
+                item = {
+                    'nombre': validar_nombre(fila.get('nombre')),
+                    'precio': validar_precio(fila.get('precio')),
+                    'medidas': normalizar_medidas(fila.get('medidas')),
+                    'descripcion': str(fila.get('descripcion') or '').strip(),
+                }
+                clave = item['nombre'].lower()
+                if clave in vistos:
+                    raise ValueError(f"El nombre «{item['nombre']}» está repetido (ya aparece en la fila {vistos[clave]})")
+                vid = str(fila.get('video_url') or '').strip()
+                if vid:
+                    yt_id = extract_youtube_id(vid)
+                    if not yt_id:
+                        raise ValueError("URL de video de YouTube inválida")
+                    item['video_url'] = yt_id
+                imagenes = fila.get('imagenes') or []
+                if not isinstance(imagenes, list) or not all(isinstance(i, str) and i for i in imagenes):
+                    raise ValueError("Lista de imágenes inválida")
+                if len(imagenes) > IMAGENES_MAX:
+                    raise ValueError(f"Máximo {IMAGENES_MAX} imágenes por mueble")
+                item['imagenes'] = imagenes
+                vistos[clave] = n
+                validos.append(item)
+            except ValueError as e:
+                errores.append({"fila": n, "error": str(e)})
+
+        if errores:
+            resumen = errores[0]
+            msg = f"Fila {resumen['fila']}: {resumen['error']}"
+            if len(errores) > 1:
+                msg += f" (y {len(errores) - 1} fila(s) más con errores)"
+            return jsonify({"status": "error", "error": msg, "errores": errores}), 400
+
+        ids = MueblesPropiosRepository.create_many(categoria_id, validos)
+        return jsonify({"status": "success", "ids": ids, "creados": len(ids),
+                        "mensaje": f"{len(ids)} mueble(s) creado(s) correctamente"}), 201
+    except Exception:
+        logger.exception("Error creando muebles propios en lote")
+        return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
+
 @muebles_propios_bp.route('/api/muebles-propios/<int:mueble_id>', methods=['PUT'])
 @jwt_required()
 def update_mueble_propio(mueble_id):
