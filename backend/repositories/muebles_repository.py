@@ -196,6 +196,27 @@ class MueblesRepository:
 
   
     @staticmethod
+    def update_imagen_by_sku(sku, nombre_imagen):
+        """Actualiza la imagen asociada a un mueble por su SKU."""
+        conexion = get_db_connection()
+        if not conexion:
+            raise Exception("No se pudo conectar a la base de datos")
+
+        cursor = None
+        try:
+            cursor = conexion.cursor()
+            cursor.execute("UPDATE muebles SET imagen = %s WHERE sku = %s", (nombre_imagen, str(sku)))
+            conexion.commit()
+            return cursor.rowcount > 0
+        except mysql.connector.Error:
+            conexion.rollback()
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+            conexion.close()
+
+    @staticmethod
     def get_imagen_by_sku(sku):
         """
         Devuelve el nombre del archivo de imagen asociado al SKU, '' si el

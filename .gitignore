@@ -3,3 +3,8 @@ backend/.env
 __pycache__/
 venv/
 backend/venv/
+
+# Imágenes generadas y subidas dinámicamente (se extraen automáticamente de Excel)
+backend/static/imagenes/*
+!backend/static/imagenes/producto-placeholder.jpg
+!backend/static/imagenes/.gitkeep

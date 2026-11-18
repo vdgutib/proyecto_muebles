@@ -17,8 +17,10 @@ def subir_imagenes():
     if not archivos or all(a.filename == '' for a in archivos):
         return jsonify({"status": "error", "error": "No se seleccionó ninguna imagen"}), 400
 
+    tipo = request.form.get('tipo', 'general')
+
     try:
-        guardadas, rechazadas = ImagenService.guardar_imagenes(archivos)
+        guardadas, rechazadas, asociadas = ImagenService.guardar_imagenes(archivos, tipo=tipo)
     except Exception:
         logger.exception("Error guardando imágenes en disco")
         return jsonify({"status": "error", "error": "Error interno del servidor"}), 500
@@ -26,14 +28,19 @@ def subir_imagenes():
     if not guardadas and rechazadas:
         return jsonify({
             "status": "error",
-            "error": "Ninguna imagen pudo guardarse",
+            "error": "Ninguna imagen pudo guardarse. Verifica que el nombre sea un SKU numérico existente.",
             "rechazadas": rechazadas
         }), 400
 
+    mensaje = f"{len(guardadas)} imágenes subidas correctamente."
+    if rechazadas:
+        mensaje += f" ({len(rechazadas)} rechazadas)."
+
     return jsonify({
         "status": "success",
-        "mensaje": f"{len(guardadas)} imágenes subidas correctamente.",
+        "mensaje": mensaje,
         "guardadas": guardadas,
+        "asociadas": asociadas,
         "rechazadas": rechazadas
     }), 200
 

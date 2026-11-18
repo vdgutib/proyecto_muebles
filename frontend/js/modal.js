@@ -27,6 +27,15 @@ function mostrarModal(titulo, mensaje, tipo = 'info', onConfirm = null, textoCon
     const titleElement = document.getElementById('global-modal-title');
     const bodyElement = document.getElementById('global-modal-body');
     const footerElement = document.getElementById('global-modal-footer');
+    const dialogElement = modalElement.querySelector('.modal-dialog');
+
+    if (dialogElement) {
+        if (mensaje && (mensaje.includes('<table') || mensaje.includes('col-sm-3'))) {
+            dialogElement.classList.add('modal-lg');
+        } else {
+            dialogElement.classList.remove('modal-lg');
+        }
+    }
 
     // Configurar según tipo
     let btnClass = 'btn-primary';

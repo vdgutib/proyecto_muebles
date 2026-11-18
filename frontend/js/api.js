@@ -58,9 +58,12 @@ const api = {
         }
     },
 
-    async subirImagenes(files) {
+    async subirImagenes(files, tipo = null) {
         const formData = new FormData();
         Array.from(files).forEach(file => formData.append('imagenes', file));
+        if (tipo) {
+            formData.append('tipo', tipo);
+        }
         try {
             const response = await fetch(`${API_BASE_URL}/subir-imagenes`, {
                 method: 'POST',

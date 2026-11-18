@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Panel de Subida de Archivos">
+    <meta name="description" content="Panel de Subida y Sincronización de Archivos">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
-    <link rel="stylesheet" href="../css/subidaArchivos.css?v=3" type="text/css">
-    <title>Subida de Archivos | Muebles LB</title>
+    <link rel="stylesheet" href="../css/subidaArchivos.css?v=4" type="text/css">
+    <title>Sincronización de Inventario | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
 
@@ -39,30 +39,36 @@
             <a href="panelAdmin.html" class="back-link"><i class="bi bi-arrow-left"></i> Volver al panel</a>
 
             <header class="page-header">
-                <h1 class="page-title">Subida de archivos</h1>
-                <p class="page-subtitle">Actualiza el inventario con una hoja de cálculo y sube las imágenes de tus productos.</p>
+                <h1 class="page-title">Actualización de Inventario</h1>
+                <p class="page-subtitle">Sube tu lista de precios en Excel. El sistema procesará automáticamente los datos de los muebles y extraerá sus imágenes integradas en un solo paso.</p>
             </header>
 
-            <div class="upload-grid">
+            <div class="upload-stack">
 
-                <section class="upload-card">
+                <!-- 1. MÓDULO PRINCIPAL: EXCEL CON EXTRACCIÓN AUTOMÁTICA DE IMÁGENES -->
+                <section class="upload-card upload-card-primary">
                     <div class="card-head">
-                        <span class="icon-tile"><i class="bi bi-file-earmark-spreadsheet"></i></span>
+                        <span class="icon-tile icon-tile-primary"><i class="bi bi-file-earmark-spreadsheet-fill"></i></span>
                         <div class="card-head-text">
-                            <h2 class="section-title">Hojas de cálculo Excel</h2>
-                            <p>Formatos .xlsx y .xls</p>
+                            <h2 class="section-title">
+                                Sincronización por Excel
+                                <span class="badge-pill-primary"><i class="bi bi-magic"></i> Todo en Uno</span>
+                            </h2>
+                            <p>Formatos .xlsx y .xls. El sistema procesa precios, medidas y <strong>extrae automáticamente las fotos de cada producto</strong>.</p>
                         </div>
-                        <button class="btn-primary-custom" id="btn-subir-excel"><i class="bi bi-upload"></i> Seleccionar</button>
+                        <button class="btn-primary-custom" id="btn-subir-excel"><i class="bi bi-upload"></i> Seleccionar Excel</button>
                     </div>
 
-                    <div class="drop-zone" id="drop-zone-excel">
-                        <i class="bi bi-cloud-arrow-up drop-icon"></i>
+                    <div class="drop-zone drop-zone-primary" id="drop-zone-excel">
+                        <i class="bi bi-cloud-arrow-up-fill drop-icon"></i>
                         <p class="drop-title">Arrastra y suelta tu archivo Excel aquí</p>
-                        <p class="drop-hint">o haz clic para buscarlo en tu equipo</p>
+                        <p class="drop-hint">o haz clic para buscarlo en tu equipo (las fotos se vincularán solas)</p>
                         <input type="file" id="file-excel" accept=".xlsx, .xls" style="display: none;">
                     </div>
 
                     <div class="file-list" id="excel-file-list"></div>
+
+                    <div id="excel-reporte-resumen"></div>
 
                     <div class="danger-zone">
                         <div class="danger-text">
@@ -73,20 +79,32 @@
                     </div>
                 </section>
 
-                <section class="upload-card">
+                <!-- 2. MÓDULO SECUNDARIO/OPCIONAL: GESTOR DE IMÁGENES DE RESPALDO O REEMPLAZO -->
+                <section class="upload-card upload-card-secondary">
                     <div class="card-head">
-                        <span class="icon-tile"><i class="bi bi-images"></i></span>
+                        <span class="icon-tile icon-tile-secondary"><i class="bi bi-images"></i></span>
                         <div class="card-head-text">
-                            <h2 class="section-title">Imágenes</h2>
-                            <p>Puedes seleccionar varias a la vez</p>
+                            <h2 class="section-title">
+                                Gestor Adicional de Imágenes
+                                <span class="badge-pill-optional"><i class="bi bi-info-circle"></i> Opcional</span>
+                            </h2>
+                            <p><strong>No es necesario para la carga normal.</strong> Úsalo únicamente si deseas sustituir imágenes por unas de mayor resolución o corregir productos pendientes.</p>
                         </div>
-                        <button class="btn-primary-custom" id="btn-subir-imagenes"><i class="bi bi-upload"></i> Seleccionar</button>
+                        <button class="btn-secondary-custom" id="btn-subir-imagenes"><i class="bi bi-upload"></i> Subir Fotos Manuales</button>
                     </div>
 
-                    <div class="drop-zone" id="drop-zone-imagenes">
-                        <i class="bi bi-cloud-arrow-up drop-icon"></i>
-                        <p class="drop-title">Arrastra y suelta tus imágenes aquí</p>
-                        <p class="drop-hint">o haz clic para buscarlas en tu equipo</p>
+                    <div class="optional-notice">
+                        <i class="bi bi-shield-check"></i>
+                        <div>
+                            <strong>Validación estricta por SKU:</strong>
+                            El nombre del archivo debe ser <strong>únicamente el SKU numérico</strong> del producto (ejemplo: <code>10102054.png</code>). El mueble debe existir previamente en el catálogo para ser aceptado, y cualquier versión anterior de la foto se reemplazará automáticamente para evitar duplicados en disco.
+                        </div>
+                    </div>
+
+                    <div class="drop-zone drop-zone-secondary" id="drop-zone-imagenes">
+                        <i class="bi bi-image drop-icon"></i>
+                        <p class="drop-title">Arrastra fotos de reemplazo aquí</p>
+                        <p class="drop-hint">o haz clic para seleccionarlas desde tu equipo (JPG, PNG, WEBP)</p>
                         <input type="file" id="file-imagenes" accept="image/*" multiple style="display: none;">
                     </div>
 
@@ -96,17 +114,17 @@
             </div>
 
             <div class="action-footer">
-                <p class="footer-note"><i class="bi bi-info-circle"></i> Al terminar, revisa el resultado en el catálogo.</p>
-                <button class="btn-primary-custom btn-finish" id="btn-finalizar">Finalizar carga <i class="bi bi-arrow-right"></i></button>
+                <p class="footer-note"><i class="bi bi-check2-circle"></i> Al completar la carga, puedes revisar tus productos en el catálogo.</p>
+                <button class="btn-primary-custom btn-finish" id="btn-finalizar">Ver Catálogo de Productos <i class="bi bi-arrow-right"></i></button>
             </div>
 
         </div>
     </main>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/api.js?v=2"></script>
+    <script src="../js/api.js?v=3"></script>
     <script src="../js/modal.js"></script>
-    <script src="../js/subidaArchivos.js?v=3"></script>
+    <script src="../js/subidaArchivos.js?v=4"></script>
 </body>
 
 </html>
