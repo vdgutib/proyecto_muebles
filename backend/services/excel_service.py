@@ -107,7 +107,7 @@ class ExcelService:
                     "fila": excel_row_num,
                     "sku": sku,
                     "nombre": nombre_producto,
-                    "motivo": f"Formato EMF corrupto o incompatible ({str(e)}). Debe cambiar la imagen o subirla manualmente con el SKU del mueble ({sku}.png o {sku}.jpg) en el gestor de imágenes adicional."
+                    "motivo": f"La foto del Excel no se pudo abrir o venía dañada. Puedes subirla manualmente abajo nombrando el archivo '{sku}.png'."
                 }
                 return f"{sku}.jpg", advertencia
 
@@ -132,7 +132,7 @@ class ExcelService:
                 "fila": excel_row_num,
                 "sku": sku,
                 "nombre": nombre_producto,
-                "motivo": f"No se pudo guardar la imagen en disco ({str(e)}). Puede subirla manualmente en el gestor de imágenes adicional como {sku}.{ext}."
+                "motivo": f"No se pudo guardar la foto ({str(e)}). Puedes subirla manualmente abajo como '{sku}.{ext}'."
             }
             return nombre_archivo, advertencia
 
@@ -380,9 +380,9 @@ class ExcelService:
                 "advertencias_imagenes_count": len(advertencias_imagenes)
             }
 
-            mensaje_final = f"¡Sincronización completada! Se procesaron {muebles_insertados} muebles y {imagenes_guardadas_count} imágenes."
+            mensaje_final = f"¡Carga completada! Se guardaron {muebles_insertados} muebles y {imagenes_guardadas_count} fotos."
             if total_duplicados_omitidos > 0:
-                mensaje_final += f" Atención: {total_duplicados_omitidos} muebles no se subieron por tener SKU duplicado."
+                mensaje_final += f" Atención: {total_duplicados_omitidos} muebles no se guardaron porque su SKU está repetido en el archivo."
 
             return {
                 "status": "success",

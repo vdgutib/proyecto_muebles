@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 1. CARGA Y SINCRONIZACIÓN DE EXCEL
+    // 1. CARGA Y LECTURA DE EXCEL
     // ==========================================
     btnSubirExcel.addEventListener('click', () => fileInputExcel.click());
     dropZoneExcel.addEventListener('click', () => fileInputExcel.click());
-
+    
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         dropZoneExcel.addEventListener(eventName, preventDefaults, false);
     });
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function processExcelFile(file) {
         if (!file.name.endsWith('.xls') && !file.name.endsWith('.xlsx')) {
-            mostrarModalAdvertencia('Por favor selecciona un archivo Excel válido (.xls, .xlsx)');
+            mostrarModalAdvertencia('Por favor selecciona un archivo Excel válido (.xls o .xlsx)');
             return;
         }
 
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="file-item excel-item" id="${id}">
                 <i class="bi bi-file-earmark-excel text-success"></i>
                 <span class="file-name" title="${file.name}">${file.name}</span>
-                <span class="file-badge warning" id="${id}-badge">Procesando y extrayendo fotos...</span>
+                <span class="file-badge warning" id="${id}-badge">Leyendo datos y fotos...</span>
                 <span class="file-size">${formatBytes(file.size)}</span>
                 <span class="file-progress-text" id="${id}-text">Progreso: 15%</span>
                 <div class="progress-bar-container"><div class="progress-bar-fill warning" id="${id}-bar" style="width: 15%;"></div></div>
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const result = await api.uploadExcel(file);
             clearInterval(progresoTimer);
-
+            
             if (result.status === 'success') {
                 const hayDuplicados = result.duplicados && result.duplicados.length > 0;
                 const hayAdvertenciasImg = result.advertencias_imagenes && result.advertencias_imagenes.length > 0;
@@ -108,15 +108,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (hayDuplicados || hayAdvertenciasImg) {
                     badge.className = 'file-badge warning';
-                    badge.innerText = 'Completado con advertencias';
+                    badge.innerText = 'Listo con observaciones';
                     bar.className = 'progress-bar-fill warning';
                 } else {
                     badge.className = 'file-badge success';
-                    badge.innerText = 'Completado con éxito';
+                    badge.innerText = 'Cargado con éxito';
                     bar.className = 'progress-bar-fill success';
                 }
 
-                // Renderizar resumen en pantalla y modal de detalle
+                // Renderizar resumen en pantalla y abrir modal explicativo
                 renderizarReporteExcel(result);
                 mostrarModalReporteDetallado(result);
 
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 badge.innerText = 'Error';
                 bar.style.backgroundColor = '#e53e3e';
                 text.innerText = 'Fallo';
-                mostrarModalError('Error al procesar Excel: ' + (result.error || 'Ocurrió un error inesperado'));
+                mostrarModalError('No se pudo cargar el Excel: ' + (result.error || 'Revisa que el archivo tenga el formato correcto.'));
             }
         } catch (err) {
             clearInterval(progresoTimer);
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             badge.innerText = 'Error';
             bar.style.backgroundColor = '#e53e3e';
             text.innerText = 'Fallo';
-            mostrarModalError('Error de conexión al subir el archivo Excel.');
+            mostrarModalError('Hubo un problema de conexión al subir el archivo Excel. Intenta de nuevo.');
         }
     }
 
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="reporte-resumen-box">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold m-0 text-dark">
-                        <i class="bi bi-file-earmark-check-fill text-success me-1"></i> Resumen de la sincronización
+                        <i class="bi bi-file-earmark-check-fill text-success me-1"></i> Resumen de la carga
                     </h6>
                     <button class="btn btn-sm btn-outline-secondary" id="btn-reabrir-reporte">
                         <i class="bi bi-eye"></i> Ver detalle
@@ -170,15 +170,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="stat-pill info">
                         <strong>${res.imagenes_extraidas}</strong>
-                        <span>Fotos extraídas</span>
+                        <span>Fotos listas</span>
                     </div>
                     <div class="stat-pill ${totalDuplicados > 0 ? 'danger' : ''}">
                         <strong>${res.skus_duplicados_omitidos}</strong>
-                        <span>Duplicados omitidos</span>
+                        <span>Repetidos sin guardar</span>
                     </div>
                     <div class="stat-pill ${totalAdvImg > 0 ? 'warning' : ''}">
                         <strong>${res.advertencias_imagenes_count}</strong>
-                        <span>Fotos con error</span>
+                        <span>Fotos con aviso</span>
                     </div>
                 </div>
         `;
@@ -186,8 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalDuplicados > 0) {
             html += `
                 <div class="alerta-duplicados">
-                    <strong><i class="bi bi-exclamation-octagon-fill me-1"></i> ${totalDuplicados} SKU(s) duplicados detectados:</strong>
-                    Los muebles repetidos no se subieron a la base de datos para prevenir inconsistencias.
+                    <strong><i class="bi bi-exclamation-octagon-fill me-1"></i> ${totalDuplicados} SKU repetidos en el Excel:</strong>
+                    Estos muebles no se agregaron al catálogo porque tienen el código repetido en el archivo.
                 </div>
             `;
         }
@@ -195,8 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (totalAdvImg > 0) {
             html += `
                 <div class="alerta-imagenes">
-                    <strong><i class="bi bi-image me-1"></i> ${totalAdvImg} foto(s) con formato incompatible/corrupto:</strong>
-                    Los productos sí se guardaron, pero requieren que subas su imagen manualmente en el gestor adicional.
+                    <strong><i class="bi bi-image me-1"></i> ${totalAdvImg} fotos no se pudieron leer:</strong>
+                    Los muebles sí se guardaron, pero debes subirles la foto a mano en la sección de abajo.
                 </div>
             `;
         }
@@ -224,32 +224,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const hayAdvImg = advImagenes.length > 0;
 
         let tipoModal = (hayDuplicados || hayAdvImg) ? 'warning' : 'success';
-        let tituloModal = (hayDuplicados || hayAdvImg)
-            ? 'Reporte de Carga con Advertencias'
-            : '¡Sincronización Exitosa!';
+        let tituloModal = (hayDuplicados || hayAdvImg) 
+            ? 'Resultado de la Carga (Con Avisos)' 
+            : '¡Carga Exitosa!';
 
         let html = `
             <div>
                 <p class="mb-3 text-secondary">
-                    ${result.mensaje || 'El archivo Excel fue analizado y procesado por el servidor.'}
+                    ${result.mensaje || 'El archivo Excel se procesó y se guardó en el catálogo.'}
                 </p>
 
                 <div class="row g-2 text-center mb-3">
                     <div class="col-6 col-sm-3">
                         <div class="border rounded p-2 bg-light">
-                            <span class="d-block text-muted small">Muebles OK</span>
+                            <span class="d-block text-muted small">Muebles Listos</span>
                             <strong class="fs-5 text-success">${res.muebles_procesados}</strong>
                         </div>
                     </div>
                     <div class="col-6 col-sm-3">
                         <div class="border rounded p-2 bg-light">
-                            <span class="d-block text-muted small">Fotos Extraídas</span>
+                            <span class="d-block text-muted small">Fotos Asociadas</span>
                             <strong class="fs-5 text-primary">${res.imagenes_extraidas}</strong>
                         </div>
                     </div>
                     <div class="col-6 col-sm-3">
                         <div class="border rounded p-2 bg-light">
-                            <span class="d-block text-muted small">Duplicados Omitidos</span>
+                            <span class="d-block text-muted small">Repetidos Omitidos</span>
                             <strong class="fs-5 ${hayDuplicados ? 'text-danger' : 'text-secondary'}">${res.skus_duplicados_omitidos}</strong>
                         </div>
                     </div>
@@ -266,18 +266,18 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="alert alert-danger p-3 mb-3">
                     <h6 class="alert-heading fw-bold fs-6 mb-2">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Muebles NO subidos por SKU duplicado:
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Muebles que NO se guardaron porque el SKU está repetido:
                     </h6>
                     <p class="small mb-2">
-                        La base de datos exige que cada mueble tenga un SKU único. Los siguientes registros se omitieron; debes corregir su SKU en el Excel y volver a subirlo:
+                        Cada mueble debe tener un número de SKU diferente. Estos muebles no se guardaron para evitar confusiones; cambia el código en el Excel y vuelve a subir el archivo:
                     </p>
                     <div class="table-responsive" style="max-height: 180px; overflow-y: auto;">
                         <table class="table table-sm table-bordered bg-white mb-0" style="font-size: 0.82rem;">
                             <thead class="table-danger">
                                 <tr>
                                     <th>SKU</th>
-                                    <th>Filas Excel</th>
-                                    <th>Muebles en Conflicto</th>
+                                    <th>Fila en Excel</th>
+                                    <th>Muebles con el mismo código</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -303,10 +303,10 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="alert alert-warning p-3 mb-3">
                     <h6 class="alert-heading fw-bold fs-6 mb-2">
-                        <i class="bi bi-image-fill me-1"></i> Fotos con problema de formato o corrupción:
+                        <i class="bi bi-image-fill me-1"></i> Muebles guardados pero sin foto:
                     </h6>
                     <p class="small mb-2">
-                        Los muebles fueron guardados, pero su foto interna no se pudo convertir o leer automáticamente. Puedes agregar la imagen manualmente en el Gestor Adicional nombrándola con el SKU del producto:
+                        El mueble sí quedó guardado en el catálogo, pero su foto en el Excel venía dañada o no se pudo abrir. Puedes subir la foto a mano en la sección de abajo con el número de SKU (ejemplo: <code>10102054.png</code>):
                     </p>
                     <ul class="list-group list-group-flush border rounded bg-white" style="font-size: 0.82rem; max-height: 160px; overflow-y: auto;">
             `;
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `
                 <div class="alert alert-success p-3 mb-0 small">
                     <i class="bi bi-check-circle-fill me-1"></i>
-                    Todos los productos y sus imágenes fueron procesados e integrados exitosamente sin incidencias.
+                    Todos los muebles y sus fotos se cargaron correctamente al catálogo sin ningún problema.
                 </div>
             `;
         }
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ==========================================
-    // 2. GESTOR ADICIONAL / OPCIONAL DE IMÁGENES
+    // 2. SUBIDA MANUAL DE FOTOS (OPCIONAL)
     // ==========================================
     btnSubirImagenes.addEventListener('click', () => fileInputImagenes.click());
     dropZoneImagenes.addEventListener('click', () => fileInputImagenes.click());
@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!file.type.startsWith('image/')) {
                 rechazadosPre.push({
                     archivo: file.name,
-                    motivo: 'El archivo no tiene un formato de imagen permitido (debe ser JPG, PNG o WEBP).'
+                    motivo: 'El archivo no es una foto válida (debe ser JPG o PNG).'
                 });
                 return;
             }
@@ -387,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!/^\d+$/.test(nombreBase.trim())) {
                 rechazadosPre.push({
                     archivo: file.name,
-                    motivo: `El nombre debe ser el SKU numérico del producto (ej: 10102054.png). Se recibió '${nombreBase}'.`
+                    motivo: `El nombre de la foto debe ser solo el número de SKU (ejemplo: 10102054.png). Se recibió '${nombreBase}'.`
                 });
                 return;
             }
@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (todasRechazadas.length > 0) {
                     mostrarModalImagenesRechazadas(todasRechazadas, asociadas);
                 } else {
-                    mostrarModalExito(`¡Excelente! Se actualizaron correctamente ${asociadas.length} imágenes y fueron vinculadas a sus respectivos muebles en el catálogo sin generar duplicados.`);
+                    mostrarModalExito(`¡Listo! Se actualizaron ${asociadas.length} fotos y quedaron guardadas en sus muebles correspondientes.`);
                 }
             } else {
                 mostrarModalImagenesRechazadas(todasRechazadas, asociadas, result.error);
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error("Error subiendo imágenes", err);
             fileInputImagenes.value = '';
-            mostrarModalError('Error de conexión al subir imágenes.');
+            mostrarModalError('Hubo un problema de conexión al subir las fotos. Intenta nuevamente.');
         }
     }
 
@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (asociadas && asociadas.length > 0) {
             html += `
                 <div class="alert alert-success p-2 mb-3">
-                    <strong class="d-block mb-1"><i class="bi bi-check-circle-fill me-1"></i> Imágenes actualizadas con éxito (${asociadas.length}):</strong>
+                    <strong class="d-block mb-1"><i class="bi bi-check-circle-fill me-1"></i> Fotos guardadas con éxito (${asociadas.length}):</strong>
                     <ul class="mb-0 ps-3 small">
             `;
             asociadas.forEach(a => {
@@ -464,14 +464,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (rechazadas && rechazadas.length > 0) {
             html += `
                 <div class="alert alert-danger p-2 mb-0">
-                    <strong class="d-block mb-1"><i class="bi bi-x-circle-fill me-1"></i> Imágenes rechazadas (${rechazadas.length}):</strong>
-                    <p class="small text-muted mb-2">Para evitar inconsistencias en el catálogo y duplicados en disco, solo se aceptan imágenes cuyo nombre sea el SKU numérico de un mueble existente.</p>
+                    <strong class="d-block mb-1"><i class="bi bi-x-circle-fill me-1"></i> Fotos que no se pudieron subir (${rechazadas.length}):</strong>
+                    <p class="small text-muted mb-2">Para que el sistema sepa a qué mueble corresponde cada foto, el archivo debe llamarse exactamente con el número de SKU de un mueble que ya esté en el catálogo.</p>
                     <div class="table-responsive" style="max-height: 180px; overflow-y: auto;">
                         <table class="table table-sm table-bordered bg-white mb-0" style="font-size: 0.8rem;">
                             <thead class="table-danger">
                                 <tr>
                                     <th>Archivo</th>
-                                    <th>Motivo del Rechazo</th>
+                                    <th>Motivo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -494,13 +494,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         html += `</div>`;
         const tipo = (asociadas && asociadas.length > 0) ? 'warning' : 'error';
-        const titulo = (asociadas && asociadas.length > 0) ? 'Resultado de Subida de Imágenes' : 'Imágenes No Permitidas';
+        const titulo = (asociadas && asociadas.length > 0) ? 'Resultado de Subida de Fotos' : 'Fotos No Aceptadas';
         mostrarModal(titulo, html, tipo);
     }
 
 
     // ==========================================
-    // 3. NAVEGACIÓN Y BORRADO DE BASE DE DATOS
+    // 3. NAVEGACIÓN Y BORRADO DE CATÁLOGO
     // ==========================================
     btnFinalizar.addEventListener('click', () => {
         window.location.href = 'catalogoProductos.html';
@@ -508,25 +508,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnLimpiarBD.addEventListener('click', async () => {
         mostrarModalConfirmacion(
-            'Confirmar eliminación',
-            '¿Estás seguro de que deseas eliminar TODOS los muebles y solicitudes del catálogo? Esta acción no se puede deshacer.',
+            'Confirmar borrado',
+            '¿Estás seguro de que deseas borrar TODOS los muebles y solicitudes del catálogo? Esta acción no se puede deshacer.',
             async () => {
                 try {
                     const result = await api.limpiarBaseDatos();
                     if (result.status === 'success') {
-                        mostrarModalExito('Base de datos limpiada correctamente.');
+                        mostrarModalExito('Catálogo limpiado correctamente.');
                         excelFileList.innerHTML = '';
                         imagePreviewGrid.innerHTML = '';
                         if (excelReporteResumen) excelReporteResumen.innerHTML = '';
                     } else {
-                        mostrarModalError('Error: ' + result.error);
+                        mostrarModalError('No se pudo borrar: ' + (result.error || 'Ocurrió un error.'));
                     }
                 } catch (err) {
-                    mostrarModalError('Error de conexión al intentar limpiar la base de datos.');
+                    mostrarModalError('Hubo un problema de conexión al intentar borrar los muebles.');
                     console.error('Error limpiando BD:', err);
                 }
             },
-            'Sí, eliminar todo'
+            'Sí, borrar todo'
         );
     });
 

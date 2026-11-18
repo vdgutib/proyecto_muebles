@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Panel de Subida y Sincronización de Archivos">
+    <meta name="description" content="Panel de Subida y Actualización de Muebles">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../css/bootstrap-icons.min.css" type="text/css">
-    <link rel="stylesheet" href="../css/subidaArchivos.css?v=4" type="text/css">
-    <title>Sincronización de Inventario | Muebles LB</title>
+    <link rel="stylesheet" href="../css/subidaArchivos.css?v=5" type="text/css">
+    <title>Actualizar Inventario | Muebles LB</title>
     <link rel="icon" href="../imagenes/logo_empresa.jpeg" type="image/jpeg">
 </head>
 
@@ -39,8 +39,8 @@
             <a href="panelAdmin.html" class="back-link"><i class="bi bi-arrow-left"></i> Volver al panel</a>
 
             <header class="page-header">
-                <h1 class="page-title">Actualización de Inventario</h1>
-                <p class="page-subtitle">Sube tu lista de precios en Excel. El sistema procesará automáticamente los datos de los muebles y extraerá sus imágenes integradas en un solo paso.</p>
+                <h1 class="page-title">Actualizar Muebles del Catálogo</h1>
+                <p class="page-subtitle">Sube tu lista de precios en Excel. El sistema guardará los muebles y asociará sus fotos automáticamente en un solo paso.</p>
             </header>
 
             <div class="upload-stack">
@@ -51,10 +51,10 @@
                         <span class="icon-tile icon-tile-primary"><i class="bi bi-file-earmark-spreadsheet-fill"></i></span>
                         <div class="card-head-text">
                             <h2 class="section-title">
-                                Sincronización por Excel
-                                <span class="badge-pill-primary"><i class="bi bi-magic"></i> Todo en Uno</span>
+                                Carga por Excel
+                                <span class="badge-pill-primary"><i class="bi bi-magic"></i> Automático</span>
                             </h2>
-                            <p>Formatos .xlsx y .xls. El sistema procesa precios, medidas y <strong>extrae automáticamente las fotos de cada producto</strong>.</p>
+                            <p>Archivos .xlsx o .xls. Guarda nombres, medidas, precios y <strong>saca las fotos del archivo solo</strong>.</p>
                         </div>
                         <button class="btn-primary-custom" id="btn-subir-excel"><i class="bi bi-upload"></i> Seleccionar Excel</button>
                     </div>
@@ -62,7 +62,7 @@
                     <div class="drop-zone drop-zone-primary" id="drop-zone-excel">
                         <i class="bi bi-cloud-arrow-up-fill drop-icon"></i>
                         <p class="drop-title">Arrastra y suelta tu archivo Excel aquí</p>
-                        <p class="drop-hint">o haz clic para buscarlo en tu equipo (las fotos se vincularán solas)</p>
+                        <p class="drop-hint">o haz clic para buscarlo en tu computador (las fotos se agregan solas)</p>
                         <input type="file" id="file-excel" accept=".xlsx, .xls" style="display: none;">
                     </div>
 
@@ -72,8 +72,8 @@
 
                     <div class="danger-zone">
                         <div class="danger-text">
-                            <strong>Borrar inventario actual</strong>
-                            <small>Elimina todos los registros de la base de datos. No se puede deshacer.</small>
+                            <strong>Borrar catálogo actual</strong>
+                            <small>Borra todos los muebles guardados en el catálogo. No se puede deshacer.</small>
                         </div>
                         <button class="btn-danger-custom" id="btn-limpiar-bd"><i class="bi bi-trash"></i> Borrar</button>
                     </div>
@@ -85,26 +85,26 @@
                         <span class="icon-tile icon-tile-secondary"><i class="bi bi-images"></i></span>
                         <div class="card-head-text">
                             <h2 class="section-title">
-                                Gestor Adicional de Imágenes
+                                Subida manual de fotos
                                 <span class="badge-pill-optional"><i class="bi bi-info-circle"></i> Opcional</span>
                             </h2>
-                            <p><strong>No es necesario para la carga normal.</strong> Úsalo únicamente si deseas sustituir imágenes por unas de mayor resolución o corregir productos pendientes.</p>
+                            <p><strong>No es obligatorio.</strong> Úsalo solo si quieres cambiar una foto por una de mejor calidad o agregar una que haya faltado en el Excel.</p>
                         </div>
-                        <button class="btn-secondary-custom" id="btn-subir-imagenes"><i class="bi bi-upload"></i> Subir Fotos Manuales</button>
+                        <button class="btn-secondary-custom" id="btn-subir-imagenes"><i class="bi bi-upload"></i> Seleccionar Fotos</button>
                     </div>
 
                     <div class="optional-notice">
-                        <i class="bi bi-shield-check"></i>
+                        <i class="bi bi-camera-fill"></i>
                         <div>
-                            <strong>Validación estricta por SKU:</strong>
-                            El nombre del archivo debe ser <strong>únicamente el SKU numérico</strong> del producto (ejemplo: <code>10102054.png</code>). El mueble debe existir previamente en el catálogo para ser aceptado, y cualquier versión anterior de la foto se reemplazará automáticamente para evitar duplicados en disco.
+                            <strong>Cómo nombrar la foto:</strong>
+                            El archivo debe llamarse exactamente con el número de SKU del mueble (ejemplo: <code>10102054.png</code>). El mueble ya debe estar cargado en el catálogo para que el sistema lo reconozca, y si ya tenía otra foto se cambiará por la nueva.
                         </div>
                     </div>
 
                     <div class="drop-zone drop-zone-secondary" id="drop-zone-imagenes">
                         <i class="bi bi-image drop-icon"></i>
                         <p class="drop-title">Arrastra fotos de reemplazo aquí</p>
-                        <p class="drop-hint">o haz clic para seleccionarlas desde tu equipo (JPG, PNG, WEBP)</p>
+                        <p class="drop-hint">o haz clic para buscarlas en tu computador (JPG o PNG)</p>
                         <input type="file" id="file-imagenes" accept="image/*" multiple style="display: none;">
                     </div>
 
@@ -114,7 +114,7 @@
             </div>
 
             <div class="action-footer">
-                <p class="footer-note"><i class="bi bi-check2-circle"></i> Al completar la carga, puedes revisar tus productos en el catálogo.</p>
+                <p class="footer-note"><i class="bi bi-check2-circle"></i> Al terminar, puedes ver cómo quedaron los muebles en el catálogo público.</p>
                 <button class="btn-primary-custom btn-finish" id="btn-finalizar">Ver Catálogo de Productos <i class="bi bi-arrow-right"></i></button>
             </div>
 
@@ -122,9 +122,9 @@
     </main>
 
     <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/api.js?v=3"></script>
+    <script src="../js/api.js?v=4"></script>
     <script src="../js/modal.js"></script>
-    <script src="../js/subidaArchivos.js?v=4"></script>
+    <script src="../js/subidaArchivos.js?v=5"></script>
 </body>
 
 </html>
