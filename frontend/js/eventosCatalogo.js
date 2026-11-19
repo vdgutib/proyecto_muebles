@@ -5,13 +5,13 @@ let state = {
     q: '',
     origen: 'todos', // todos, propia, tiendas
     cat: 'todos',
-    precioMax: 1000000,
+    precioMax: 20000000,
     precioMin: 0,
     video: false,
     sort: 'relevancia'
 };
 
-let maxGlobalPrecio = 1000000;
+let maxGlobalPrecio = 20000000;
 let minGlobalPrecio = 0;
 
 function initFiltersFromUrl() {
@@ -171,7 +171,7 @@ function removeFilter(key) {
         const videoInput = document.getElementById('filter-video');
         if (videoInput) videoInput.checked = false;
     }
-    
+
     // update inputs
     document.querySelectorAll('.filter-origin').forEach(r => {
         r.checked = (r.value === state.origen);
@@ -183,7 +183,7 @@ function removeFilter(key) {
 function renderChips() {
     const chipsContainer = document.getElementById('active-filters-chips');
     if (!chipsContainer) return;
-    
+
     let html = '';
     let hasFilters = false;
 
@@ -221,11 +221,11 @@ function renderChips() {
     }
 
     chipsContainer.innerHTML = html;
-    
+
     // count filters mobile
     const mc = document.getElementById('filtros-count-mobile');
     if (mc) {
-        let count = (state.q?1:0) + (state.origen!=='todos'?1:0) + (state.cat!=='todos'?1:0) + (state.precioMax<maxGlobalPrecio?1:0) + (state.video?1:0);
+        let count = (state.q ? 1 : 0) + (state.origen !== 'todos' ? 1 : 0) + (state.cat !== 'todos' ? 1 : 0) + (state.precioMax < maxGlobalPrecio ? 1 : 0) + (state.video ? 1 : 0);
         mc.textContent = count;
     }
 }
@@ -250,12 +250,12 @@ function applyFilters() {
     renderChips();
 
     const qNorm = normalizarTexto(state.q);
-    
+
     let base = getBaseMuebles();
     let filtrados = base.filter(m => {
         const p = Number(m.precio_venta ?? m.precio_costo ?? m.precio ?? 0);
         if (p > state.precioMax || p < state.precioMin) return false;
-        
+
         if (state.video) {
             if (m.tipo !== 'propio' || !m.video_url) return false;
         }
@@ -280,11 +280,11 @@ function applyFilters() {
 
     // Ordenar
     if (state.sort === 'precio-asc') {
-        filtrados.sort((a,b) => Number(a.precio_venta ?? a.precio_costo ?? a.precio ?? 0) - Number(b.precio_venta ?? b.precio_costo ?? b.precio ?? 0));
+        filtrados.sort((a, b) => Number(a.precio_venta ?? a.precio_costo ?? a.precio ?? 0) - Number(b.precio_venta ?? b.precio_costo ?? b.precio ?? 0));
     } else if (state.sort === 'precio-desc') {
-        filtrados.sort((a,b) => Number(b.precio_venta ?? b.precio_costo ?? b.precio ?? 0) - Number(a.precio_venta ?? a.precio_costo ?? a.precio ?? 0));
+        filtrados.sort((a, b) => Number(b.precio_venta ?? b.precio_costo ?? b.precio ?? 0) - Number(a.precio_venta ?? a.precio_costo ?? a.precio ?? 0));
     } else if (state.sort === 'nombre-asc') {
-        filtrados.sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
+        filtrados.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
     }
 
     renderCategoriesSidebar(base);
@@ -410,7 +410,7 @@ function crearTarjetaHtml(m) {
     }
 
     let cardClass = isPropio ? 'cat-card compra cat-card--propio position-relative h-100' : 'cat-card compra position-relative h-100';
-    
+
     const desc = (m.observaciones || m.descripcion || '').trim();
     const descHtml = desc ? `<p class="cat-card-desc">${desc}</p>` : '';
 
@@ -454,7 +454,7 @@ function renderCatalogContent(filtrados) {
 
     const renderGroup = (items, isPropioGroup) => {
         if (items.length === 0) return '';
-        
+
         let groupHtml = '';
         const cats = {};
         items.forEach(m => {
@@ -464,7 +464,7 @@ function renderCatalogContent(filtrados) {
         });
 
         const esVistaGeneral = state.cat === 'todos';
-        
+
         Object.keys(cats).sort().forEach(catName => {
             const itemsCat = cats[catName];
             const catSlug = toSlug(catName);
@@ -473,9 +473,9 @@ function renderCatalogContent(filtrados) {
             const suf = isPropioGroup ? '-propio' : '-tienda';
 
             const cantidadTexto = itemsCat.length + (itemsCat.length === 1 ? ' producto' : ' productos');
-            
+
             let headerHtml = '';
-            
+
             // Si es línea propia y vista específica de cat (o hay solo 1 cat total en propios), no repetir el título si ya estamos en un filtro, pero el requerimiento dice: 
             // "Línea propia: sin título de categoría ni 'Todos' si hay una sola categoría".
             // Para mantener consistencia, mostramos el título a menos que sea la única categoría de la vista.
@@ -533,7 +533,7 @@ function renderCatalogContent(filtrados) {
                 </div>
             `;
         }
-        
+
         if (window._errorSecciones?.ext) {
             html += `<div class="alert alert-danger">Error al cargar las Tiendas.</div>`;
         } else if (tiendas.length > 0) {
@@ -606,13 +606,13 @@ window.addEventListener('resize', function () {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
         document.querySelectorAll('.catalog-grid--carousel').forEach(actualizarFlechasCarrusel);
-        
+
         // Manejar offcanvas filters responsiveness
         const desktopContainer = document.getElementById('filters-desktop-container');
         const mobileContainer = document.getElementById('mobile-filters-container');
         const content = document.getElementById('filters-content');
         if (!content) return;
-        
+
         if (window.innerWidth >= 992) {
             if (mobileContainer && mobileContainer.contains(content)) {
                 desktopContainer.appendChild(content);
@@ -628,8 +628,8 @@ window.addEventListener('resize', function () {
 
 async function cargarMueblesTodos() {
     const [mueblesExt, mueblesPro] = await Promise.all([
-        api.getMuebles().catch(() => ({error: true})),
-        api.getMueblesPropios().catch(() => ({error: true}))
+        api.getMuebles().catch(() => ({ error: true })),
+        api.getMueblesPropios().catch(() => ({ error: true }))
     ]);
 
     let hayErrorExt = false;
@@ -646,7 +646,7 @@ async function cargarMueblesTodos() {
     } else {
         allMueblesPropios = mueblesPro || [];
     }
-    
+
     // Guardar estado de error global
     window._errorSecciones = { ext: hayErrorExt, pro: hayErrorPro };
 
@@ -654,10 +654,10 @@ async function cargarMueblesTodos() {
     const preciosExt = allMueblesExternos.map(m => parseFloat(m.precio_venta ?? m.precio_costo ?? 0)).filter(p => !Number.isNaN(p));
     const preciosPro = allMueblesPropios.map(m => parseFloat(m.precio ?? 0)).filter(p => !Number.isNaN(p));
     const maxCombo = Math.max(0, ...preciosExt, ...preciosPro);
-    
+
     // No re-establecer max global sobre el filtro
-    maxGlobalPrecio = maxCombo > 0 ? maxCombo : 1000000;
-    
+    maxGlobalPrecio = maxCombo > 0 ? maxCombo : 20000000;
+
     // Limite inferior acorde a los precios reales del catalogo (redondeado hacia abajo a miles)
     const preciosValidos = [...preciosExt, ...preciosPro].filter(p => p > 0);
     minGlobalPrecio = preciosValidos.length ? Math.floor(Math.min(...preciosValidos) / 1000) * 1000 : 0;
@@ -678,9 +678,9 @@ async function cargarMueblesTodos() {
         state.precioMin = minGlobalPrecio;
         syncUIWithState();
     }
-    
+
     bindEvents();
-    
+
     // Trigger resize once to move filters content to correct container on load
     window.dispatchEvent(new Event('resize'));
 
@@ -755,7 +755,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
     }
 
     carruselInner.innerHTML = itemsHtml;
-    
+
     // Ocultar flechas si hay 1 o menos elementos
     const prevBtn = document.querySelector('#modalProducto .carousel-control-prev');
     const nextBtn = document.querySelector('#modalProducto .carousel-control-next');
@@ -778,7 +778,7 @@ function abrirModal(nombre, precio, medidas, categoria, imagenesStr, videoUrlStr
 document.addEventListener('DOMContentLoaded', function () {
     initFiltersFromUrl();
     cargarMueblesTodos();
-    
+
     // Detener videos al cerrar el modal
     const modalEl = document.getElementById('modalProducto');
     if (modalEl) {

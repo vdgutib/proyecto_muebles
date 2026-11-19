@@ -5,7 +5,7 @@ sean siempre las mismas aunque la petición no venga de la interfaz.
 """
 import re
 
-PRECIO_MIN = 5_000          # ningún mueble cuesta menos que esto
+PRECIO_MIN = 14_000          # ningún mueble cuesta menos que esto
 PRECIO_MAX = 20_000_000
 NOMBRE_MAX = 150            # VARCHAR(150) en la BD
 MEDIDA_MIN_CM = 1

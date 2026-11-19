@@ -3,7 +3,7 @@
  * vuelve a validar, esto solo evita errores de tipeo y guía al admin mientras escribe.
  */
 const FormatoMuebles = (() => {
-    const PRECIO_MIN = 5000;
+    const PRECIO_MIN = 14000;
     const PRECIO_MAX = 20000000;
     const MEDIDA_MIN = 1;
     const MEDIDA_MAX = 600;
@@ -188,9 +188,11 @@ const FormatoMuebles = (() => {
         };
     }
 
-    return { PRECIO_MIN, PRECIO_MAX, MEDIDA_MIN, MEDIDA_MAX, conPuntos, formatearPrecio, parsePrecio,
-        errorDePrecio, sugerenciasDePrecio, etiquetaMagnitud, enlazarPrecio, medidasDesdeTexto, evaluarMedidas, enlazarMedidas };
+    return {
+        PRECIO_MIN, PRECIO_MAX, MEDIDA_MIN, MEDIDA_MAX, conPuntos, formatearPrecio, parsePrecio,
+        errorDePrecio, sugerenciasDePrecio, etiquetaMagnitud, enlazarPrecio, medidasDesdeTexto, evaluarMedidas, enlazarMedidas
+    };
 })();
 
-// xd estaba pensando en lo siguiente, que era hacer varios muebles a la vez, 
+// xd estaba pensando en lo siguiente, que era hacer varios muebles a la vez,
 // ignoren el commit anterior, ahorita si en el commit siguiente viene el cambio de hacer varios muebles a la vez
