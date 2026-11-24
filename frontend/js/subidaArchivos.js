@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnLimpiarBD.addEventListener('click', async () => {
         mostrarModalConfirmacion(
             'Confirmar borrado',
-            '¿Estás seguro de que deseas borrar TODOS los muebles y solicitudes del catálogo? Esta acción no se puede deshacer.',
+            '¿Estás seguro de que deseas borrar TODOS los muebles del catálogo? Esta acción no se puede deshacer.',
             async () => {
                 try {
                     const result = await api.limpiarBaseDatos();
