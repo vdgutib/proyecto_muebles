@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!file.type.startsWith('image/')) {
                 rechazadosPre.push({
                     archivo: file.name,
-                    motivo: 'El archivo no es una foto válida (debe ser JPG o PNG).'
+                    motivo: 'El archivo no es una foto válida (debe ser JPG, PNG o WEBP).'
                 });
                 return;
             }
