@@ -1,22 +1,43 @@
-CREATE DATABASE IF NOT EXISTS tienda_muebles;
+CREATE DATABASE IF NOT EXISTS tienda_muebles 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
 USE tienda_muebles;
+
+-- Limpieza segura para poder re-ejecutar el script completo sin errores en XAMPP
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS muebles_propios_imagenes;
+DROP TABLE IF EXISTS muebles_propios;
+DROP TABLE IF EXISTS categorias_propias;
+DROP TABLE IF EXISTS detalle_calculo;
+DROP TABLE IF EXISTS calculos_medidas;
+DROP TABLE IF EXISTS solicitudes;
+DROP TABLE IF EXISTS muebles;
+DROP TABLE IF EXISTS categorias;
+DROP TABLE IF EXISTS inventario;
+DROP TABLE IF EXISTS administrador;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ==========================================
+-- TABLAS PRINCIPALES
+-- ==========================================
 
 CREATE TABLE administrador (
     id_admin INT AUTO_INCREMENT PRIMARY KEY,
     nombre_usuario VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE inventario (
     id_inventario INT AUTO_INCREMENT PRIMARY KEY,
     fecha_ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     id_admin INT
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE categorias (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nombre_categoria VARCHAR(100) NOT NULL UNIQUE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE muebles (
     id_mueble INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,7 +51,7 @@ CREATE TABLE muebles (
     bultos INT DEFAULT 1,
     observaciones VARCHAR(255),
     id_categoria INT
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE solicitudes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -41,8 +62,9 @@ CREATE TABLE solicitudes (
     mensaje TEXT,
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado VARCHAR(50) DEFAULT 'PENDIENTE',
-    producto_id INT
-);
+    producto_id INT NULL,
+    mueble_propio_id INT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE calculos_medidas (
     id_calculo INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,17 +75,52 @@ CREATE TABLE calculos_medidas (
     grosor_melamina_mm DECIMAL(4,2) NOT NULL,
     fecha_calculo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_admin INT
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE detalle_calculo (
     id_detalle INT AUTO_INCREMENT PRIMARY KEY,
-    id_calculo INT,
+    id_calculo INT NOT NULL,
     nombre_pieza VARCHAR(100) NOT NULL,
     cantidad INT NOT NULL,
     largo_mm DECIMAL(6,1) NOT NULL,
     ancho_mm DECIMAL(6,1) NOT NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ==========================================
+-- TABLAS PARA MUEBLES PROPIOS (CRUD ADMIN)
+-- ==========================================
+
+CREATE TABLE categorias_propias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    orden INT DEFAULT 0,
+    activa BOOLEAN DEFAULT TRUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE muebles_propios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    descripcion TEXT,
+    video_url VARCHAR(500),
+    medidas VARCHAR(255),
+    precio INT NOT NULL,
+    categoria_id INT NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (categoria_id) REFERENCES categorias_propias(id) ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE muebles_propios_imagenes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mueble_id INT NOT NULL,
+    imagen_url VARCHAR(255) NOT NULL,
+    orden INT DEFAULT 0,
+    FOREIGN KEY (mueble_id) REFERENCES muebles_propios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ==========================================
+-- LLAVES FORÁNEAS
+-- ==========================================
 
 ALTER TABLE inventario
 ADD CONSTRAINT fk_inventario_admin 
@@ -77,6 +134,10 @@ ALTER TABLE solicitudes
 ADD CONSTRAINT fk_solicitudes_mueble 
 FOREIGN KEY (producto_id) REFERENCES muebles(id_mueble) ON DELETE SET NULL;
 
+ALTER TABLE solicitudes
+ADD CONSTRAINT fk_solicitudes_mueble_propio
+FOREIGN KEY (mueble_propio_id) REFERENCES muebles_propios(id) ON DELETE SET NULL;
+
 ALTER TABLE calculos_medidas
 ADD CONSTRAINT fk_calculos_admin 
 FOREIGN KEY (id_admin) REFERENCES administrador(id_admin) ON DELETE SET NULL;
@@ -85,51 +146,30 @@ ALTER TABLE detalle_calculo
 ADD CONSTRAINT fk_detalle_calculo 
 FOREIGN KEY (id_calculo) REFERENCES calculos_medidas(id_calculo) ON DELETE CASCADE;
 
-INSERT INTO administrador VALUES('', 'admin', '123456');
+-- ==========================================
+-- DATOS INICIALES Y TRIGGERS
+-- ==========================================
+
+INSERT INTO administrador (nombre_usuario, password) VALUES ('admin', '123456');
 
 DELIMITER //
+
 CREATE TRIGGER calcular_precio_venta 
 BEFORE INSERT ON muebles
 FOR EACH ROW
 BEGIN
-    SET NEW.precio_venta = ROUND(NEW.precio_costo * 1.60);
+    IF NEW.precio_venta IS NULL THEN
+        SET NEW.precio_venta = ROUND(NEW.precio_costo * 1.60);
+    END IF;
 END; //
+
+CREATE TRIGGER calcular_precio_venta_update
+BEFORE UPDATE ON muebles
+FOR EACH ROW
+BEGIN
+    IF NEW.precio_costo <> OLD.precio_costo AND NEW.precio_venta = OLD.precio_venta THEN
+        SET NEW.precio_venta = ROUND(NEW.precio_costo * 1.60);
+    END IF;
+END; //
+
 DELIMITER ;
-
--- ==========================================
--- TABLAS PARA MUEBLES PROPIOS (CRUD ADMIN)
--- ==========================================
-
-CREATE TABLE categorias_propias (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE,
-    orden INT DEFAULT 0,
-    activa BOOLEAN DEFAULT TRUE
-);
-
-CREATE TABLE muebles_propios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(150) NOT NULL,
-    descripcion TEXT,
-    video_url VARCHAR(500),
-    medidas VARCHAR(255),
-    precio INT NOT NULL,
-    categoria_id INT NOT NULL,
-    activo BOOLEAN DEFAULT TRUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (categoria_id) REFERENCES categorias_propias(id) ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
-CREATE TABLE muebles_propios_imagenes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    mueble_id INT NOT NULL,
-    imagen_url VARCHAR(255) NOT NULL,
-    orden INT DEFAULT 0,
-    FOREIGN KEY (mueble_id) REFERENCES muebles_propios(id) ON DELETE CASCADE
-);
-
--- Vinculo de solicitudes con muebles propios (producto_id solo apunta a muebles externos)
-ALTER TABLE solicitudes ADD COLUMN mueble_propio_id INT NULL;
-ALTER TABLE solicitudes
-ADD CONSTRAINT fk_solicitudes_mueble_propio
-FOREIGN KEY (mueble_propio_id) REFERENCES muebles_propios(id) ON DELETE SET NULL;
